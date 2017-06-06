@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function
 import numpy as np
 
 _float_type = np.float32
+_int_type = np.int32
 
 def _write_padded_string(fp, s, padding):
 	s = s.encode('ascii', "ignore")
@@ -29,7 +30,7 @@ def _read_single_float(fp):
 	return ret
 
 def _write_int_to_binary(fp, a):
-	fp.write(np.asarray(a, dtype=np.int32).tostring())
+	fp.write(np.asarray(a, dtype=_int_type).tostring())
 
 def _write_float_to_binary(fp, a):
 	fp.write(np.asarray(a, dtype=_float_type).tostring())
@@ -87,12 +88,12 @@ def read_from_mpl_binary(self, filename):
 	self.textheader = '\n'.join(h_list)
 
 	# global data
-	self.nalt = np.fromstring(f.read(4), dtype=np.int32)[0]
-	self.npix = np.fromstring(f.read(4), dtype=np.int32)[0]
-	self.orbit_state = np.fromstring(f.read(4 * 5), dtype=np.int32)
+	self.nalt = np.fromstring(f.read(4), dtype=_int_type)[0]
+	self.npix = np.fromstring(f.read(4), dtype=_int_type)[0]
+	self.orbit_state = np.fromstring(f.read(4 * 5), dtype=_int_type)
 	(self.orbit, self.state_in_orbit, self.state_id,
 		self.profiles_per_state, self.profile_in_state) = self.orbit_state
-	self.date = np.fromstring(f.read(4 * 6), dtype=np.int32)
+	self.date = np.fromstring(f.read(4 * 6), dtype=_int_type)
 	self.cent_lat_lon = np.fromstring(f.read(4 * 10), dtype=_float_type)
 	if self.textheader_length > 29:
 		self.orbit_phase = np.fromstring(f.read(4), dtype=_float_type)[0]

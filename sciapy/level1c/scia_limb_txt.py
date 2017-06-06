@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function
 import numpy as np
 
 _float_type = np.float32
+_int_type = np.int32
 
 def _print_indent(fp, indent):
 	for i in range(indent):
@@ -57,12 +58,12 @@ def read_from_textfile(self, filename):
 		h_list.append(bytes(f.readline()).decode().rstrip())
 	self.textheader_length = nh
 	self.textheader = '\n'.join(h_list)
-	self.nalt, self.npix = np.fromstring(f.readline(), dtype=np.int32, sep=' ')
+	self.nalt, self.npix = np.fromstring(f.readline(), dtype=_int_type, sep=' ')
 
-	self.orbit_state = np.fromstring(f.readline(), dtype=np.int32, sep=' ')
+	self.orbit_state = np.fromstring(f.readline(), dtype=_int_type, sep=' ')
 	(self.orbit, self.state_in_orbit, self.state_id,
 		self.profiles_per_state, self.profile_in_state) = self.orbit_state
-	self.date = np.fromstring(f.readline(), dtype=np.int32, sep=' ')
+	self.date = np.fromstring(f.readline(), dtype=_int_type, sep=' ')
 	if nh > 27:
 		self.sub_sat_lat_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
 		self.sub_sat_lon_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
