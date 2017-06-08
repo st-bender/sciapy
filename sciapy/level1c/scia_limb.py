@@ -168,6 +168,8 @@ class scia_limb_scan(object):
 		self.cent_lat_lon = []
 		self.orbit_phase = 0.
 
+		self.meta_data = {}
+
 		self.sub_sat_lat_list = []
 		self.sub_sat_lon_list = []
 		self.tp_lat_list = []
@@ -220,6 +222,74 @@ class scia_limb_scan(object):
 		res = parse("#Nr Profiles / act. : {np:3d} {ap:3d}", split_header[line])
 		self.metadata["nr_profile"] = res["np"]
 		self.metadata["act_profile"] = res["ap"]
+
+	def assemble_textheader(self):
+		# Prepare the header
+		meta = self.metadata
+		if not meta:
+			return
+		n_header = 30
+		line = n_header + 2
+		header = ("#Data type          : {0[datatype_txt]}\n".format(meta))
+		header += ("#L1b product        : {0[l1b_product]}\n".format(meta))
+		header += ("#Orbit nr.,State ID : {0:05d} {1:2d}\n".format(meta["orbit"], meta["state_id"]))
+		header += ("#Ver. Proc/Key/M/I/D: {0[software_version]:14s}  "
+				"{0[keyfile_version]}  {0[mfactor_version]}  "
+				"{0[init_version]}  {0[decont_flags]}\n"
+				.format(meta))
+		header += ("#Calibr. appl. (0-8): {0[calibration]}\n".format(meta))
+		header += ("#State Starttime    : {0[date]}\n".format(meta))
+		header += ("#Nr Profiles / act. : {0[nr_profile]:3d} {0[act_profile]:3d}\n".format(meta))
+		header += ("# Angles TOA\n")
+		header += ("#L.{0:2d} : Number_of_altitudes Number_of_pixels\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : Orbit State_in_orbit/file State-ID Profiles_per_state Profile_in_State\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : Date Time : yyyy mm dd hh mm ss\n".format(line))
+		line += 1
+
+		header += ("#L.{0:2d} : Sub satellite point lat\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : Sub satellite point lon\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : orbit phase [0..1]\n".format(line))
+		line += 1
+
+		header += ("#L.{0:2d} : Center(lat/lon) 4*Corners(lat/lon)\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : Tangent ground point lat\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : Tangent ground point lon\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : Tangent height\n".format(line))
+		line += 1
+
+		header += ("#L.{0:2d} : tangent pnt: Solar Zenith angle\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : tangent pnt: rel. Solar Azimuth angle\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : tangent pnt: LOS zenith\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : TOA: Solar Zenith angle\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : TOA: rel Solar Azimuth angle\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : TOA: LOS zenith\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : Sat: Solar Zenith angle\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : Sat: rel Solar Azimuth angle\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : Sat: LOS zenith\n".format(line))
+		line += 1
+
+		header += ("#L.{0:2d} : Sat. height\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : Earth radius\n".format(line))
+		line += 1
+		header += ("#L.{0:2d} : Npix lines : wavelength  n_altitude x radiance".format(line))
+		self.textheader_length = n_header
+		self.textheader = header
 
 	def read_from_file(self, filename):
 		try:
