@@ -86,6 +86,7 @@ def read_from_mpl_binary(self, filename):
 		h_list.append(line.rstrip())
 
 	self.textheader = '\n'.join(h_list)
+	self.parse_textheader()
 
 	# global data
 	self.nalt = np.fromstring(f.read(4), dtype=_int_type)[0]

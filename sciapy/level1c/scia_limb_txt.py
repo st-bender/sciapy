@@ -58,6 +58,7 @@ def read_from_textfile(self, filename):
 		h_list.append(bytes(f.readline()).decode().rstrip())
 	self.textheader_length = nh
 	self.textheader = '\n'.join(h_list)
+	self.parse_textheader()
 	self.nalt, self.npix = np.fromstring(f.readline(), dtype=_int_type, sep=' ')
 
 	self.orbit_state = np.fromstring(f.readline(), dtype=_int_type, sep=' ')
