@@ -144,96 +144,44 @@ def read_hdf5_limb_state_common_data(self, hf, lstate_id, state_in_orbit, cl_id)
 	if cl_mds_group is None:
 		return 1
 	# Load meta data
-	cal_applied = hf.attrs["Calibration"].decode()
-	product = hf.get("/MPH")["product_name"][0].decode()
-	soft_ver = hf.get("/MPH")["software_version"][0].decode()
-	orbit_nr = hf.get("/MPH")["abs_orbit"][0]
-	state_id = hf.get("/ADS/STATES")["state_id"][lstate_id]
+	self.metadata["calibration"] = hf.attrs["Calibration"].decode()
+	self.metadata["l1b_product"] = hf.get("/MPH")["product_name"][0].decode()
+	self.metadata["orbit"] = hf.get("/MPH")["abs_orbit"][0]
+	self.metadata["state_id"] = hf.get("/ADS/STATES")["state_id"][lstate_id]
+	self.metadata["software_version"] = hf.get("/MPH")["software_version"][0].decode()
+	self.metadata["keyfile_version"] = hf.get("/SPH")["key_data_version"][0].decode()
+	self.metadata["mfactor_version"] = hf.get("/SPH")["m_factor_version"][0].decode()
+	init_ver = hf.get("/SPH")["init_version"][0].decode().strip()
+	self.metadata["init_version"], decont = init_ver.split()
+	self.metadata["decont_flags"] = decont.lstrip("DECONT=")
 	orb_phase = hf.get("/ADS/STATES")["orb_phase"][lstate_id]
-	key_ver = hf.get("/SPH")["key_data_version"][0].decode()
-	mf_ver = hf.get("/SPH")["m_factor_version"][0].decode()
-	init_version = hf.get("/SPH")["init_version"][0].decode().strip()
-	init_ver, decont = init_version.split()
-	decont = decont.lstrip("DECONT=")
 	j_day_0 = 2451544.5  # 2000-01-01
 	dsr_d, dsr_s, dsr_us = hf.get("/ADS/STATES")["dsr_time"][lstate_id]
 	state_dt = Time(dsr_d + j_day_0 + dsr_s / 86400. + dsr_us / (86400. * 1e6),
 			format="jd").datetime
-	state_date = state_dt.strftime("%d-%b-%Y %H:%M:%S.%f")
+	self.metadata["date"] = state_dt.strftime("%d-%b-%Y %H:%M:%S.%f")
 
-	logging.debug("applied calibrations: %s", cal_applied)
+	logging.debug("applied calibrations: %s", self.metadata["calibration"])
 	logging.debug("product: %s, orbit_nr: %s, state_id: %s, orb_phase: %s",
-			product, orbit_nr, state_id, orb_phase)
+			self.metadata["l1b_product"], self.metadata["orbit"],
+			self.metadata["state_id"], orb_phase)
 	logging.debug("soft_ver: %s, key_ver: %s, mf_ver: %s, init_ver: %s, "
-			"decont_ver: %s", soft_ver, key_ver, mf_ver, init_ver, decont)
+			"decont_ver: %s", self.metadata["software_version"],
+			self.metadata["keyfile_version"], self.metadata["mfactor_version"],
+			self.metadata["init_version"], self.metadata["decont_flags"])
 
 	ads_state = hf.get("/ADS/STATES")[lstate_id]
 	cl_n_readouts = ads_state["clus_config"]["num_readouts"][cl_id]
 	cl_intg_time = ads_state["clus_config"]["intg_time"][cl_id]
-	n_profiles = 24 // (cl_intg_time * cl_n_readouts)
+	self.metadata["nr_profile"] = 24 // (cl_intg_time * cl_n_readouts)
+	self.metadata["act_profile"] = 0  # always zero for now
 
 	# Prepare the header
-	datatype_txt = "SCIAMACHY limb mesosp"
-	n_header = 30
-	line = n_header + 2
-	header = ("#Data type          : {0}\n".format(datatype_txt))
-	header += ("#L1b product        : {0}\n".format(product))
-	header += ("#Orbit nr.,State ID : {0:05d} {1:2d}\n".format(orbit_nr, state_id))
-	header += ("#Ver. Proc/Key/M/I/D: {0}  {1}  {2}  {3}  {4}\n"
-			.format(soft_ver, key_ver, mf_ver, init_ver, decont))
-	header += ("#Calibr. appl. (0-8): {0}\n".format(cal_applied))
-	header += ("#State Starttime    : {0}\n".format(state_date))
-	header += ("#Nr Profiles / act. : {0:3d} {1:3d}\n".format(n_profiles, 0))
-	header += ("# Angles TOA\n")
-	header += ("#L.{0:2d} : Number_of_altitudes Number_of_pixels\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : Orbit State_in_orbit/file State-ID Profiles_per_state Profile_in_State\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : Date Time : yyyy mm dd hh mm ss\n".format(line))
-	line += 1
+	self.metadata["datatype_txt"] = "SCIAMACHY limb mesosp"
+	self.assemble_textheader()
+	logging.debug("header:\n%s", self.textheader)
 
-	header += ("#L.{0:2d} : Sub satellite point lat\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : Sub satellite point lon\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : orbit phase [0..1]\n".format(line))
-	line += 1
-
-	header += ("#L.{0:2d} : Center(lat/lon) 4*Corners(lat/lon)\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : Tangent ground point lat\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : Tangent ground point lon\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : Tangent height\n".format(line))
-	line += 1
-
-	header += ("#L.{0:2d} : tangent pnt: Solar Zenith angle\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : tangent pnt: rel. Solar Azimuth angle\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : tangent pnt: LOS zenith\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : TOA: Solar Zenith angle\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : TOA: rel Solar Azimuth angle\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : TOA: LOS zenith\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : Sat: Solar Zenith angle\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : Sat: rel Solar Azimuth angle\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : Sat: LOS zenith\n".format(line))
-	line += 1
-
-	header += ("#L.{0:2d} : Sat. height\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : Earth radius\n".format(line))
-	line += 1
-	header += ("#L.{0:2d} : Npix lines : wavelength  n_altitude x radiance".format(line))
-	logging.debug("header:\n%s", header)
-
+	# parse geolocation data
 	gr_scia_geo = cl_mds_group.get("geoL_scia")
 	tan_h = gr_scia_geo["tan_h"]
 	# lat and lon are integers in degrees * 10^6
@@ -340,10 +288,10 @@ def read_hdf5_limb_state_common_data(self, hf, lstate_id, state_in_orbit, cl_id)
 	logging.debug("SAT sza, saa, los: %s, %s, %s", sza_sat, saa_sat, los_sat)
 
 	# save the data to the limb scan class
-	self.textheader_length = n_header
-	self.textheader = header
 	self.nalt = nalt
-	self.orbit_state = (orbit_nr, state_in_orbit, state_id, n_profiles, 0)
+	self.orbit_state = (self.metadata["orbit"], state_in_orbit,
+			self.metadata["state_id"],
+			self.metadata["nr_profile"], self.metadata["act_profile"])
 	self.date = (state_dt.year, state_dt.month, state_dt.day,
 			state_dt.hour, state_dt.minute, state_dt.second)
 	self.sub_sat_lat_list = subsatlat
