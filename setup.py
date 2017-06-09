@@ -1,12 +1,24 @@
+from codecs import open
+from os import path
+# Always prefer setuptools over distutils
 from setuptools import setup
+
+here = path.abspath(path.dirname(__file__))
+
+# Get the long description from the README file
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+	long_description = f.read()
 
 setup(name='sciapy',
 		version='0.0.1',
 		description='Python tools for (some) SCIAMACHY data',
+		long_description=long_description,
 		url='http://github.com/st-bender/sciapy',
 		author='Stefan Bender',
 		author_email='stefan.bender@kit.edu',
-		packages=['sciapy'],
+		packages=['sciapy', 'sciapy.level1c'],
+		scripts=['scripts/scia_binary_util.py',
+			'scripts/scia_conv_hdf5_limb.py']
 		install_requires=[
 			'numpy',
 			'netCDF4',
