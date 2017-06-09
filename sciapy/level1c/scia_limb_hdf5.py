@@ -362,3 +362,44 @@ def read_hdf5_limb_state_spectral_data(self, hf, lstate_id, cl_id):
 		self.rad_list = signal
 		self.err_list = sig_errs
 	return 0
+
+def read_from_hdf5(self, hf, limb_state_id, state_in_orbit, cluster_ids):
+	"""SCIAMACHY level 1c HDF main interface
+
+	This should be the function to be used for HDF5 reading.
+	It reads the common data and iterates over the spectral
+	clusters to fill the class data.
+
+	Parameters
+	----------
+	hf : opened file
+		Pointer to the opened level 1c HDF5 file
+	limb_state_id : int
+		The limb state id.
+	state_in_orbit : int
+		The number in this batch of states for the header.
+	cluster_ids : int or sequence of ints
+		The spectral cluster numbers.
+
+	Returns
+	-------
+	success : int
+		0 on success,
+		1 if an error occurred, for example if the measurement data
+		set for the requested limb and cluster ids is empty.
+	"""
+	if not hasattr(cluster_ids, '__getitem__'):
+		cluster_ids = [cluster_ids]
+
+	if self.read_hdf5_limb_state_common_data(hf, limb_state_id,
+			state_in_orbit, cluster_ids[0]):
+		return 1
+
+	for cl_id in cluster_ids:
+		self.read_hdf5_limb_state_spectral_data(hf, limb_state_id, cl_id)
+
+	self.npix = len(self.wls)
+
+	# save to limb_data recarray
+	self.combine_limb_data()
+	return 0

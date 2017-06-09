@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function
 
 import numpy as np
 
-from ._types import _float_type, _int_type
+from ._types import _float_type, _int_type, _limb_data_dtype
 
 def _write_padded_string(fp, s, padding):
 	s = s.encode('ascii', "ignore")
@@ -100,27 +100,17 @@ def read_from_mpl_binary(self, filename):
 
 	self.wls = np.fromstring(f.read(4 * self.npix), dtype=_float_type)
 
-	for i in range(self.nalt):
-		if self.textheader_length > 27:
-			self.sub_sat_lat_list.append(_read_single_float(f))
-			self.sub_sat_lon_list.append(_read_single_float(f))
-		self.tp_lat_list.append(_read_single_float(f))
-		self.tp_lon_list.append(_read_single_float(f))
-		self.tp_alt_list.append(_read_single_float(f))
-		self.tp_sza_list.append(_read_single_float(f))
-		self.tp_saa_list.append(_read_single_float(f))
-		self.tp_los_zenith_list.append(_read_single_float(f))
-		self.toa_sza_list.append(_read_single_float(f))
-		self.toa_saa_list.append(_read_single_float(f))
-		self.toa_los_zenith_list.append(_read_single_float(f))
-		self.sat_sza_list.append(_read_single_float(f))
-		self.sat_saa_list.append(_read_single_float(f))
-		self.sat_los_zenith_list.append(_read_single_float(f))
-		self.sat_alt_list.append(_read_single_float(f))
-		self.earthradii.append(_read_single_float(f))
+	if self._limb_data_dtype is None:
+		self._limb_data_dtype = _limb_data_dtype.copy()
+		if self.textheader_length < 28:
+			self._limb_data_dtype.remove(("sub_sat_lat", _float_type))
+			self._limb_data_dtype.remove(("sub_sat_lon", _float_type))
 
-		self.rad_list.append(np.fromstring(f.read(4 * self.npix), dtype=_float_type))
-		self.err_list.append(np.fromstring(f.read(4 * self.npix), dtype=_float_type))
+		self._limb_data_dtype.append(("rad", _float_type, (self.npix)))
+		self._limb_data_dtype.append(("err", _float_type, (self.npix)))
+
+	self.limb_data = np.fromfile(f, dtype=np.dtype(self._limb_data_dtype),
+			count=self.nalt).view(type=np.recarray)
 
 def write_to_mpl_binary(self, filename):
 	"""SCIAMACHY level 1c limb scan binary export
@@ -157,26 +147,8 @@ def write_to_mpl_binary(self, filename):
 
 	_write_float_to_binary(f, self.wls)
 
-	for i in range(self.nalt):
-		if self.textheader_length > 27:
-			_write_float_to_binary(f, self.sub_sat_lat_list[i])
-			_write_float_to_binary(f, self.sub_sat_lon_list[i])
-		_write_float_to_binary(f, self.tp_lat_list[i])
-		_write_float_to_binary(f, self.tp_lon_list[i])
-		_write_float_to_binary(f, self.tp_alt_list[i])
-		_write_float_to_binary(f, self.tp_sza_list[i])
-		_write_float_to_binary(f, self.tp_saa_list[i])
-		_write_float_to_binary(f, self.tp_los_zenith_list[i])
-		_write_float_to_binary(f, self.toa_sza_list[i])
-		_write_float_to_binary(f, self.toa_saa_list[i])
-		_write_float_to_binary(f, self.toa_los_zenith_list[i])
-		_write_float_to_binary(f, self.sat_sza_list[i])
-		_write_float_to_binary(f, self.sat_saa_list[i])
-		_write_float_to_binary(f, self.sat_los_zenith_list[i])
-		_write_float_to_binary(f, self.sat_alt_list[i])
-		_write_float_to_binary(f, self.earthradii[i])
-
-		_write_float_to_binary(f, self.rad_list[i])
-		_write_float_to_binary(f, self.err_list[i])
+	# write the data as is, the dtype should take care of
+	# all the formatting.
+	self.limb_data.tofile(f)
 
 	f.close()

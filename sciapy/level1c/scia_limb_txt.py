@@ -106,6 +106,9 @@ def read_from_textfile(self, filename):
 		self.rad_list.append(tmp_rad_arr[i])
 		self.err_list.append(tmp_err_arr[i])
 
+	# save to limb_data recarray
+	self.combine_limb_data()
+
 def write_to_textfile(self, filename):
 	"""SCIAMACHY level 1c limb scan text export
 
@@ -129,31 +132,32 @@ def write_to_textfile(self, filename):
 	print("%05d %2d %2d %2d %2d" % tuple(self.orbit_state), file=f)
 	print("%4d %2d %2d %2d %2d %2d" % tuple(self.date), file=f)
 	if self.textheader_length > 27:
-		_print_array1(f, self.sub_sat_lat_list, 9)
-		_print_array1(f, self.sub_sat_lon_list, 9)
+		_print_array1(f, self.limb_data["sub_sat_lat"], 9)
+		_print_array1(f, self.limb_data["sub_sat_lon"], 9)
 	if self.textheader_length > 29:
 		_print_indent(f, 9)
 		print("%12.3f " % (self.orbit_phase,), file=f)
 	_print_indent(f, 9)
 	print("%8.3f %8.3f    %8.3f %8.3f  %8.3f %8.3f  "
 			"%8.3f %8.3f %8.3f %8.3f" % tuple(self.cent_lat_lon), file=f)
-	_print_array1(f, self.tp_lat_list, 9)
-	_print_array1(f, self.tp_lon_list, 9)
-	_print_array1(f, self.tp_alt_list, 9)
-	_print_array1(f, self.tp_sza_list, 9)
-	_print_array1(f, self.tp_saa_list, 9)
-	_print_array1(f, self.tp_los_zenith_list, 9)
-	_print_array1(f, self.toa_sza_list, 9)
-	_print_array1(f, self.toa_saa_list, 9)
-	_print_array1(f, self.toa_los_zenith_list, 9)
-	_print_array1(f, self.sat_sza_list, 9)
-	_print_array1(f, self.sat_saa_list, 9)
-	_print_array1(f, self.sat_los_zenith_list, 9)
-	_print_array1(f, self.sat_alt_list, 9)
-	_print_array1(f, self.earthradii, 9)
+	# print the limb data
+	_print_array1(f, self.limb_data["tp_lat"], 9)
+	_print_array1(f, self.limb_data["tp_lon"], 9)
+	_print_array1(f, self.limb_data["tp_alt"], 9)
+	_print_array1(f, self.limb_data["tp_sza"], 9)
+	_print_array1(f, self.limb_data["tp_saa"], 9)
+	_print_array1(f, self.limb_data["tp_los"], 9)
+	_print_array1(f, self.limb_data["toa_sza"], 9)
+	_print_array1(f, self.limb_data["toa_saa"], 9)
+	_print_array1(f, self.limb_data["toa_los"], 9)
+	_print_array1(f, self.limb_data["sat_sza"], 9)
+	_print_array1(f, self.limb_data["sat_saa"], 9)
+	_print_array1(f, self.limb_data["sat_los"], 9)
+	_print_array1(f, self.limb_data["sat_alt"], 9)
+	_print_array1(f, self.limb_data["earth_rad"], 9)
 
-	rads = np.asarray(self.rad_list).reshape(self.nalt, self.npix).transpose()
-	errs = np.asarray(self.err_list).reshape(self.nalt, self.npix).transpose()
+	rads = np.asarray(self.limb_data["rad"]).reshape(self.nalt, self.npix).transpose()
+	errs = np.asarray(self.limb_data["err"]).reshape(self.nalt, self.npix).transpose()
 
 	# format strings taken from scia_L1C_ascii.c
 	for i in range(self.npix):

@@ -78,6 +78,7 @@ def read_from_netcdf(self, filename):
 
 	self.rad_list = list(ncf.variables['radiance'][:])
 	self.err_list = list(ncf.variables['radiance errors'][:])
+	self.combine_limb_data()
 	ncf.close()
 
 def write_to_netcdf(self, filename):
@@ -111,58 +112,58 @@ def write_to_netcdf(self, filename):
 
 	sslat = ncf.createVariable('sub_sat_lat', np.dtype('float32').char, ('limb',))
 	sslat.units = 'deg'
-	sslat[:] = np.asarray(self.sub_sat_lat_list)
+	sslat[:] = np.asarray(self.limb_data["sub_sat_lat"])
 	sslon = ncf.createVariable('sub_sat_lon', np.dtype('float32').char, ('limb',))
 	sslon.units = 'deg'
-	sslon[:] = np.asarray(self.sub_sat_lon_list)
+	sslon[:] = np.asarray(self.limb_data["sub_sat_lon"])
 	tp_lats = ncf.createVariable('TP latitude', np.dtype('float32').char, ('limb',))
 	tp_lats.units = 'deg'
-	tp_lats[:] = np.asarray(self.tp_lat_list)
+	tp_lats[:] = np.asarray(self.limb_data["tp_lat"])
 	tp_lons = ncf.createVariable('TP longitude', np.dtype('float32').char, ('limb',))
 	tp_lons.units = 'deg'
-	tp_lons[:] = np.asarray(self.tp_lon_list)
+	tp_lons[:] = np.asarray(self.limb_data["tp_lon"])
 	tp_alts = ncf.createVariable('TP altitude', np.dtype('float32').char, ('limb',))
 	tp_alts.units = 'km'
-	tp_alts[:] = np.asarray(self.tp_alt_list)
+	tp_alts[:] = np.asarray(self.limb_data["tp_alt"])
 	tp_szas = ncf.createVariable('TP SZA', np.dtype('float32').char, ('limb',))
 	tp_szas.units = 'deg'
-	tp_szas[:] = np.asarray(self.tp_sza_list)
+	tp_szas[:] = np.asarray(self.limb_data["tp_sza"])
 	tp_saas = ncf.createVariable('TP SAA', np.dtype('float32').char, ('limb',))
 	tp_saas.units = 'deg'
-	tp_saas[:] = np.asarray(self.tp_saa_list)
+	tp_saas[:] = np.asarray(self.limb_data["tp_saa"])
 	tp_los_zeniths = ncf.createVariable('TP LOS Zenith', np.dtype('float32').char, ('limb',))
 	tp_los_zeniths.units = 'deg'
-	tp_los_zeniths[:] = np.asarray(self.tp_los_zenith_list)
+	tp_los_zeniths[:] = np.asarray(self.limb_data["tp_los"])
 	toa_szas = ncf.createVariable('TOA SZA', np.dtype('float32').char, ('limb',))
 	toa_szas.units = 'deg'
-	toa_szas[:] = np.asarray(self.toa_sza_list)
+	toa_szas[:] = np.asarray(self.limb_data["toa_sza"])
 	toa_saas = ncf.createVariable('TOA SAA', np.dtype('float32').char, ('limb',))
 	toa_saas.units = 'deg'
-	toa_saas[:] = np.asarray(self.toa_saa_list)
+	toa_saas[:] = np.asarray(self.limb_data["toa_saa"])
 	toa_los_zeniths = ncf.createVariable('TOA LOS Zenith', np.dtype('float32').char, ('limb',))
 	toa_los_zeniths.units = 'deg'
-	toa_los_zeniths[:] = np.asarray(self.toa_los_zenith_list)
+	toa_los_zeniths[:] = np.asarray(self.limb_data["toa_los"])
 	sat_szas = ncf.createVariable('SAT SZA', np.dtype('float32').char, ('limb',))
 	sat_szas.units = 'deg'
-	sat_szas[:] = np.asarray(self.sat_sza_list)
+	sat_szas[:] = np.asarray(self.limb_data["sat_sza"])
 	sat_saas = ncf.createVariable('SAT SAA', np.dtype('float32').char, ('limb',))
 	sat_saas.units = 'deg'
-	sat_saas[:] = np.asarray(self.sat_saa_list)
+	sat_saas[:] = np.asarray(self.limb_data["sat_saa"])
 	sat_los_zeniths = ncf.createVariable('SAT LOS Zenith', np.dtype('float32').char, ('limb',))
 	sat_los_zeniths.units = 'deg'
-	sat_los_zeniths[:] = np.asarray(self.sat_los_zenith_list)
+	sat_los_zeniths[:] = np.asarray(self.limb_data["sat_los"])
 	sat_alts = ncf.createVariable('SAT altitude', np.dtype('float32').char, ('limb',))
 	sat_alts.units = 'km'
-	sat_alts[:] = np.asarray(self.sat_alt_list)
+	sat_alts[:] = np.asarray(self.limb_data["sat_alt"])
 	eradii_alts = ncf.createVariable('earthradius', np.dtype('float32').char, ('limb',))
 	eradii_alts.units = 'km'
-	eradii_alts[:] = np.asarray(self.earthradii)
+	eradii_alts[:] = np.asarray(self.limb_data["earth_rad"])
 
 	rads = ncf.createVariable('radiance', np.dtype('float32').char, ('limb', 'wavelength'))
 	errs = ncf.createVariable('radiance errors', np.dtype('float32').char, ('limb', 'wavelength'))
 	rads.units = 'ph / s / cm^2 / nm'
 	errs.units = 'ph / s / cm^2 / nm'
-	rads[:] = np.asarray(self.rad_list).reshape(self.nalt, self.npix)
-	errs[:] = np.asarray(self.err_list).reshape(self.nalt, self.npix)
+	rads[:] = np.asarray(self.limb_data["rad"]).reshape(self.nalt, self.npix)
+	errs[:] = np.asarray(self.limb_data["err"]).reshape(self.nalt, self.npix)
 
 	ncf.close()
