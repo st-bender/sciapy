@@ -93,8 +93,7 @@ within python the rough steps are:
 >>> import sciapy
 >>> h5file = h5py.File(args.file, "r")
 >>> scia_limb_scan = sciapy.level1c.scia_limb_scan()
->>> scia_limb_scan.read_hdf5_limb_state_common_data(h5file, limb_state_id, id, cluster_id)
->>> scia_limb_scan.read_hdf5_limb_state_spectral_data(h5file, limb_state_id, cluster_id)
+>>> scia_limb_scan.read_from_hdf5(h5file, limb_state_id, id, cluster_ids)
 >>> scia_limb_scan.write_to_textfile("/path/to/limb_state_filename.dat")
 ```
 For a more complete example which also extracts the solar reference spectrum,
