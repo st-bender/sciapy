@@ -14,8 +14,7 @@ from __future__ import absolute_import, division, print_function
 
 import numpy as np
 
-_float_type = np.float32
-_int_type = np.int32
+from ._types import _float_type, _int_type
 
 def _print_indent(fp, indent):
 	for i in range(indent):
