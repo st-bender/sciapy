@@ -117,6 +117,17 @@ def _middle_coord(lat1, lon1, lat2, lon2):
 	return (np.degrees(np.arctan2(sin_lat, cos_lat)),
 			np.degrees(np.arctan2(sin_lon, cos_lon)))
 
+_state_txt = {
+	27: "SCIAMACHY limb eclips",
+	28: "SCIAMACHY limb",
+	29: "SCIAMACHY limb",
+	30: "SCIAMACHY limb",
+	31: "SCIAMACHY limb",
+	32: "SCIAMACHY limb",
+	33: "SCIAMACHY limb",
+	55: "SCIAMACHY limb mesosp",
+}
+
 def read_hdf5_limb_state_common_data(self, hf, lstate_id, state_in_orbit, cl_id):
 	"""SCIAMACHY level 1c common data
 
@@ -177,7 +188,11 @@ def read_hdf5_limb_state_common_data(self, hf, lstate_id, state_in_orbit, cl_id)
 	self.metadata["act_profile"] = 0  # always zero for now
 
 	# Prepare the header
-	self.metadata["datatype_txt"] = "SCIAMACHY limb mesosp"
+	try:
+		self.metadata["datatype_txt"] = _state_txt[self.metadata["state_id"]]
+	except KeyError:
+		logging.warn("State id %s not supported.", self.metadata["state_id"])
+		return 1
 	self.assemble_textheader()
 	logging.debug("header:\n%s", self.textheader)
 
