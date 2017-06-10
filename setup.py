@@ -18,7 +18,7 @@ setup(name='sciapy',
 		author_email='stefan.bender@kit.edu',
 		packages=['sciapy', 'sciapy.level1c'],
 		scripts=['scripts/scia_binary_util.py',
-			'scripts/scia_conv_hdf5_limb.py']
+			'scripts/scia_conv_hdf5_limb.py'],
 		install_requires=[
 			'numpy',
 			'netCDF4',
