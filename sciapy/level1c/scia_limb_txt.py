@@ -14,7 +14,7 @@ from __future__ import absolute_import, division, print_function
 
 import numpy as np
 
-from ._types import _float_type, _int_type
+from ._types import _float_type, _int_type, _limb_data_dtype
 
 def _print_indent(fp, indent):
 	for i in range(indent):
@@ -47,6 +47,7 @@ def read_from_textfile(self, filename):
 	-------
 	nothing
 	"""
+	import numpy.lib.recfunctions as rfn
 	if hasattr(filename, 'seek'):
 		f = filename
 	else:
@@ -64,27 +65,31 @@ def read_from_textfile(self, filename):
 	(self.orbit, self.state_in_orbit, self.state_id,
 		self.profiles_per_state, self.profile_in_state) = self.orbit_state
 	self.date = np.fromstring(f.readline(), dtype=_int_type, sep=' ')
+	# pre-set the limb_data
+	if self._limb_data_dtype is None:
+		self._limb_data_dtype = _limb_data_dtype.copy()
+	self.limb_data = np.zeros((self.nalt), dtype=self._limb_data_dtype)
 	if nh > 27:
-		self.sub_sat_lat_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
-		self.sub_sat_lon_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+		self.limb_data["sub_sat_lat"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+		self.limb_data["sub_sat_lon"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
 		if nh > 29:
 			self.orbit_phase = np.fromstring(f.readline(), dtype=_float_type, sep=' ')[0]
 	self.cent_lat_lon = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
 
-	self.tp_lat_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
-	self.tp_lon_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
-	self.tp_alt_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
-	self.tp_sza_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
-	self.tp_saa_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
-	self.tp_los_zenith_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
-	self.toa_sza_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
-	self.toa_saa_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
-	self.toa_los_zenith_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
-	self.sat_sza_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
-	self.sat_saa_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
-	self.sat_los_zenith_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
-	self.sat_alt_list = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
-	self.earthradii = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+	self.limb_data["tp_lat"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+	self.limb_data["tp_lon"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+	self.limb_data["tp_alt"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+	self.limb_data["tp_sza"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+	self.limb_data["tp_saa"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+	self.limb_data["tp_los"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+	self.limb_data["toa_sza"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+	self.limb_data["toa_saa"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+	self.limb_data["toa_los"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+	self.limb_data["sat_sza"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+	self.limb_data["sat_saa"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+	self.limb_data["sat_los"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+	self.limb_data["sat_alt"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
+	self.limb_data["earth_rad"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
 
 	tmp_list = []
 	for i in range(self.npix):
@@ -102,12 +107,15 @@ def read_from_textfile(self, filename):
 		for i in range(self.npix):
 			tmp_list.append(np.zeros(self.nalt))
 	tmp_err_arr = np.asarray(tmp_list).reshape(self.npix, self.nalt).transpose()
-	for i in range(self.nalt):
-		self.rad_list.append(tmp_rad_arr[i])
-		self.err_list.append(tmp_err_arr[i])
 
 	# save to limb_data recarray
-	self.combine_limb_data()
+	rads = np.rec.fromarrays([tmp_rad_arr],
+				dtype=np.dtype([("rad", 'f4', (self.npix,))]))
+	errs = np.rec.fromarrays([tmp_err_arr],
+				dtype=np.dtype([("err", 'f4', (self.npix,))]))
+	self.limb_data = rfn.merge_arrays([self.limb_data, rads, errs],
+			usemask=False, asrecarray=True, flatten=True)
+	self._limb_data_dtype = self.limb_data.dtype
 
 def write_to_textfile(self, filename):
 	"""SCIAMACHY level 1c limb scan text export
