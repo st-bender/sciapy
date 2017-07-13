@@ -18,6 +18,8 @@ import logging
 import numpy as np
 from astropy.time import Time
 
+from ._types import _limb_data_dtype
+
 logging.basicConfig(level=logging.INFO,
 		format="[%(levelname)-8s] (%(asctime)s) "
 		"%(filename)s:%(lineno)d %(message)s",
@@ -309,24 +311,28 @@ def read_hdf5_limb_state_common_data(self, hf, lstate_id, state_in_orbit, cl_id)
 			self.metadata["nr_profile"], self.metadata["act_profile"])
 	self.date = (state_dt.year, state_dt.month, state_dt.day,
 			state_dt.hour, state_dt.minute, state_dt.second)
-	self.sub_sat_lat_list = subsatlat
-	self.sub_sat_lon_list = subsatlon
 	self.orbit_phase = orb_phase
 	self.cent_lat_lon = cent_lat_lon
-	self.tp_lat_list = tp_lats
-	self.tp_lon_list = tp_lons
-	self.tp_alt_list = tangent_heights
-	self.tp_sza_list = sza_tp
-	self.tp_saa_list = saa_tp
-	self.tp_los_zenith_list = los_tp
-	self.toa_sza_list = sza_toa
-	self.toa_saa_list = saa_toa
-	self.toa_los_zenith_list = los_toa
-	self.sat_sza_list = sza_sat
-	self.sat_saa_list = saa_sat
-	self.sat_los_zenith_list = los_sat
-	self.sat_alt_list = sat_hs
-	self.earthradii = earth_rads
+	# pre-set the limb_data
+	if self._limb_data_dtype is None:
+		self._limb_data_dtype = _limb_data_dtype.copy()
+	self.limb_data = np.zeros((self.nalt), dtype=self._limb_data_dtype)
+	self.limb_data["sub_sat_lat"] = subsatlat
+	self.limb_data["sub_sat_lon"] = subsatlon
+	self.limb_data["tp_lat"] = tp_lats
+	self.limb_data["tp_lon"] = tp_lons
+	self.limb_data["tp_alt"] = tangent_heights
+	self.limb_data["tp_sza"] = sza_tp
+	self.limb_data["tp_saa"] = saa_tp
+	self.limb_data["tp_los"] = los_tp
+	self.limb_data["toa_sza"] = sza_toa
+	self.limb_data["toa_saa"] = saa_toa
+	self.limb_data["toa_los"] = los_toa
+	self.limb_data["sat_sza"] = sza_sat
+	self.limb_data["sat_saa"] = saa_sat
+	self.limb_data["sat_los"] = los_sat
+	self.limb_data["sat_alt"] = sat_hs
+	self.limb_data["earth_rad"] = earth_rads
 	return 0
 
 def read_hdf5_limb_state_spectral_data(self, hf, lstate_id, cl_id):
@@ -403,6 +409,7 @@ def read_from_hdf5(self, hf, limb_state_id, state_in_orbit, cluster_ids):
 		1 if an error occurred, for example if the measurement data
 		set for the requested limb and cluster ids is empty.
 	"""
+	import numpy.lib.recfunctions as rfn
 	if not hasattr(cluster_ids, '__getitem__'):
 		cluster_ids = [cluster_ids]
 
@@ -415,6 +422,12 @@ def read_from_hdf5(self, hf, limb_state_id, state_in_orbit, cluster_ids):
 
 	self.npix = len(self.wls)
 
-	# save to limb_data recarray
-	self.combine_limb_data()
+	rads = np.rec.fromarrays([self.rad_list],
+				dtype=np.dtype([("rad", 'f4', (self.npix,))]))
+	errs = np.rec.fromarrays([self.err_list],
+				dtype=np.dtype([("err", 'f4', (self.npix,))]))
+	self.limb_data = rfn.merge_arrays([self.limb_data, rads, errs],
+			usemask=False, asrecarray=True, flatten=True)
+	self._limb_data_dtype = self.limb_data.dtype
+
 	return 0
