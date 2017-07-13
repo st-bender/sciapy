@@ -116,43 +116,46 @@ class scia_limb_scan(object):
 		lat_corner3, lon_corner3).
 	orbit_phase : float
 		The orbital phase of the limb scan.
-	sub_sat_lat_list : (M,) array_like
+	limb_data : numpy.recarray
+		The limb data containing the following records:
+
+	sub_sat_lat : (M,) array_like
 		The latitudes of the satellite ground points (M = nalt).
-	sub_sat_lon_list : (M,) array_like
+	sub_sat_lon : (M,) array_like
 		The longitudes of the satellite ground points (M = nalt).
-	tp_lat_list : (M,) array_like
+	tp_lat : (M,) array_like
 		The latitudes of the tangent points (M = nalt).
-	tp_lon_list : (M,) array_like
+	tp_lon : (M,) array_like
 		The longitudes of the tangent points (M = nalt).
-	tp_alt_list : (M,) array_like
+	tp_alt : (M,) array_like
 		The tangent altitudes (M = nalt).
-	tp_sza_list : (M,) array_like
+	tp_sza : (M,) array_like
 		The solar zenith angles at the tangent points (M = nalt).
-	tp_saa_list : (M,) array_like
+	tp_saa : (M,) array_like
 		The solar azimuth angles at the tangent points (M = nalt).
-	tp_los_zenith_list : (M,) array_like
+	tp_los : (M,) array_like
 		The line-of-sight zenith angles at the tangent points (M = nalt).
-	toa_sza_list : (M,) array_like
+	toa_sza : (M,) array_like
 		The solar zenith angles at the top-of-atmosphere points (M = nalt).
-	toa_saa_list : (M,) array_like
+	toa_saa : (M,) array_like
 		The solar azimuth angles at the top-of-atmosphere points (M = nalt).
-	toa_los_zenith_list : (M,) array_like
+	toa_los : (M,) array_like
 		The line-of-sight zenith angles at the top-of-atmosphere points (M = nalt).
-	sat_sza_list : (M,) array_like
+	sat_sza : (M,) array_like
 		The solar zenith angles at the satellite points (M = nalt).
-	sat_saa_list : (M,) array_like
+	sat_saa : (M,) array_like
 		The solar azimuth angles at the satellite points (M = nalt).
-	sat_los_zenith_list : (M,) array_like
+	sat_los : (M,) array_like
 		The line-of-sight zenith angles at the satellite points (M = nalt).
-	sat_alt_list : (M,) array_like
+	sat_alt : (M,) array_like
 		The satellite altitudes (M = nalt).
-	earthradii : (M,) array_like
+	earth_rad : (M,) array_like
 		The earth radii at the tangent ground points (M = nalt).
 	wls : (N,) array_like
 		The spectral wavelengths.
-	rad_list : (M, N) array_like
+	rad : (M, N) array_like
 		The radiances at the tangent points, M = nalt, N = len(wls).
-	err_list : (M, N) array_like
+	err : (M, N) array_like
 		The relative radiance uncertainties at the tangent points,
 		M = nalt, N = len(wls).
 	"""
@@ -180,26 +183,7 @@ class scia_limb_scan(object):
 		self.limb_data = None
 		self.meta_data = {}
 
-		self.sub_sat_lat_list = []
-		self.sub_sat_lon_list = []
-		self.tp_lat_list = []
-		self.tp_lon_list = []
-		self.tp_alt_list = []
-		self.tp_sza_list = []
-		self.tp_saa_list = []
-		self.tp_los_zenith_list = []
-		self.toa_sza_list = []
-		self.toa_saa_list = []
-		self.toa_los_zenith_list = []
-		self.sat_sza_list = []
-		self.sat_saa_list = []
-		self.sat_los_zenith_list = []
-		self.sat_alt_list = []
-		self.earthradii = []
-
 		self.wls = []
-		self.rad_list = []
-		self.err_list = []
 
 	def parse_textheader(self):
 		from parse import parse
