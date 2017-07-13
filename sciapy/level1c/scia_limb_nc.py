@@ -25,6 +25,7 @@ except ImportError:
 		from pupynere import netcdf_file
 		_fmtargs = {"version": 1}
 
+from ._types import _limb_data_dtype
 
 def read_from_netcdf(self, filename):
 	"""SCIAMACHY level 1c limb scan netcdf import
@@ -38,6 +39,7 @@ def read_from_netcdf(self, filename):
 	-------
 	nothing
 	"""
+	import numpy.lib.recfunctions as rfn
 	ncf = netcdf_file(filename, 'r')
 
 	self.textheader_length = ncf.textheader_length
@@ -59,26 +61,40 @@ def read_from_netcdf(self, filename):
 
 	self.wls = ncf.variables['wavelength'][:]
 
-	self.sub_sat_lat_list = ncf.variables['sub_sat_lat'][:]
-	self.sub_sat_lon_list = ncf.variables['sub_sat_lon'][:]
-	self.tp_lat_list = ncf.variables['TP latitude'][:]
-	self.tp_lon_list = ncf.variables['TP longitude'][:]
-	self.tp_alt_list = ncf.variables['TP altitude'][:]
-	self.tp_sza_list = ncf.variables['TP SZA'][:]
-	self.tp_saa_list = ncf.variables['TP SAA'][:]
-	self.tp_los_zenith_list = ncf.variables['TP LOS Zenith'][:]
-	self.toa_sza_list = ncf.variables['TOA SZA'][:]
-	self.toa_saa_list = ncf.variables['TOA SAA'][:]
-	self.toa_los_zenith_list = ncf.variables['TOA LOS Zenith'][:]
-	self.sat_sza_list = ncf.variables['SAT SZA'][:]
-	self.sat_saa_list = ncf.variables['SAT SAA'][:]
-	self.sat_los_zenith_list = ncf.variables['SAT LOS Zenith'][:]
-	self.sat_alt_list = ncf.variables['SAT altitude'][:]
-	self.earthradii = ncf.variables['earthradius'][:]
+	# pre-set the limb_data
+	if self._limb_data_dtype is None:
+		self._limb_data_dtype = _limb_data_dtype.copy()
+	self.limb_data = np.zeros((self.nalt), dtype=self._limb_data_dtype)
 
-	self.rad_list = list(ncf.variables['radiance'][:])
-	self.err_list = list(ncf.variables['radiance errors'][:])
-	self.combine_limb_data()
+	self.limb_data["sub_sat_lat"] = ncf.variables['sub_sat_lat'][:]
+	self.limb_data["sub_sat_lon"] = ncf.variables['sub_sat_lon'][:]
+	self.limb_data["tp_lat"] = ncf.variables['TP latitude'][:]
+	self.limb_data["tp_lon"] = ncf.variables['TP longitude'][:]
+	self.limb_data["tp_alt"] = ncf.variables['TP altitude'][:]
+	self.limb_data["tp_sza"] = ncf.variables['TP SZA'][:]
+	self.limb_data["tp_saa"] = ncf.variables['TP SAA'][:]
+	self.limb_data["tp_los"] = ncf.variables['TP LOS Zenith'][:]
+	self.limb_data["toa_sza"] = ncf.variables['TOA SZA'][:]
+	self.limb_data["toa_saa"] = ncf.variables['TOA SAA'][:]
+	self.limb_data["toa_los"] = ncf.variables['TOA LOS Zenith'][:]
+	self.limb_data["sat_sza"] = ncf.variables['SAT SZA'][:]
+	self.limb_data["sat_saa"] = ncf.variables['SAT SAA'][:]
+	self.limb_data["sat_los"] = ncf.variables['SAT LOS Zenith'][:]
+	self.limb_data["sat_alt"] = ncf.variables['SAT altitude'][:]
+	self.limb_data["earth_rad"] = ncf.variables['earthradius'][:]
+
+	tmp_rad_arr = list(ncf.variables['radiance'][:])
+	tmp_err_arr = list(ncf.variables['radiance errors'][:])
+
+	# save to limb_data recarray
+	rads = np.rec.fromarrays([tmp_rad_arr],
+				dtype=np.dtype([("rad", 'f4', (self.npix,))]))
+	errs = np.rec.fromarrays([tmp_err_arr],
+				dtype=np.dtype([("err", 'f4', (self.npix,))]))
+	self.limb_data = rfn.merge_arrays([self.limb_data, rads, errs],
+			usemask=False, asrecarray=True, flatten=True)
+	self._limb_data_dtype = self.limb_data.dtype
+
 	ncf.close()
 
 def write_to_netcdf(self, filename):
