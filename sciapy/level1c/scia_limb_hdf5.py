@@ -375,13 +375,13 @@ def read_hdf5_limb_state_spectral_data(self, hf, lstate_id, cl_id):
 	if np.any(self.wls):
 		# apparently we already have some data, so concatenate
 		self.wls = np.concatenate([self.wls, pwl], axis=0)
-		self.rad_list = np.concatenate([self.rad_list, signal], axis=1)
-		self.err_list = np.concatenate([self.err_list, sig_errs], axis=1)
+		self._rad_arr = np.concatenate([self._rad_arr, signal], axis=1)
+		self._err_arr = np.concatenate([self._err_arr, sig_errs], axis=1)
 	else:
 		# this seems to be the first time we fill the arrays
 		self.wls = pwl
-		self.rad_list = signal
-		self.err_list = sig_errs
+		self._rad_arr = signal
+		self._err_arr = sig_errs
 	return 0
 
 def read_from_hdf5(self, hf, limb_state_id, state_in_orbit, cluster_ids):
@@ -422,9 +422,9 @@ def read_from_hdf5(self, hf, limb_state_id, state_in_orbit, cluster_ids):
 
 	self.npix = len(self.wls)
 
-	rads = np.rec.fromarrays([self.rad_list],
+	rads = np.rec.fromarrays([self._rad_arr],
 				dtype=np.dtype([("rad", 'f4', (self.npix,))]))
-	errs = np.rec.fromarrays([self.err_list],
+	errs = np.rec.fromarrays([self._err_arr],
 				dtype=np.dtype([("err", 'f4', (self.npix,))]))
 	self.limb_data = rfn.merge_arrays([self.limb_data, rads, errs],
 			usemask=False, asrecarray=True, flatten=True)
