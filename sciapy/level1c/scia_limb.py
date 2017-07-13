@@ -55,32 +55,35 @@ class scia_limb_point(object):
 		self.wls = []
 		self.rads = []
 		self.errs = []
+		self.limb_data = None
+		self.from_limb_scan(ls, i)
 
 	def from_limb_scan(self, ls, i):
 		self.date = ls.date
 		self.npix = ls.npix
 		self.orbit = ls.orbit
-		if list(ls.sub_sat_lat_list):
-			self.sub_sat_lat = ls.sub_sat_lat_list[i]
-			self.sub_sat_lon = ls.sub_sat_lon_list[i]
-		self.tp_lat = ls.tp_lat_list[i]
-		self.tp_lon = ls.tp_lon_list[i]
-		self.tp_alt = ls.tp_alt_list[i]
-		self.tp_sza = ls.tp_sza_list[i]
-		self.tp_saa = ls.tp_saa_list[i]
-		self.tp_los_zenith = ls.tp_los_zenit_list[i]
-		self.toa_sza = ls.toa_sza_list[i]
-		self.toa_saa = ls.toa_saa_list[i]
-		self.toa_los_zenith = ls.toa_los_zenit_list[i]
-		self.sat_sza = ls.sat_sza_list[i]
-		self.sat_saa = ls.sat_saa_list[i]
-		self.sat_los_zenith = ls.sat_los_zenit_list[i]
-		self.sat_alt = ls.sat_alt_list[i]
-		self.earthradius = ls.earthradii[i]
+		if np.any(ls.limb_data.sub_sat_lat):
+			self.sub_sat_lat = ls.limb_data.sub_sat_lat[i]
+			self.sub_sat_lon = ls.limb_data.sub_sat_lon[i]
+		self.tp_lat = ls.limb_data.tp_lat[i]
+		self.tp_lon = ls.limb_data.tp_lon[i]
+		self.tp_alt = ls.limb_data.tp_alt[i]
+		self.tp_sza = ls.limb_data.tp_sza[i]
+		self.tp_saa = ls.limb_data.tp_saa[i]
+		self.tp_los_zenith = ls.limb_data.tp_los[i]
+		self.toa_sza = ls.limb_data.toa_sza[i]
+		self.toa_saa = ls.limb_data.toa_saa[i]
+		self.toa_los_zenith = ls.limb_data.toa_los[i]
+		self.sat_sza = ls.limb_data.sat_sza[i]
+		self.sat_saa = ls.limb_data.sat_saa[i]
+		self.sat_los_zenith = ls.limb_data.sat_los[i]
+		self.sat_alt = ls.limb_data.sat_alt[i]
+		self.earthradius = ls.limb_data.earth_rad[i]
 
 		self.wls = ls.wls
-		self.rads = ls.rad_list[i]
-		self.errs = ls.err_list[i]
+		self.rads = ls.limb_data.rad[i]
+		self.errs = ls.limb_data.err[i]
+		self.limb_data = ls.limb_data[i]
 
 
 class scia_limb_scan(object):
