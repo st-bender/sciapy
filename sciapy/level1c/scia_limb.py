@@ -298,31 +298,6 @@ class scia_limb_scan(object):
 		self.textheader_length = n_header
 		self.textheader = header
 
-	def combine_limb_data(self):
-		# save to limb_data recarray
-		limb_dat_keys = ["sub_sat_lat_list", "sub_sat_lon_list",
-				"tp_lat_list", "tp_lon_list", "tp_alt_list",
-				"tp_sza_list", "tp_saa_list", "tp_los_zenith_list",
-				"toa_sza_list", "toa_saa_list", "toa_los_zenith_list",
-				"sat_sza_list", "sat_saa_list", "sat_los_zenith_list",
-				"sat_alt_list", "earthradii", "rad_list", "err_list"]
-
-		if self.textheader_length < 28:
-			limb_dat_keys.remove("sub_sat_lat_list")
-			limb_dat_keys.remove("sub_sat_lon_list")
-
-		if self._limb_data_dtype is None:
-			self._limb_data_dtype = _limb_data_dtype.copy()
-			if self.textheader_length < 28:
-				self._limb_data_dtype.remove(("sub_sat_lat", _float_type))
-				self._limb_data_dtype.remove(("sub_sat_lon", _float_type))
-			self._limb_data_dtype.append(("rad", _float_type, (self.npix)))
-			self._limb_data_dtype.append(("err", _float_type, (self.npix)))
-
-		self.limb_data = np.rec.fromarrays(
-				[self.__dict__[key] for key in limb_dat_keys],
-				dtype=np.dtype(self._limb_data_dtype))
-
 	def read_from_file(self, filename):
 		try:
 			# try netcdf first
