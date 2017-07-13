@@ -119,45 +119,45 @@ class scia_limb_scan(object):
 	limb_data : numpy.recarray
 		The limb data containing the following records:
 
-	sub_sat_lat : (M,) array_like
-		The latitudes of the satellite ground points (M = nalt).
-	sub_sat_lon : (M,) array_like
-		The longitudes of the satellite ground points (M = nalt).
-	tp_lat : (M,) array_like
-		The latitudes of the tangent points (M = nalt).
-	tp_lon : (M,) array_like
-		The longitudes of the tangent points (M = nalt).
-	tp_alt : (M,) array_like
-		The tangent altitudes (M = nalt).
-	tp_sza : (M,) array_like
-		The solar zenith angles at the tangent points (M = nalt).
-	tp_saa : (M,) array_like
-		The solar azimuth angles at the tangent points (M = nalt).
-	tp_los : (M,) array_like
-		The line-of-sight zenith angles at the tangent points (M = nalt).
-	toa_sza : (M,) array_like
-		The solar zenith angles at the top-of-atmosphere points (M = nalt).
-	toa_saa : (M,) array_like
-		The solar azimuth angles at the top-of-atmosphere points (M = nalt).
-	toa_los : (M,) array_like
-		The line-of-sight zenith angles at the top-of-atmosphere points (M = nalt).
-	sat_sza : (M,) array_like
-		The solar zenith angles at the satellite points (M = nalt).
-	sat_saa : (M,) array_like
-		The solar azimuth angles at the satellite points (M = nalt).
-	sat_los : (M,) array_like
-		The line-of-sight zenith angles at the satellite points (M = nalt).
-	sat_alt : (M,) array_like
-		The satellite altitudes (M = nalt).
-	earth_rad : (M,) array_like
-		The earth radii at the tangent ground points (M = nalt).
-	wls : (N,) array_like
-		The spectral wavelengths.
-	rad : (M, N) array_like
-		The radiances at the tangent points, M = nalt, N = len(wls).
-	err : (M, N) array_like
-		The relative radiance uncertainties at the tangent points,
-		M = nalt, N = len(wls).
+		sub_sat_lat : (M,) array_like
+			The latitudes of the satellite ground points (M = nalt).
+		sub_sat_lon : (M,) array_like
+			The longitudes of the satellite ground points (M = nalt).
+		tp_lat : (M,) array_like
+			The latitudes of the tangent points (M = nalt).
+		tp_lon : (M,) array_like
+			The longitudes of the tangent points (M = nalt).
+		tp_alt : (M,) array_like
+			The tangent altitudes (M = nalt).
+		tp_sza : (M,) array_like
+			The solar zenith angles at the tangent points (M = nalt).
+		tp_saa : (M,) array_like
+			The solar azimuth angles at the tangent points (M = nalt).
+		tp_los : (M,) array_like
+			The line-of-sight zenith angles at the tangent points (M = nalt).
+		toa_sza : (M,) array_like
+			The solar zenith angles at the top-of-atmosphere points (M = nalt).
+		toa_saa : (M,) array_like
+			The solar azimuth angles at the top-of-atmosphere points (M = nalt).
+		toa_los : (M,) array_like
+			The line-of-sight zenith angles at the top-of-atmosphere points (M = nalt).
+		sat_sza : (M,) array_like
+			The solar zenith angles at the satellite points (M = nalt).
+		sat_saa : (M,) array_like
+			The solar azimuth angles at the satellite points (M = nalt).
+		sat_los : (M,) array_like
+			The line-of-sight zenith angles at the satellite points (M = nalt).
+		sat_alt : (M,) array_like
+			The satellite altitudes (M = nalt).
+		earth_rad : (M,) array_like
+			The earth radii at the tangent ground points (M = nalt).
+		wls : (N,) array_like
+			The spectral wavelengths.
+		rad : (M, N) array_like
+			The radiances at the tangent points, M = nalt, N = len(wls).
+		err : (M, N) array_like
+			The relative radiance uncertainties at the tangent points,
+			M = nalt, N = len(wls).
 	"""
 	from .scia_limb_nc import read_from_netcdf, write_to_netcdf
 	from .scia_limb_txt import read_from_textfile, write_to_textfile
