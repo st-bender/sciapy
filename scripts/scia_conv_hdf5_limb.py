@@ -97,7 +97,7 @@ def main():
 		if slsc.read_from_hdf5(hf, lstate_id, sid, cl_ids):
 			continue
 		logging.debug("final shapes: %s (wls), %s (signal)",
-				slsc.wls.shape, slsc.rad_list.shape)
+				slsc.wls.shape, slsc.limb_data["rad"].shape)
 		filename = "SCIA_limb_{0:04d}{1:02d}{2:02d}_{3:02d}{4:02d}{5:02d}_{6}_{7}_{8:05d}".format(
 				slsc.date[0], slsc.date[1], slsc.date[2],
 				slsc.date[3], slsc.date[4], slsc.date[5],
