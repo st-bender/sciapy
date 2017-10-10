@@ -175,8 +175,10 @@ def write_to_netcdf(self, filename):
 	eradii_alts.units = 'km'
 	eradii_alts[:] = np.asarray(self.limb_data["earth_rad"])
 
-	rads = ncf.createVariable('radiance', np.dtype('float32').char, ('limb', 'wavelength'))
-	errs = ncf.createVariable('radiance errors', np.dtype('float32').char, ('limb', 'wavelength'))
+	rads = ncf.createVariable('radiance', np.dtype('float32').char,
+			('limb', 'wavelength'), zlib=True, complevel=1)
+	errs = ncf.createVariable('radiance errors', np.dtype('float32').char,
+			('limb', 'wavelength'), zlib=True, complevel=1)
 	rads.units = 'ph / s / cm^2 / nm'
 	errs.units = 'ph / s / cm^2 / nm'
 	rads[:] = np.asarray(self.limb_data["rad"]).reshape(self.nalt, self.npix)
