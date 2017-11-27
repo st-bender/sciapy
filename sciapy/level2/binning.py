@@ -1,4 +1,5 @@
-# vim: set fileencoding=utf-8
+# -*- coding: utf-8 -*-
+# vim:fileencoding=utf-8
 """SCIAMACHY level 2 binning
 
 Copyright (c) 2017 Stefan Bender
