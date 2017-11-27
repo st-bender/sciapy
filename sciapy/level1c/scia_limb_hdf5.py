@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# vim: set fileencoding=utf-8
+# -*- coding: utf-8 -*-
+# vim:fileencoding=utf-8
 """SCIAMACHY level 1c limb spectra hdf5 interface
 
 Copyright (c) 2017 Stefan Bender
