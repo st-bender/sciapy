@@ -84,9 +84,10 @@ class ProxyModel(Model):
 		When not `None`, cos(sza) and sin(sza) are used instead
 		of the time to model the annual variation of the lifetime.
 		Semi-annual variations are not used in that case.
-	use_phase : bool, optional
+	fit_phase : bool, optional
 		Fit the phase shift directly instead of using sine and cosine
-		terms for the (semi-)annual lifetime variations.
+		terms for the (semi-)annual lifetime variations. If True, the fitted
+		cosine parameter is the amplitude and the sine parameter the phase.
 		Default: False (= fit sine and cosine terms)
 	lifetime_prior : str, optional
 		The prior probability density for each coefficient of the lifetime.
@@ -104,12 +105,12 @@ class ProxyModel(Model):
 			"ltscan")
 
 	def __init__(self, proxy_times, proxy_vals,
-			sza_intp=None, use_phase=False,
+			sza_intp=None, fit_phase=False,
 			lifetime_prior=None, lifetime_metric=1.,
 			*args, **kwargs):
 		self.intp = interp1d(proxy_times, proxy_vals, fill_value="extrapolate")
 		self.sza_intp = sza_intp
-		self.use_phase = use_phase
+		self.fit_phase = fit_phase
 		self.lifetime_prior = lifetime_prior
 		self.lifetime_metric = lifetime_metric
 		super(ProxyModel, self).__init__(*args, **kwargs)
@@ -121,10 +122,10 @@ class ProxyModel(Model):
 			# using the solar zenith angle
 			tau_cs = (self.taucos1 * np.cos(np.radians(self.sza_intp(t)))
 					+ self.tausin1 * np.sin(np.radians(self.sza_intp(t))))
-		elif self.use_phase:
-			# using time and phase
-			tau_cs = (self.taucos1 * np.cos(2 * np.pi * (t + self.tausin1))
-					+ self.taucos2 * np.cos(4 * np.pi * (t + self.tausin2)))
+		elif self.fit_phase:
+			# using time (cos) and phase (sin)
+			tau_cs = (self.taucos1 * np.cos(2 * np.pi * t + self.tausin1)
+					+ self.taucos2 * np.cos(4 * np.pi * t + self.tausin2))
 		else:
 			# using time
 			tau_cs = (self.taucos1 * np.cos(2 * np.pi * t)
