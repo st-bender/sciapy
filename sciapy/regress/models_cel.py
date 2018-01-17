@@ -22,9 +22,11 @@ from scipy.interpolate import interp1d
 
 from celerite.modeling import Model, ModelSet, ConstantModel
 
-__all__ = ["ConstantModel", "HarmonicModel", "ProxyModel", "CeleriteModelSet"]
+__all__ = ["ConstantModel",
+		"HarmonicModelCosineSine", "HarmonicModelAmpPhase",
+		"ProxyModel", "CeleriteModelSet"]
 
-class HarmonicModel(Model):
+class HarmonicModelCosineSine(Model):
 	"""Model for harmonic terms
 
 	Models harmonic terms using a cosine and sine part.
@@ -51,6 +53,31 @@ class HarmonicModel(Model):
 	def get_phase(self):
 		return np.arctan2(np.sin, np.cos)
 
+class HarmonicModelAmpPhase(Model):
+	"""Model for harmonic terms
+
+	Models harmonic terms using a cosine and sine part.
+	The total amplitude and phase can be inferred from that.
+
+	Parameters
+	----------
+	freq : float
+		The frequency in years^-1
+	amp : float
+		The amplitude of the harmonic term
+	phase : float
+		The phase of the harmonic part
+	"""
+	parameter_names = ("freq", "amp", "phase")
+
+	def get_value(self, t):
+		return self.amp * np.cos(self.freq * 2 * np.pi * t + self.phase)
+
+	def get_amplitude(self):
+		return self.amp
+
+	def get_phase(self):
+		return self.phase
 
 class ProxyModel(Model):
 	"""Model for proxy terms
