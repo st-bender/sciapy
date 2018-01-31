@@ -107,6 +107,11 @@ class ProxyModel(Model):
 	ltscan : float
 		The number of days to sum the previous proxy values. If it is zero or
 		negative, the value will be set to three times the maximal lifetime.
+	center : bool, optional
+		Centers the proxy values by subtracting the overall mean. The mean is
+		calculated from the whole `proxy_vals` array and is stored in the
+		`mean` attribute.
+		Default: False
 	sza_intp : scipy.interpolate.interp1d() instance, optional
 		When not `None`, cos(sza) and sin(sza) are used instead
 		of the time to model the annual variation of the lifetime.
@@ -132,10 +137,15 @@ class ProxyModel(Model):
 			"ltscan")
 
 	def __init__(self, proxy_times, proxy_vals,
+			center=False,
 			sza_intp=None, fit_phase=False,
 			lifetime_prior=None, lifetime_metric=1.,
 			*args, **kwargs):
-		self.intp = interp1d(proxy_times, proxy_vals, fill_value="extrapolate")
+		self.mean = 0.
+		if center:
+			self.mean = np.nanmean(proxy_vals)
+		self.intp = interp1d(proxy_times, proxy_vals - self.mean,
+				fill_value="extrapolate")
 		self.sza_intp = sza_intp
 		self.fit_phase = fit_phase
 		self.lifetime_prior = lifetime_prior
