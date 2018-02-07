@@ -116,6 +116,7 @@ class ProxyModel(Model):
 		When not `None`, cos(sza) and sin(sza) are used instead
 		of the time to model the annual variation of the lifetime.
 		Semi-annual variations are not used in that case.
+		Default: None
 	fit_phase : bool, optional
 		Fit the phase shift directly instead of using sine and cosine
 		terms for the (semi-)annual lifetime variations. If True, the fitted
