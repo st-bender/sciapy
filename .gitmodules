@@ -1,0 +1,3 @@
+[submodule "nrlmsise00"]
+	path = sciapy/level2/nrlmsise00
+	url = git://git.linta.de/~brodo/nrlmsise-00.git
