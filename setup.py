@@ -2,8 +2,18 @@ from codecs import open
 from os import path
 # Always prefer setuptools over distutils
 from setuptools import setup
+from distutils.core import Extension
 
 here = path.abspath(path.dirname(__file__))
+
+extnrlmsise00 = Extension(
+		name='sciapy.level2.nrlmsise00',
+		sources=[
+			'sciapy/level2/nrlmsise00module.c',
+			'sciapy/level2/nrlmsise00/nrlmsise-00.c',
+			'sciapy/level2/nrlmsise00/nrlmsise-00_data.c'
+		],
+		include_dirs=['sciapy/level2/nrlmsise00'])
 
 # Get the long description from the README file
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
@@ -37,4 +47,5 @@ setup(name='sciapy',
 			"Programming Language :: Python :: 2",
 			"Programming Language :: Python :: 3",
 		],
+		ext_modules=[extnrlmsise00],
 		zip_safe=False)

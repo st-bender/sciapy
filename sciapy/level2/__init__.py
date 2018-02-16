@@ -15,3 +15,6 @@ See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 """
 
 from . import binning
+from . import nrlmsise00
+
+__all__ = ["binning", "nrlmsise00"]
