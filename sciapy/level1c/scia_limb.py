@@ -2,7 +2,7 @@
 # vim:fileencoding=utf-8
 """SCIAMACHY level 1c limb spectra module
 
-Copyright (c) 2014-2017 Stefan Bender
+Copyright (c) 2014-2018 Stefan Bender
 
 This module contains the class for SCIAMACHY level 1c limb spectra.
 It include some simple conversion routines: from and to ascii,
