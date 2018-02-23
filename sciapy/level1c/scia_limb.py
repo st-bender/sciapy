@@ -27,6 +27,31 @@ from ._types import _float_type, _limb_data_dtype
 
 __all__ = ["scia_limb_point", "scia_limb_scan"]
 
+def _equation_of_time(doy):
+	"""Equation of time correction for day of year (doy)
+
+	See:
+	https://en.wikipedia.org/wiki/Equation_of_time
+
+	Parameters
+	----------
+	doy: int
+		Day of year, Jan 1 = 1
+
+	Returns
+	-------
+	eot: float
+		Equation of time correction in minutes
+	"""
+	D = doy - 1  # jan 1 = day zero
+	W = 360.0 / 365.242
+	A = W * (D + 10)
+	B = A + 1.914 * np.sin(np.radians(W * (D - 2)))
+	C = (np.radians(A) -
+			np.arctan2(np.tan(np.radians(B)),
+					np.cos(np.radians(23.44)))) / np.pi
+	return 720.0 * (C - round(C))
+
 class scia_limb_point(object):
 	"""SCIAMACHY limb tangent point data
 
@@ -296,3 +321,35 @@ class scia_limb_scan(object):
 			except:
 				# fall back to text file as a last resort
 				self.read_from_textfile(filename)
+
+	def local_solar_time(limb_scan, debug=True):
+		"""Local solar time at limb scan footprint centre
+
+		Returns
+		-------
+		(mean_lst, apparent_lst, eot_correction): tuple
+			mean_lst - mean local solar time
+			apparent_lst - apparent local solar time,
+				equation of time corrected
+			eot_correction - equation of time correction in minutes
+		"""
+		import datetime as dt
+		import logging
+		dtime = dt.datetime(*limb_scan.date)
+		doy = int(dtime.strftime("%j"))
+		eot_correction = _equation_of_time(doy)
+		hours, mins, secs = limb_scan.date[3:]
+		clat, clon = limb_scan.cent_lat_lon[:2]
+		if clon > 180.0:
+			clon = clon - 360.0
+		mean_lst = hours + mins / 60. + secs / 3600. + clon / 15.
+		apparent_lst = mean_lst + eot_correction / 60.0
+
+		if debug:
+			logging.debug("%d %d %02d",
+					limb_scan.orbit, limb_scan.state_in_orbit, doy)
+			logging.debug("%s", limb_scan.orbit_state)
+			logging.debug("%02d %02d %02d", hours, mins, secs)
+			logging.debug("%.3f %.3f %.6f %.6f %.6f", clat, clon,
+					mean_lst % 24, apparent_lst % 24, eot_correction)
+		return mean_lst % 24, apparent_lst % 24, eot_correction
