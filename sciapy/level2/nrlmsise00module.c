@@ -53,8 +53,8 @@ static char gtd7_docstring[] =
 		\n\n\
 	Returns\n\
 	-------\n\
-	([densities], [temperatures])\n\
-		Tuple of two lists, the NRLMSISE-00 densities:\n\
+	densities: list\n\
+		the NRLMSISE-00 densities:\n\
 		d[0] - HE NUMBER DENSITY(CM-3)\n\
 		d[1] - O NUMBER DENSITY(CM-3)\n\
 		d[2] - N2 NUMBER DENSITY(CM-3)\n\
@@ -70,7 +70,8 @@ static char gtd7_docstring[] =
 		SUBROUTINE GTD7 -- d[5] is the sum of the mass densities of the\n\
 		species labeled by indices 0-4 and 6-7 in output variable d.\n\
 		This includes He, O, N2, O2, Ar, H, and N but does NOT include\n\
-		anomalous oxygen (species index 8).\n\n\
+		anomalous oxygen (species index 8).\n\
+	temperatures: list\n\
 		the NRLMSISE-00 temperatures:\n\
 		t[0] - EXOSPHERIC TEMPERATURE\n\
 		t[1] - TEMPERATURE AT ALT\n\n\
@@ -95,8 +96,8 @@ static char gtd7d_docstring[] =
 		\n\n\
 	Returns\n\
 	-------\n\
-	([densities], [temperatures])\n\
-		Tuple of two lists, see documentation for gtd7(), except d[5]:\n\n\
+	densities, temperatures: lists\n\
+		See documentation for gtd7(), except d[5]:\n\n\
 		SUBROUTINE GTD7D -- d[5] is the 'effective total mass density\n\
 		for drag' and is the sum of the mass densities of all species\n\
 		in this model, INCLUDING anomalous oxygen.\
