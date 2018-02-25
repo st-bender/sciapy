@@ -107,10 +107,11 @@ static PyObject *output_to_TupleList(struct nrlmsise_output output)
 	PyObject *ret = PyTuple_New(2);
 	PyObject *dens = PyList_New(9);
 	PyObject *temp = PyList_New(2);
+	int i;
 
-	for (int i = 0; i < 9; i++)
+	for (i = 0; i < 9; i++)
 		PyList_SetItem(dens, i, PyFloat_FromDouble(output.d[i]));
-	for (int i = 0; i < 2; i++)
+	for (i = 0; i < 2; i++)
 		PyList_SetItem(temp, i, PyFloat_FromDouble(output.t[i]));
 
 	PyTuple_SetItem(ret, 0, dens);
@@ -140,6 +141,7 @@ static struct nrlmsise_input dict_to_input(PyObject *in_dict)
 {
 	struct nrlmsise_input ret;
 	struct ap_array ap_ar;
+	int i;
 	int ap_list_size = 0;
 	PyObject *ap_list;
 
@@ -158,12 +160,11 @@ static struct nrlmsise_input dict_to_input(PyObject *in_dict)
 	if (ap_list) {
 		ap_list_size = PyList_Size(ap_list);
 		if (ap_list_size > 7) {
-			PyErr_WarnFormat(PyExc_RuntimeWarning, 2,
-				"ap list is too long: %d > 7, cutting.",
-				ap_list_size);
+			PyErr_WarnEx(PyExc_RuntimeWarning,
+				"ap list is too long (> 7), cutting.", 2);
 			ap_list_size = 7;
 		}
-		for (int i = 0; i < ap_list_size; i++)
+		for (i = 0; i < ap_list_size; i++)
 			ap_ar.a[i] = PyFloat_AsDouble(PyList_GetItem(ap_list, i));
 		ret.ap_a = &ap_ar;
 	} else
@@ -174,16 +175,16 @@ static struct nrlmsise_input dict_to_input(PyObject *in_dict)
 static struct nrlmsise_flags list_to_flags(PyObject *fl_list)
 {
 	struct nrlmsise_flags ret;
+	int i;
 	int sw_list_size = PyList_Size(fl_list);
 
 	if (sw_list_size > 24) {
-		PyErr_WarnFormat(PyExc_RuntimeWarning, 2,
-				"nrlmsise flag switches list too long: %d > 24, cutting.",
-				sw_list_size);
+		PyErr_WarnEx(PyExc_RuntimeWarning,
+				"nrlmsise flag switches list too long (> 24), cutting.", 2);
 		sw_list_size = 24;
 	}
 
-	for (int i = 0; i < sw_list_size; i++)
+	for (i = 0; i < sw_list_size; i++)
 		ret.switches[i] = PyLong_AsLong(PyList_GetItem(fl_list, i));
 
 	return ret;
@@ -262,7 +263,7 @@ PyMODINIT_FUNC PyInit_nrlmsise00(void)
 
 #else
 
-PyMODINIT_FUNC init_aacgmv2(void)
+PyMODINIT_FUNC initnrlmsise00(void)
 {
 	module = Py_InitModule("nrlmsise00", nrlmsise00_methods);
 }
