@@ -42,7 +42,7 @@ The regression tools support various parameter fitting methods using
 [`scipy.optimize`](https://docs.scipy.org/doc/scipy/reference/optimize.html)
 and uncertainty evaluation using Markov-Chain Monte-Carlo sampling with
 [`emcee`](https://emcee.readthedocs.io).
-Furhter supports covariance modelling via
+Further supports covariance modelling via
 [`celerite`](https://celerite.readthedocs.io)
 and [`george`](https://george.readthedocs.io).
 
