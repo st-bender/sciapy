@@ -37,12 +37,12 @@ and https://pip.pypa.io/en/stable/reference/pip_install/#git):
 $ pip install [-e] git+https://github.com/st-bender/sciapy.git
 ```
 
-Or using a local clone
+Or install from a local clone:
 ```sh
 $ git clone https://github.com/st-bender/sciapy.git
 $ cd sciapy
 ```
-and then `pip` (use `-e` at your own risk, see
+and then using `pip` (use `-e` at your own risk, see
 https://pip.pypa.io/en/stable/reference/pip_install/#install-editable):
 ```sh
 $ pip install -e .
@@ -60,15 +60,15 @@ $ pydoc sciapy
 ```
 
 This packages provides a submodule `level1c` with the following classes
-- `scia_limb_scan` to handle SCIAMACHY limb scans
-- `scia_solar` to handle SCIAMACHY solar reference spectra
+- `scia_limb_scan` to handle calibrated SCIAMACHY level 1c limb scan spectra
+- `scia_solar` to handle calibrated SCIAMACHY solar reference spectra
 
 The submodule documentation can also be accessed with `pydoc`:
 ```sh
 $ pydoc sciapy.level1c
 $ pydoc sciapy.level1c.scia_limb_scan
 $ pydoc sciapy.level1c.scia_solar
-````
+```
 
 ## Examples
 
