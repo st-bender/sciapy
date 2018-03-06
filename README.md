@@ -8,7 +8,7 @@ SCIAMACHY level 1c limb spectra and retrieved level 2 trace-gas densities.
 ### Level 1c tools
 
 The `sciapy.level1c` submodule provides a few
-[conversion tools](sciapy/level1c/README.md) for [SCIAMACHY](www.sciamachy.org)
+[conversion tools](sciapy/level1c/README.md) for [SCIAMACHY](http://www.sciamachy.org)
 level 1c calibrated spectra, to be used as input for trace gas retrieval with
 [scia\_retrieval\_2d](https://github.com/st-bender/scia_retrieval_2d).
 
@@ -59,6 +59,9 @@ Or install from a local clone:
 ```sh
 $ git clone https://github.com/st-bender/sciapy.git
 $ cd sciapy
+# level 2 needs the nrlmsise-00 submodule
+$ git submodule init
+$ git submodule update
 ```
 and then using `pip` (use `-e` at your own risk, see
 https://pip.pypa.io/en/stable/reference/pip_install/#install-editable):
@@ -89,4 +92,5 @@ The submodules' documentation can be accessed with `pydoc` as well:
 ```sh
 $ pydoc sciapy.level1c
 $ pydoc sciapy.level2
+$ pydoc sciapy.regress
 ```
