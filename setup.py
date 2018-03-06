@@ -51,4 +51,7 @@ setup(name='sciapy',
 			"Programming Language :: Python :: 3",
 		],
 		ext_modules=[extnrlmsise00],
+		entry_points={'console_scripts':
+			['scia_regress = sciapy.regress.cli:main']
+		},
 		zip_safe=False)
