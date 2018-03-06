@@ -180,6 +180,24 @@ def mcmc_sample_model(model, y, beta=1.,
 	logging.info("poor man's evidence 2 max: %s, std: %s", np.max(np.exp(lnp)), np.std(np.exp(lnp)))
 	logging.info("poor man's evidence 3: %s", np.max(np.exp(lnp)) / np.std(np.exp(lnp)))
 
+	max_lp, max_lp_pos = np.max(lnp), pos[np.argmax(lnp)]
+	model.set_parameter_vector(max_lp_pos)
+	resid_mod = model.mean.get_value(model.mean.t) - y
+	cost_gp = np.sum((model.predict(y, return_cov=False) - y)**2)
+	cost_mod = np.sum(resid_mod**2)
+	chi_sq = model.solver.dot_solve(resid_mod)
+	logdet = model.solver.log_determinant()
+	_const = len(y) * np.log(2.0 * np.pi)
+	chisq_red_gp = cost_gp / (len(y) - ndim)
+	chisq_red_mod = cost_mod / (len(y) - ndim)
+	chisq_red_gp2 = chi_sq / (len(y) - ndim)
+	logging.info("max logpost: %s, log_lh: %s", max_lp, model.log_likelihood(y))
+	logging.info("1 cost: %s, reduced chi^2: %s", cost_gp, chisq_red_gp)
+	logging.info("2 cost: %s, reduced chi^2: %s", cost_mod, chisq_red_mod)
+	logging.info("3 tot var: %s, res var 2: %s", np.var(y, ddof=1), np.var(resid_mod, ddof=ndim + 1))
+	logging.info("4 chi^2: %s, reduced chi^2: %s", chi_sq, chisq_red_gp2)
+	logging.info("5 logdet: %s, const 2: %s", logdet, _const)
+
 	if return_logpost:
 		return samples, lnp
 	return samples
