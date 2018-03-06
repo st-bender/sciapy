@@ -1,7 +1,7 @@
 from codecs import open
 from os import path
 # Always prefer setuptools over distutils
-from setuptools import setup
+from setuptools import find_packages, setup
 from distutils.core import Extension
 
 here = path.abspath(path.dirname(__file__))
@@ -26,7 +26,7 @@ setup(name='sciapy',
 		url='http://github.com/st-bender/sciapy',
 		author='Stefan Bender',
 		author_email='stefan.bender@kit.edu',
-		packages=['sciapy'],
+		packages=find_packages(),
 		scripts=['scripts/scia_binary_util.py',
 			'scripts/scia_conv_hdf5_limb.py',
 			'scripts/scia_post_process_l2.py'],
