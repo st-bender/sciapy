@@ -23,7 +23,7 @@ command line tool or the free software
 [nadc\_tools](https://github.com/rmvanhees/nadc_tools).
 The first produces `.child` files, the second can output to HDF5 (`.h5`).
 
-**Furtger note**: `.child` files are currently not supported.
+**Further note**: `.child` files are currently not supported.
 
 ### Level 2 tools
 
