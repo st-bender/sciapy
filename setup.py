@@ -20,12 +20,12 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 	long_description = f.read()
 
 setup(name='sciapy',
-		version='0.0.1',
+		version='0.0.2',
 		description='Python tools for (some) SCIAMACHY data',
 		long_description=long_description,
 		url='http://github.com/st-bender/sciapy',
 		author='Stefan Bender',
-		author_email='stefan.bender@kit.edu',
+		author_email='stefan.bender@ntnu.no',
 		packages=find_packages(),
 		scripts=['scripts/scia_binary_util.py',
 			'scripts/scia_conv_hdf5_limb.py',
