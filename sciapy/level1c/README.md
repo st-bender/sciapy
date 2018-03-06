@@ -30,33 +30,14 @@ The first produces `.child` files, the second can output to HDF5 (`.h5`).
 
 ## Install
 
-This package can be installed with [pip](https://pip.pypa.io) directly
-from github (see https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support
-and https://pip.pypa.io/en/stable/reference/pip_install/#git):
-```sh
-$ pip install [-e] git+https://github.com/st-bender/sciapy.git
-```
-
-Or install from a local clone:
-```sh
-$ git clone https://github.com/st-bender/sciapy.git
-$ cd sciapy
-```
-and then using `pip` (use `-e` at your own risk, see
-https://pip.pypa.io/en/stable/reference/pip_install/#install-editable):
-```sh
-$ pip install -e .
-```
-or using `setup.py`:
-```sh
-$ python setup.py install
-```
+The sciapy level 1c module is part of `sciapy` whose installation
+is described in the main [README](../../README.md).
 
 ## Usage
 
 A simple documentation it provided using `pydoc`:
 ```sh
-$ pydoc sciapy
+$ pydoc sciapy.level1c
 ```
 
 This packages provides a submodule `level1c` with the following classes
