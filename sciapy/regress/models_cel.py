@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 # vim:fileencoding=utf-8
+#
+# Copyright (c) 2017-2018 Stefan Bender
+#
+# This module is part of sciapy.
+# sciapy is free software: you can redistribute it or modify
+# it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, version 2.
+# See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 """SCIAMACHY regression models (celerite version)
 
-Copyright (c) 2014-2017 Stefan Bender
+Model classes for SCIAMACHY data regression fits using the
+`celerite`[1] modeling protocol.
 
-This module contains the model classes for SCIAMACHY data regression fits.
-The models use the `celerite` modeling protocol.
-
-License
--------
-This module is part of sciapy.
-sciapy is free software: you can redistribute it or modify
-it under the terms of the GNU General Public License as published
-by the Free Software Foundation, version 2.
-See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
+[1](https://celerite.readthedocs.io)
 """
 from __future__ import absolute_import, division, print_function
 

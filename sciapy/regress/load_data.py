@@ -1,20 +1,17 @@
 # -*- coding: utf-8 -*-
 # vim:fileencoding=utf-8
+#
+# Copyright (c) 2017-2018 Stefan Bender
+#
+# This module is part of sciapy.
+# sciapy is free software: you can redistribute it or modify
+# it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, version 2.
+# See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 """SCIAMACHY data interface
 
-Copyright (c) 2014-2017 Stefan Bender
-
-This module contains data loading and selection routines for
-SCIAMACHY data regression fits. Includes reading the solar and
-geomagnetic index files used as proxies.
-
-License
--------
-This module is part of sciapy.
-sciapy is free software: you can redistribute it or modify
-it under the terms of the GNU General Public License as published
-by the Free Software Foundation, version 2.
-See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
+Data loading and selection routines for SCIAMACHY data regression fits.
+Includes reading the solar and geomagnetic index files used as proxies.
 """
 
 import logging
