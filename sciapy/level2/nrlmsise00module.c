@@ -138,24 +138,30 @@ static double dict_get_double_default(PyObject *dict, const char *key, double de
 	return def;
 }
 
-static struct nrlmsise_input dict_to_input(PyObject *in_dict)
+/* Copies the values from the python dictionary to the input struct.
+ * We do not return a new struct because we need to fill the ap array,
+ * and the struct only carries the pointer to that array.
+ * The alternative would be to malloc() the ap_array here, but then
+ * the caller would have to keep track of the instances and free() it.
+ * By passing the struct to fill, the caller can and has to take care of
+ * everything itself.
+ */
+static void dict_to_input(PyObject *in_dict, struct nrlmsise_input *ret)
 {
-	struct nrlmsise_input ret;
-	struct ap_array ap_ar;
 	int i;
 	int ap_list_size = 0;
 	PyObject *ap_list;
 
-	ret.year = dict_get_int_default(in_dict, "year", 2000);
-	ret.doy = dict_get_int_default(in_dict, "doy", 1);
-	ret.sec = dict_get_double_default(in_dict, "sec", 0.);
-	ret.alt = dict_get_double_default(in_dict, "alt", 0.);
-	ret.g_lat = dict_get_double_default(in_dict, "g_lat", 0.);
-	ret.g_long = dict_get_double_default(in_dict, "g_long", 0.);
-	ret.lst = dict_get_double_default(in_dict, "lst", 0.);
-	ret.f107A = dict_get_double_default(in_dict, "f107A", 150.);
-	ret.f107 = dict_get_double_default(in_dict, "f107", 150.);
-	ret.ap = dict_get_double_default(in_dict, "ap", 4.);
+	ret->year = dict_get_int_default(in_dict, "year", 2000);
+	ret->doy = dict_get_int_default(in_dict, "doy", 1);
+	ret->sec = dict_get_double_default(in_dict, "sec", 0.);
+	ret->alt = dict_get_double_default(in_dict, "alt", 0.);
+	ret->g_lat = dict_get_double_default(in_dict, "g_lat", 0.);
+	ret->g_long = dict_get_double_default(in_dict, "g_long", 0.);
+	ret->lst = dict_get_double_default(in_dict, "lst", 0.);
+	ret->f107A = dict_get_double_default(in_dict, "f107A", 150.);
+	ret->f107 = dict_get_double_default(in_dict, "f107", 150.);
+	ret->ap = dict_get_double_default(in_dict, "ap", 4.);
 
 	ap_list = PyDict_GetItemString(in_dict, "ap_a");
 	if (ap_list) {
@@ -166,13 +172,10 @@ static struct nrlmsise_input dict_to_input(PyObject *in_dict)
 			ap_list_size = 7;
 		}
 		for (i = 0; i < ap_list_size; i++)
-			ap_ar.a[i] = PyFloat_AsDouble(PyList_GetItem(ap_list, i));
-		ret.ap_a = &ap_ar;
-	} else
-		ret.ap_a = NULL;
-
-	return ret;
+			ret->ap_a->a[i] = PyFloat_AsDouble(PyList_GetItem(ap_list, i));
+	}
 }
+
 static struct nrlmsise_flags list_to_flags(PyObject *fl_list)
 {
 	struct nrlmsise_flags ret;
@@ -198,6 +201,7 @@ static PyObject *nrlmsise00_gtd7(PyObject *self, PyObject *args, PyObject *kwarg
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
 	struct nrlmsise_output msis_output;
 	struct nrlmsise_input msis_input;
+	struct ap_array ap_arr;
 
 	PyObject *input_dict, *flags_list = NULL;
 	static char *kwlist[] = {"input", "flags", NULL};
@@ -205,7 +209,8 @@ static PyObject *nrlmsise00_gtd7(PyObject *self, PyObject *args, PyObject *kwarg
 				&PyDict_Type, &input_dict, &PyList_Type, &flags_list)) {
 		return NULL;
 	}
-	msis_input = dict_to_input(input_dict);
+	msis_input.ap_a = &ap_arr;
+	dict_to_input(input_dict, &msis_input);
 	if (flags_list)
 		msis_flags = list_to_flags(flags_list);
 
@@ -221,6 +226,7 @@ static PyObject *nrlmsise00_gtd7d(PyObject *self, PyObject *args, PyObject *kwar
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
 	struct nrlmsise_output msis_output;
 	struct nrlmsise_input msis_input;
+	struct ap_array ap_arr;
 
 	PyObject *input_dict, *flags_list = NULL;
 	static char *kwlist[] = {"input", "flags", NULL};
@@ -228,7 +234,8 @@ static PyObject *nrlmsise00_gtd7d(PyObject *self, PyObject *args, PyObject *kwar
 				&PyDict_Type, &input_dict, &PyList_Type, &flags_list)) {
 		return NULL;
 	}
-	msis_input = dict_to_input(input_dict);
+	msis_input.ap_a = &ap_arr;
+	dict_to_input(input_dict, &msis_input);
 	if (flags_list)
 		msis_flags = list_to_flags(flags_list);
 
