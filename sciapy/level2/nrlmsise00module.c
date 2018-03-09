@@ -121,11 +121,17 @@ static PyObject *output_to_TupleList(struct nrlmsise_output output)
 	return ret;
 }
 
+/* Define PyInt_Check (python 2) also for python 3.
+ * Restores python 2/3 compatibility. */
+#if PY_MAJOR_VERSION >= 3
+#define PyInt_Check PyLong_Check
+#endif
+
 static int dict_get_int_default(PyObject *dict, const char *key, int def)
 {
 	PyObject *val = PyDict_GetItem(dict, PyUnicode_FromString(key));
 
-	if (val && PyLong_Check(val))
+	if (val && PyInt_Check(val))
 		return PyLong_AsLong(val);
 	return def;
 }
@@ -133,7 +139,7 @@ static double dict_get_double_default(PyObject *dict, const char *key, double de
 {
 	PyObject *val = PyDict_GetItem(dict, PyUnicode_FromString(key));
 
-	if (val && (PyFloat_Check(val) || PyLong_Check(val)))
+	if (val && (PyFloat_Check(val) || PyInt_Check(val)))
 		return PyFloat_AsDouble(val);
 	return def;
 }
