@@ -43,27 +43,44 @@ george_solvers = {
 
 celerite_terms = {
 	"N": terms.Term(),
-	"B": terms.RealTerm(log_a=-6., log_c=-np.inf),
-	"W": terms.JitterTerm(log_sigma=-25),
+	"B": terms.RealTerm(log_a=-6., log_c=-np.inf,
+				bounds={"log_a": [-30, 30],
+						"log_c": [-np.inf, np.inf]}),
+	"W": terms.JitterTerm(log_sigma=-25,
+				bounds={"log_sigma": [-30, 30]}),
 	"Mat32": terms.Matern32Term(
 				log_sigma=-6,
-				log_rho=2. * np.log(0.5)),
-	"SHO": terms.SHOTerm(-6, 1.0 / np.sqrt(2.), 0.),
-	"SHO2": terms.SHOTerm(-6, -2.24, -0.6)
+				log_rho=2. * np.log(0.5),
+				bounds={"log_sigma": [-30, 30],
+						"log_rho": [-30, 30]}),
+	"SHO0": terms.SHOTerm(log_S0=-6, log_Q=1.0 / np.sqrt(2.), log_omega0=0.,
+				bounds={"log_S0": [-30, 30],
+						"log_Q": [-30, 30],
+						"log_omega0": [-30, 30]}),
+	"SHO1": terms.SHOTerm(log_S0=-6, log_Q=1.0 / 2., log_omega0=0.,
+				bounds={"log_S0": [-10, 10],
+						"log_omega0": [-10, 10]}),
+	"SHO2": terms.SHOTerm(log_S0=-6, log_Q=-2.24, log_omega0=-0.6,
+				bounds={"log_S0": [-30, 30],
+						"log_Q": [-30, 30],
+						"log_omega0": [-30, 30]}),
+	# see Foreman-Mackey et al. 2017, AJ 154, 6, pp. 220
+	# doi: 10.3847/1538-3881/aa9332
+	# Eq. (53)
+	"SHO3": terms.SHOTerm(log_S0=-6, log_Q=0., log_omega0=0.,
+				bounds={"log_S0": [-15, 5],
+						"log_Q": [-10, 10],
+						"log_omega0": [-10, 10]}) *
+			terms.SHOTerm(log_S0=1, log_Q=1.0 / np.sqrt(2.), log_omega0=0.,
+				bounds={"log_omega0": [-5, 5]}),
 }
 celerite_terms_freeze_params = {
 	"N": [],
 	"B": ["log_c"],
 	"W": [],
 	"Mat32": [],
-	"SHO": ["log_Q", "log_omega0"],
-	"SHO2": []
-}
-celerite_terms_params_bounds = {
-	"N": [],
-	"B": [[-30, 30]],
-	"W": [[-30, 30]],
-	"Mat32": [[-30, 30], [-30, 30]],
-	"SHO": [[-30, 30]],
-	"SHO2": [[-30, 30], [-30, 30], [-30, 30]]
+	"SHO0": ["log_Q", "log_omega0"],
+	"SHO1": ["log_Q"],
+	"SHO2": [],
+	"SHO3": ["k2:log_S0", "k2:log_Q"],
 }

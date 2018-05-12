@@ -42,8 +42,7 @@ from .models_cel import HarmonicModelCosineSine, HarmonicModelAmpPhase
 from .mcmc import mcmc_sample_model
 
 from ._gpkernels import (george_kernels, george_solvers,
-		celerite_terms, celerite_terms_freeze_params,
-		celerite_terms_params_bounds)
+		celerite_terms, celerite_terms_freeze_params)
 from ._plot import (plot_single_sample_and_residuals,
 		plot_residual, plot_single_sample, plot_random_samples)
 from ._options import parser
@@ -272,6 +271,7 @@ def main():
 	# george kernels
 	kernel = None
 	kname = "_gp"
+	kernel_bounds = []
 	for k in kernls:
 		try:
 			krn = george_kernels[k]
@@ -284,6 +284,12 @@ def main():
 			krnl = kernel_base * krn
 		kernel = kernel + krnl if hasattr(kernel, "is_kernel") else krnl
 		kname += "_" + k
+		# the george interface does not allow setting the bounds
+		# in the kernel initialization so we prepare a simple default
+		# bounds list to be used later
+		kernel_bounds.extend([[-0.3 * max_amp, 0.3 * max_amp]
+					for _ in krnl.get_parameter_names()])
+
 	# celerite terms
 	cel_terms = None
 	cel_name = "_cel"
@@ -294,26 +300,21 @@ def main():
 			continue
 		for freeze_p in celerite_terms_freeze_params[k]:
 			trm.freeze_parameter(freeze_p)
-		trm.parameter_bounds = celerite_terms_params_bounds[k]
 		cel_terms = cel_terms + trm if cel_terms is not None else trm
 		cel_name += "_" + k
 
 	# avoid double initialisation of White and Constant kernels
 	# if already set above
 	if args.fit_white and "W" not in kernls:
-		#krnl = kernels.WhiteKernel(0.25 * kernel_base)
-		#kernel = kernel + krnl if hasattr(kernel, "is_kernel") else krnl
-		trm = terms.JitterTerm(log_sigma=-25)
-		trm.parameter_bounds = celerite_terms_params_bounds["W"]
+		trm = celerite_terms["W"]
 		cel_terms = cel_terms + trm if cel_terms is not None else trm
 		cel_name += "_w"
 	if args.fit_bias and "B" not in kernls:
 		krnl = kernels.ConstantKernel(kernel_base)
 		kernel = kernel + krnl if hasattr(kernel, "is_kernel") else krnl
 		kname += "_b"
-		trm = terms.RealTerm(log_a=-6., log_c=-np.inf)
+		trm = celerite_terms["B"]
 		trm.freeze_parameter("log_c")
-		trm.parameter_bounds = celerite_terms_params_bounds["B"]
 		cel_terms = cel_terms + trm if cel_terms is not None else trm
 		cel_name += "_b"
 
@@ -333,14 +334,17 @@ def main():
 			white_noise=1.e-25, fit_white_noise=args.fit_white,
 			solver=george_solvers[solver], **skwargs)
 		gpname = kname
+		bounds = gpmodel.get_parameter_bounds()[:-len(kernel_bounds)] + kernel_bounds
 	else:
 		gpmodel = celerite.GP(cel_terms, mean=model,
 			#log_white_noise=np.log(1.e-25),
 			fit_white_noise=args.fit_white,
 			fit_mean=True)
 		gpname = cel_name
+		bounds = gpmodel.get_parameter_bounds()
 	gpmodel.compute(no_ys, no_errs)
 	logging.debug("gpmodel params: %s", gpmodel.get_parameter_dict())
+	logging.debug("gpmodel bounds: %s", bounds)
 	logging.debug("initial log likelihood: %s", gpmodel.log_likelihood(no_dens))
 	if isinstance(gpmodel, celerite.GP):
 		logging.info("(GP) jitter: %s", gpmodel.kernel.jitter)
@@ -373,7 +377,7 @@ def main():
 				nlpost,
 				gpmodel.get_parameter_vector(),
 				args=(no_dens, gpmodel),
-				bounds=gpmodel.get_parameter_bounds(),
+				bounds=bounds,
 				# method="l-bfgs-b", options=dict(disp=True, maxcor=100, eps=1e-9, ftol=2e-15, gtol=1e-8))
 				# method="tnc", options=dict(disp=True, maxiter=500, xtol=1e-12))
 				# method="nelder-mead", options=dict(disp=True, maxfev=100000, fatol=1.49012e-8, xatol=1.49012e-8))
@@ -381,7 +385,7 @@ def main():
 		if args.optimize == 2:
 			resop_gp = op.differential_evolution(
 				nlpost,
-				bounds=gpmodel.get_parameter_bounds(),
+				bounds=bounds,
 				args=(no_dens, gpmodel),
 				popsize=2 * args.walkers, tol=0.01)
 		if args.optimize == 3:
@@ -391,7 +395,7 @@ def main():
 				niter=200,
 				minimizer_kwargs=dict(
 					args=(no_dens, gpmodel),
-					bounds=gpmodel.get_parameter_bounds(),
+					bounds=bounds,
 					# method="tnc"))
 					# method="l-bfgs-b", options=dict(maxcor=100)))
 					# method="Nelder-Mead"))
@@ -403,7 +407,7 @@ def main():
 			resop_gp, cov_gp = op.curve_fit(
 				gpmodel_mean,
 				no_ys, no_dens, gpmodel.get_parameter_vector(),
-				bounds=tuple(np.array(gpmodel.get_parameter_bounds()).T),
+				bounds=tuple(np.array(bounds).T),
 				# method='lm',
 				# absolute_sigma=True,
 				sigma=no_errs)
@@ -433,7 +437,7 @@ def main():
 		samples = mcmc_sample_model(gpmodel, no_dens, 1.0,
 				args.walkers, args.burn_in,
 				args.production, args.threads, show_progress=args.progress,
-				optimized=pre_opt)
+				optimized=pre_opt, bounds=bounds)
 
 		sampl_percs = np.percentile(samples, [2.5, 50, 97.5], axis=0)
 		if args.plot_corner:

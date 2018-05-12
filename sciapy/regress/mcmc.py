@@ -34,6 +34,7 @@ def _lpost(p, model, y=None, beta=1.):
 def mcmc_sample_model(model, y, beta=1.,
 		nwalkers=100, nburnin=200, nprod=800,
 		nthreads=2, optimized=False,
+		bounds=None,
 		return_logpost=False,
 		show_progress=False, progress_mod=10):
 	"""Markov Chain Monte Carlo sampling interface
@@ -71,6 +72,9 @@ def mcmc_sample_model(model, y, beta=1.,
 		from there with the normal burn-in and production runs.
 		In that case, latin hypercube sampling is used to distribute the walker
 		starting positions equally in parameter space.
+	bounds : iterable, optional
+		The parameter bounds as a list of (min, max) entries.
+		Default: None
 	return_logpost : bool, optional
 		Indicate whether or not to  return the sampled log probabilities as well.
 		Default: False
@@ -110,8 +114,10 @@ def mcmc_sample_model(model, y, beta=1.,
 		# scipy.optimize's DifferentialEvolutionSolver uses
 		# latin hypercube sampling as starting positions.
 		# We just use their initialization to avoid duplicating code.
+		if bounds is None:
+			bounds = model.get_parameter_bounds(),
 		de_solver = DifferentialEvolutionSolver(_lpost,
-					bounds=model.get_parameter_bounds(),
+					bounds=bounds,
 					popsize=nwalkers // ndim)
 		# The initial population should reflect latin hypercube sampling
 		p0 = de_solver.population
