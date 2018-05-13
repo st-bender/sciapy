@@ -51,15 +51,10 @@ def plot_single_sample_and_residuals(model, sample, filename):
 	# Plot the data.
 	ax.errorbar(tm, model.mean.f, yerr=model.mean.fe, fmt=".k", zorder=8)
 	# Compute the prediction conditioned on the observations and plot it.
-	try:
-		# celerite
-		mum = model.predict(model.mean.f, return_cov=False)
-	except TypeError:
-		# george
-		mum = model.predict(model.mean.f, tm, return_cov=False)
+	mum = model.predict(model.mean.f, t=tm, return_cov=False)
 	mup = model.mean.get_value(t)
 	mum2 = model.mean.get_value(tm)
-	mu, cov = model.predict(model.mean.f, t)
+	mu, cov = model.predict(model.mean.f, t=t)
 	try:
 		cov[np.diag_indices_from(cov)] += model.kernel.jitter
 	except AttributeError:
@@ -99,7 +94,7 @@ def plot_residual(model, sample, scale, filename):
 	fig, ax = plt.subplots()
 	# Plot the data.
 	# Compute the prediction conditioned on the observations
-	mu = model.predict(model.mean.f, return_cov=False)
+	mu = model.predict(model.mean.f, t=model.mean.t, return_cov=False)
 	# Plot the residuals with error bars
 	ax.errorbar(model.mean.t, model.mean.f - mu, yerr=model.mean.fe, fmt=".k", zorder=8)
 	ax.axhline(y=0, color='k', alpha=0.5)
@@ -135,7 +130,7 @@ def plot_single_sample(model, times, data, errs, sample, filename):
 	# Plot the data.
 	ax.errorbar(times, data, yerr=errs, fmt="o", ms=4, zorder=4)
 	# Compute the prediction conditioned on the observations and plot it.
-	mu, cov = model.predict(data, t)
+	mu, cov = model.predict(data, t=t)
 	_sample = np.random.multivariate_normal(mu, cov, 1)[0]
 	ax.plot(t, _sample, alpha=0.75, zorder=2)
 	fig.savefig(filename, transparent=True)
@@ -183,7 +178,7 @@ def plot_random_samples(model, times, data, errs,
 		model.set_parameter_vector(samples[i])
 		logging.debug("sample log likelihood: %s", model.log_likelihood(data))
 		# Compute the prediction conditioned on the observations and plot it.
-		mu, cov = model.predict(data, t)
+		mu, cov = model.predict(data, t=t)
 		try:
 			cov[np.diag_indices_from(cov)] += model.kernel.jitter
 		except AttributeError:

@@ -188,11 +188,17 @@ def mcmc_sample_model(model, y, beta=1.,
 
 	max_lp, max_lp_pos = np.max(lnp), pos[np.argmax(lnp)]
 	model.set_parameter_vector(max_lp_pos)
+	model.compute(model.mean.t, model.mean.fe)
 	resid_mod = model.mean.get_value(model.mean.t) - y
-	cost_gp = np.sum((model.predict(y, return_cov=False) - y)**2)
+	cost_gp = np.sum((model.predict(y, t=model.mean.t, return_cov=False) - y)**2)
 	cost_mod = np.sum(resid_mod**2)
 	chi_sq = model.solver.dot_solve(resid_mod)
-	logdet = model.solver.log_determinant()
+	try:
+		# celerite
+		logdet = model.solver.log_determinant()
+	except TypeError:
+		# george
+		logdet = model.solver.log_determinant
 	_const = len(y) * np.log(2.0 * np.pi)
 	chisq_red_gp = cost_gp / (len(y) - ndim)
 	chisq_red_mod = cost_mod / (len(y) - ndim)
