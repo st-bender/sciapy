@@ -188,9 +188,17 @@ group_save.add_argument("--plot_residuals", dest="plot_residuals", action="store
 group_save.add_argument("--no-plot_residuals", dest="plot_residuals", action="store_false",
 		help="Plot standalone median prediction residuals "
 		"(default: %(default)s).")
+group_save.add_argument("--plot_maxlnp", dest="plot_maxlnp", action="store_true")
+group_save.add_argument("--no-plot_maxlnp", dest="plot_maxlnp", action="store_false",
+		help="Plot the maximum posterior prediction and the residuals combined "
+		"(default: %(default)s).")
+group_save.add_argument("--plot_maxlnpres", dest="plot_maxlnpres", action="store_true")
+group_save.add_argument("--no-plot_maxlnpres", dest="plot_maxlnpres", action="store_false",
+		help="Plot standalone maximum posterior prediction residuals "
+		"(default: %(default)s).")
 group_save.set_defaults(save_model=False, save_samples="netcdf4",
-		plot_corner=True, plot_samples=True, plot_median=True,
-		plot_residuals=False)
+		plot_corner=True, plot_samples=True, plot_median=False,
+		plot_residuals=False, plot_maxlnp=True, plot_maxlnpres=False)
 loglevels = parser.add_mutually_exclusive_group()
 loglevels.add_argument("-q", "--quiet", action="store_true", default=False,
 		help="less output, same as --loglevel=ERROR (default: %(default)s)")

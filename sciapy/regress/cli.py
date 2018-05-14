@@ -434,10 +434,10 @@ def main():
 					.format(gpmodel_name, lat * 10, alt, ksub))
 
 	if args.mcmc:
-		samples = mcmc_sample_model(gpmodel, no_dens, 1.0,
+		samples, lnp = mcmc_sample_model(gpmodel, no_dens, 1.0,
 				args.walkers, args.burn_in,
 				args.production, args.threads, show_progress=args.progress,
-				optimized=pre_opt, bounds=bounds)
+				optimized=pre_opt, bounds=bounds, return_logpost=True)
 
 		sampl_percs = np.percentile(samples, [2.5, 50, 97.5], axis=0)
 		if args.plot_corner:
@@ -480,6 +480,12 @@ def main():
 	if args.plot_residuals:
 		plot_residual(gpmodel, sampl_percs[1], args.scale,
 				filename_base.format("medres") + ".pdf")
+	if args.plot_maxlnp:
+		plot_single_sample_and_residuals(gpmodel, samples[np.argmax(lnp)],
+				filename_base.format("maxlnp") + ".pdf")
+	if args.plot_maxlnpres:
+		plot_residual(gpmodel, samples[np.argmax(lnp)], args.scale,
+				filename_base.format("mlpres") + ".pdf")
 
 	labels = gpmodel.get_parameter_names()
 	logging.info("param percentiles [2.5, 50, 97.5]:")
