@@ -163,10 +163,10 @@ def mcmc_sample_model(model, y, beta=1.,
 			sampler.sample(p0, lnp0, rstate0=rst0, iterations=nprod)):
 		if show_progress and (i + 1) % progress_mod == 0:
 			logging.info("{0:5.1%}".format(float(i + 1) / nprod))
-	pos, lnp, _ = result
 	logging.info("Production run finished.")
 
 	samples = sampler.flatchain
+	lnp = sampler.flatlnprobability
 	logging.info("total samples: %s", samples.shape)
 
 	samplmean = np.mean(samples, axis=0)
@@ -178,7 +178,8 @@ def mcmc_sample_model(model, y, beta=1.,
 			samplmedian, np.exp(samplmedian), np.sqrt(np.exp(samplmedian)))
 
 	logging.info("max logpost: %s, params: %s, exp(params): %s",
-			np.max(lnp), pos[np.argmax(lnp)], np.exp(pos[np.argmax(lnp)]))
+			np.max(lnp), samples[np.argmax(lnp)],
+			np.exp(samples[np.argmax(lnp)]))
 
 	logging.info("AIC: %s", 2 * ndim - 2 * np.max(lnp))
 	logging.info("BIC: %s", np.log(len(y)) * ndim - 2 * np.max(lnp))
@@ -186,7 +187,7 @@ def mcmc_sample_model(model, y, beta=1.,
 	logging.info("poor man's evidence 2 max: %s, std: %s", np.max(np.exp(lnp)), np.std(np.exp(lnp)))
 	logging.info("poor man's evidence 3: %s", np.max(np.exp(lnp)) / np.std(np.exp(lnp)))
 
-	max_lp, max_lp_pos = np.max(lnp), pos[np.argmax(lnp)]
+	max_lp, max_lp_pos = np.max(lnp), samples[np.argmax(lnp)]
 	model.set_parameter_vector(max_lp_pos)
 	model.compute(model.mean.t, model.mean.fe)
 	resid_mod = model.mean.get_value(model.mean.t) - y
