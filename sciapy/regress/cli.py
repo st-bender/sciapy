@@ -208,7 +208,7 @@ def main():
 				tau0=0,
 				taucos1=0, tausin1=0,
 				taucos2=0, tausin2=0,
-						ltscan=args.lifetime_scan,
+				ltscan=args.lifetime_scan,
 				bounds=dict([
 					("amp",
 						[0, max_amp] if pn in args.positive_proxies.split(',')
