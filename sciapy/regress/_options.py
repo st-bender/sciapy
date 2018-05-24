@@ -122,7 +122,7 @@ parser.add_argument("-O", "--optimize", metavar="m", type=int, default="1",
 		"3: basin hopping "
 		"(default: %(default)s)")
 parser.add_argument("-N", "--openblas_threads", metavar="N",
-		type=int, default=2,
+		type=int, default=1,
 		help="Use N OpenBlas threads (default: %(default)s)")
 group_mcmc = parser.add_argument_group(title="MCMC parameters",
 		description="Fine-tuning of the (optional) MCMC run.")
@@ -139,7 +139,7 @@ group_mcmc.add_argument("-p", "--production", metavar="N",
 		type=int, default=800,
 		help="Use N MCMC production samples (default: %(default)s)")
 group_mcmc.add_argument("-n", "--threads", metavar="N",
-		type=int, default=2,
+		type=int, default=1,
 		help="Use N MCMC threads (default: %(default)s)")
 group_mcmc.add_argument("-P", "--progress", action="store_true", default=False,
 		help="Show MCMC sampler progress (default: %(default)s)")
