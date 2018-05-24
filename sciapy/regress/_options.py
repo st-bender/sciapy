@@ -51,9 +51,10 @@ parser.add_argument("--use_sza", action="store_true", default=False,
 		help="Fit the proxy annual life time variations "
 		"using the (cosine and sine of the) of the solar zenith angle "
 		"instead of the time (default: %(default)s)")
-parser.add_argument("-t", "--lag_times", metavar="days", default="", type=str,
-		help="Comma-separated list of fixed proxy lags (in days) "
-		"(default: %(default)s)")
+parser.add_argument("-t", "--lag_times", metavar="years",
+		default="Sol:0,GM:0", type=str,
+		help="Comma-separated list of name:value pairs of fixed proxy lags "
+		"(in fractional years) (default: %(default)s)")
 parser.add_argument("--center_proxies", default="", type=str,
 		help="Comma-separated list of proxies to center "
 		"by subtracting the mean (default: %(default)s)")

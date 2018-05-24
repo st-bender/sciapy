@@ -122,6 +122,7 @@ def main():
 
 	proxies = args.proxies.split(',')
 	proxy_dict = dict(_p.split(':') for _p in proxies)
+	lag_dict = {pn: 0 for pn in proxy_dict.keys()}
 
 	# Post-processing of arguments...
 	# List of proxy lag fits from csv
@@ -130,14 +131,7 @@ def main():
 	fit_lifetimes = args.fit_lifetimes.split(',')
 	fit_annlifetimes = args.fit_annlifetimes.split(',')
 	# List of proxy lag times from csv
-	try:
-		#lag_times = [0. if fit_lifetimes[k] else float(f)
-		#		for k, f in enumerate(args.lag_times.split(','))]
-		lag_dict = dict(_ls.split(':') for _ls in args.lag_times.split(','))
-		for _flt in fit_lifetimes:
-			lag_dict[_flt] = 0.
-	except ValueError:
-		lag_dict = {pn: 0 for pn in proxy_dict.keys()}
+	lag_dict.update(dict(_ls.split(':') for _ls in args.lag_times.split(',')))
 	# List of cycles (frequencies in 1/year) from argument list (csv)
 	try:
 		freqs = list(map(float, args.freqs.split(',')))
