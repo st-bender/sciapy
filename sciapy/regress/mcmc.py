@@ -27,6 +27,8 @@ import celerite
 import george
 import emcee
 
+__all__ = ["mcmc_sample_model"]
+
 def _lpost(p, model, y=None, beta=1.):
 	model.set_parameter_vector(p)
 	return beta * (model.log_likelihood(y, quiet=True) + model.log_prior())

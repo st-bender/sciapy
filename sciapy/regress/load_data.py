@@ -22,6 +22,8 @@ import xarray as xr
 
 from astropy.time import Time
 
+__all__ = ["load_solar_gm_table", "load_scia_dzm"]
+
 _seasons = {
 	"summerNH": [
 		slice("2002-03-20", "2002-09-25"),
