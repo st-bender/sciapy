@@ -6,3 +6,4 @@ and to process level 2 number density data (only NO for now).
 
 from . import level1c
 from . import level2
+from . import regress
