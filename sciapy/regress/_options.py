@@ -65,6 +65,10 @@ parser.add_argument("--positive_proxies", default="", type=str,
 		help="Comma-separated list of proxies with positive cofficients. "
 		"Changes the parameter bounds for these proxies accordingly "
 		"(default: %(default)s)")
+parser.add_argument("--time_format", default="jyear", type=str,
+		choices=['jyear', 'decimalyear', 'jd', 'mjd'],
+		help="Treat the time units (proxy and data) according to the given "
+		"astropy.time time format. (default: %(default)s)")
 parser.add_argument("-k", "--fit_offset", action="store_true", default=False,
 		help="Fit an additional offset via regression (default: %(default)s)")
 parser.add_argument("-F", "--freqs", default="1, 2", type=str,

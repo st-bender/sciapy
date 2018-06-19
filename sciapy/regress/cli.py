@@ -152,6 +152,7 @@ def main():
 	logging.info("location: {0:.0f}°N {1:.0f} km".format(lat, alt))
 
 	no_ys, no_dens, no_errs, no_szas = load_scia_dzm(args.file, alt, lat,
+			tfmt=args.time_format,
 			scale=args.scale,
 			#subsample_factor=args.random_subsample,
 			#subsample_method="random",
@@ -188,7 +189,7 @@ def main():
 			)))
 	proxy_models = []
 	for pn, pf in proxy_dict.items():
-		pt, pp = load_solar_gm_table(pf, cols=[0, 1], names=["time", pn])
+		pt, pp = load_solar_gm_table(pf, cols=[0, 1], names=["time", pn], tfmt=args.time_format)
 		pv = np.log(pp[pn]) if pn in args.log_proxies.split(',') else pp[pn]
 		proxy_models.append((pn,
 			ProxyModel(pt, pv,
@@ -197,6 +198,7 @@ def main():
 				fit_phase=args.fit_phase,
 				lifetime_prior=args.lifetime_prior,
 				lifetime_metric=args.lifetime_metric,
+				days_per_time_unit=1 if args.time_format.endswith("d") else 365.25,
 				amp=0.,
 				lag=float(lag_dict[pn]),
 				tau0=0,
