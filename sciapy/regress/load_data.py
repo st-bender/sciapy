@@ -71,7 +71,7 @@ _SPEs = [pd.date_range("2002-04-20", "2002-05-01"),
 		pd.date_range("2012-01-22", "2012-02-07"),
 		pd.date_range("2012-03-06", "2012-03-27")]
 
-def load_solar_gm_table(filename, cols, names, sep="\t", julian=True):
+def load_solar_gm_table(filename, cols, names, sep="\t", tfmt="jyear"):
 	"""Load proxy tables from ascii files
 
 	This function wraps `pandas.read_table()`[1] with
@@ -92,9 +92,12 @@ def load_solar_gm_table(filename, cols, names, sep="\t", julian=True):
 	sep: string, optional
 		The column separator character, passed as `sep`.
 		Default: `\t`
-	julian: boolean, optional
-		If set to True (default), the times are returned
-		in Julian years, otherwise decimal years are used.
+	tfmt: string, optional
+		The astropy.time "Time Format" for the time units,
+		for example, "jyear", "decimalyear", "jd", "mjd", etc.
+		See:
+		http://docs.astropy.org/en/stable/time/index.html#id3
+		Default: "jyear"
 
 	Returns
 	-------
@@ -107,10 +110,8 @@ def load_solar_gm_table(filename, cols, names, sep="\t", julian=True):
 			comment="#",
 			sep=sep, usecols=cols, names=names)
 	times = Time(tab.tz_localize("UTC").index.to_pydatetime())
-	if julian:
-		ts = times.jyear
-	else:
-		ts = times.decimalyear
+	times.format = tfmt
+	ts = times.value
 	return ts, tab
 
 def _greedy_select(ds, size, varname="NO_DENS_std", scale=1.):
@@ -145,7 +146,7 @@ def _greedy_idxs_post(x, xerr, size):
 		var_p.mask[max_entr_idx] = True
 	return idxs[var.mask]
 
-def load_scia_dzm(filename, alt, lat, julian=True,
+def load_scia_dzm(filename, alt, lat, tfmt="jyear",
 		scale=1, subsample_factor=1, subsample_method="greedy",
 		center=False, season=None, SPEs=False):
 	"""Load SCIAMACHY daily zonal mean data
@@ -165,9 +166,12 @@ def load_scia_dzm(filename, alt, lat, julian=True,
 		The altitude
 	lat: float
 		The longitude
-	julian: boolean, optional
-		If set to True (default), the times are returned
-		in Julian years, otherwise decimal years are used.
+	tfmt: string, optional
+		The astropy.time "Time Format" for the time units,
+		for example, "jyear", "decimalyear", "jd", "mjd", etc.
+		See:
+		http://docs.astropy.org/en/stable/time/index.html#id3
+		Default: "jyear"
 	scale: float, optional
 		Scale factor of the data (default: 1)
 	subsample_factor: int, optional
@@ -253,10 +257,8 @@ def load_scia_dzm(filename, alt, lat, julian=True,
 
 	# Convert to astropy.Time for Julian epoch or decimal year
 	no_t = Time(pd.to_datetime(NO_tds.time.values, utc=True).to_pydatetime())
-	if julian:
-		no_ys = no_t.jyear
-	else:
-		no_ys = no_t.decimalyear
+	no_t.format = tfmt
+	no_ys = no_t.value
 
 	if subsample_factor > 1:
 		new_data_size = no_dens.shape[0] // subsample_factor
