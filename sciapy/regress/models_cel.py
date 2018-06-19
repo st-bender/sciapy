@@ -132,6 +132,11 @@ class ProxyModel(Model):
 	lifetime_metric : float, optional
 		The metric (scale) of the lifetime priors in days, see `prior`.
 		Default 1.
+	days_per_time_unit : float, optional
+		The number of days per time unit, used to normalize the lifetime
+		units. Use 365.25 if the times are in fractional years, or 1 if
+		they are in days.
+		Default: 365.25
 	"""
 	parameter_names = ("amp", "lag", "tau0",
 			"taucos1", "tausin1", "taucos2", "tausin2",
@@ -141,6 +146,7 @@ class ProxyModel(Model):
 			center=False,
 			sza_intp=None, fit_phase=False,
 			lifetime_prior=None, lifetime_metric=1.,
+			days_per_time_unit=365.25,
 			*args, **kwargs):
 		self.mean = 0.
 		if center:
@@ -149,6 +155,8 @@ class ProxyModel(Model):
 				fill_value="extrapolate")
 		self.sza_intp = sza_intp
 		self.fit_phase = fit_phase
+		self.days_per_time_unit = days_per_time_unit
+		self.omega = 2 * np.pi * days_per_time_unit / 365.25
 		self.lifetime_prior = lifetime_prior
 		self.lifetime_metric = lifetime_metric
 		super(ProxyModel, self).__init__(*args, **kwargs)
@@ -162,14 +170,14 @@ class ProxyModel(Model):
 					+ self.tausin1 * np.sin(np.radians(self.sza_intp(t))))
 		elif self.fit_phase:
 			# using time (cos) and phase (sin)
-			tau_cs = (self.taucos1 * np.cos(2 * np.pi * t + self.tausin1)
-					+ self.taucos2 * np.cos(4 * np.pi * t + self.tausin2))
+			tau_cs = (self.taucos1 * np.cos(1 * self.omega * t + self.tausin1)
+					+ self.taucos2 * np.cos(2 * self.omega * t + self.tausin2))
 		else:
 			# using time
-			tau_cs = (self.taucos1 * np.cos(2 * np.pi * t)
-					+ self.tausin1 * np.sin(2 * np.pi * t)
-					+ self.taucos2 * np.cos(4 * np.pi * t)
-					+ self.tausin2 * np.sin(4 * np.pi * t))
+			tau_cs = (self.taucos1 * np.cos(1 * self.omega * t)
+					+ self.tausin1 * np.sin(1 * self.omega * t)
+					+ self.taucos2 * np.cos(2 * self.omega * t)
+					+ self.tausin2 * np.sin(2 * self.omega * t))
 		tau_cs[tau_cs < 0] = 0.  # clip to zero
 		tau = self.tau0 + tau_cs
 		if self.ltscan > 0:
@@ -183,7 +191,7 @@ class ProxyModel(Model):
 			taufac = 1.
 			for b in range(1, _ltscn + 1):
 				taufac *= tauexp
-				proxy_val += self.intp(t - self.lag - b / 365.25) * taufac
+				proxy_val += self.intp(t - self.lag - b / self.days_per_time_unit) * taufac
 		return self.amp * proxy_val
 
 	def _log_prior_normal(self):
