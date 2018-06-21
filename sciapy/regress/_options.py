@@ -20,6 +20,32 @@ from ._gpkernels import george_kernels
 
 __all__ = ["parser"]
 
+
+class Range(object):
+	"""Ranges for floats in command line arguments
+
+	Helps to properly notify the user if the command line argument
+	is out of range[1].
+
+	[1](https://stackoverflow.com/questions/12116685/)
+	"""
+	def __init__(self, start, end):
+		self.start = start
+		self.end = end
+
+	def __eq__(self, other):
+		return self.start <= other <= self.end
+
+	def __getitem__(self, index):
+		if index == 0:
+			return self
+		else:
+			raise IndexError()
+
+	def __repr__(self):
+		return '{0}--{1}'.format(self.start, self.end)
+
+
 parser = argparse.ArgumentParser(description="SCIAMACHY data regression",
 		prog="scia_regress")
 parser.add_argument("file", default="SCIA_NO.nc",
@@ -112,7 +138,7 @@ parser.add_argument("-r", "--random_subsample", metavar="factor",
 		help="Randomly subsample the data by the given factor "
 		"(default: 1, no subsampling)")
 parser.add_argument("--train_fraction", metavar="factor",
-		type=float, default=1,
+		type=float, default=1, choices=Range(0., 1.),
 		help="Use the given fraction of the data points to train the model "
 		"(default: 1, train on all points)")
 parser.add_argument("--scheduler_address", metavar="address:port",
