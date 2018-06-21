@@ -160,6 +160,23 @@ def main():
 			season=args.season,
 			SPEs=args.exclude_spe)
 
+	# split the data into training and test subsets according to the
+	# fraction given (default is 1, i.e. no splitting)
+	train_frac = args.train_fraction
+	train_size = int(len(no_ys) * train_frac)
+	logging.info("using %s of %s samples for training.", train_size, len(no_ys))
+	no_ys_train = no_ys[:train_size]
+	no_dens_train = no_dens[:train_size]
+	no_errs_train = no_errs[:train_size]
+	if train_frac < 1:
+		no_ys_test = no_ys[train_size:]
+		no_dens_test = no_dens[train_size:]
+		no_errs_test = no_errs[train_size:]
+	else:
+		no_ys_test = no_ys
+		no_dens_test = no_dens
+		no_errs_test = no_errs
+
 	sza_intp = None
 	if args.use_sza:
 		logging.info("using solar zenith angle instead of time")
@@ -223,7 +240,7 @@ def main():
 			ConstantModel(value=0.,
 					bounds={"value": [-max_amp, max_amp]}))]
 
-	model = NOModel(no_ys, no_dens, no_errs,
+	model = NOModel(no_ys_train, no_dens_train, no_errs_train,
 			offset_model + harmonic_models + proxy_models)
 
 	logging.debug("model dict: %s", model.get_parameter_dict())
@@ -338,10 +355,10 @@ def main():
 			fit_mean=True)
 		gpname = cel_name
 		bounds = gpmodel.get_parameter_bounds()
-	gpmodel.compute(no_ys, no_errs)
+	gpmodel.compute(no_ys_train, no_errs_train)
 	logging.debug("gpmodel params: %s", gpmodel.get_parameter_dict())
 	logging.debug("gpmodel bounds: %s", bounds)
-	logging.debug("initial log likelihood: %s", gpmodel.log_likelihood(no_dens))
+	logging.debug("initial log likelihood: %s", gpmodel.log_likelihood(no_dens_train))
 	if isinstance(gpmodel, celerite.GP):
 		logging.info("(GP) jitter: %s", gpmodel.kernel.jitter)
 	model_name = "_".join(gpmodel.mean.get_parameter_names()).replace(':', '')
@@ -353,9 +370,10 @@ def main():
 		def gpmodel_mean(x, *p):
 			gpmodel.set_parameter_vector(p)
 			return gpmodel.mean.get_value(x)
+
 		def gpmodel_res(x, *p):
 			gpmodel.set_parameter_vector(p)
-			return (gpmodel.mean.get_value(x) - no_dens) / no_errs
+			return (gpmodel.mean.get_value(x) - no_dens_train) / no_errs_train
 
 		def lpost(p, y, gp):
 			gp.set_parameter_vector(p)
@@ -372,7 +390,7 @@ def main():
 			resop_gp = op.minimize(
 				nlpost,
 				gpmodel.get_parameter_vector(),
-				args=(no_dens, gpmodel),
+				args=(no_dens_train, gpmodel),
 				bounds=bounds,
 				# method="l-bfgs-b", options=dict(disp=True, maxcor=100, eps=1e-9, ftol=2e-15, gtol=1e-8))
 				# method="tnc", options=dict(disp=True, maxiter=500, xtol=1e-12))
@@ -382,7 +400,7 @@ def main():
 			resop_gp = op.differential_evolution(
 				nlpost,
 				bounds=bounds,
-				args=(no_dens, gpmodel),
+				args=(no_dens_train, gpmodel),
 				popsize=2 * args.walkers, tol=0.01)
 		if args.optimize == 3:
 			resop_bh = op.basinhopping(
@@ -390,7 +408,7 @@ def main():
 				gpmodel.get_parameter_vector(),
 				niter=200,
 				minimizer_kwargs=dict(
-					args=(no_dens, gpmodel),
+					args=(no_dens_train, gpmodel),
 					bounds=bounds,
 					# method="tnc"))
 					# method="l-bfgs-b", options=dict(maxcor=100)))
@@ -402,20 +420,36 @@ def main():
 		if args.optimize == 4:
 			resop_gp, cov_gp = op.curve_fit(
 				gpmodel_mean,
-				no_ys, no_dens, gpmodel.get_parameter_vector(),
+				no_ys_train, no_dens_train, gpmodel.get_parameter_vector(),
 				bounds=tuple(np.array(bounds).T),
 				# method='lm',
 				# absolute_sigma=True,
-				sigma=no_errs)
+				sigma=no_errs_train)
 			print(resop_gp, np.sqrt(np.diag(cov_gp)))
 		logging.info("%s", resop_gp.message)
 		logging.debug("optimization result: %s", resop_gp)
 		logging.info("gpmodel dict: %s", gpmodel.get_parameter_dict())
-		logging.info("log posterior: %s", lpost(gpmodel.get_parameter_vector(), no_dens, gpmodel))
+		logging.info("log posterior trained: %s", lpost(gpmodel.get_parameter_vector(), no_dens_train, gpmodel))
+		gpmodel.compute(no_ys_test, no_errs_test)
+		logging.info("log posterior test: %s", lpost(gpmodel.get_parameter_vector(), no_dens_test, gpmodel))
+		gpmodel.compute(no_ys, no_errs)
+		logging.info("log posterior all: %s", lpost(gpmodel.get_parameter_vector(), no_dens, gpmodel))
+		# cross check to make sure that the gpmodel parameter vector is really
+		# set to the fitted parameters
 		logging.info("opt. model vector: %s", resop_gp.x)
-		logging.info("opt. log posterior 1: %s", lpost(resop_gp.x, no_dens, gpmodel))
-		logging.info("opt. model vector: %s", gpmodel.get_parameter_vector())
-		logging.info("opt. log posterior 2: %s", lpost(gpmodel.get_parameter_vector(), no_dens, gpmodel))
+		gpmodel.compute(no_ys_train, no_errs_train)
+		logging.debug("opt. log posterior trained 1: %s", lpost(resop_gp.x, no_dens_train, gpmodel))
+		gpmodel.compute(no_ys_test, no_errs_test)
+		logging.debug("opt. log posterior test 1: %s", lpost(resop_gp.x, no_dens_test, gpmodel))
+		gpmodel.compute(no_ys, no_errs)
+		logging.debug("opt. log posterior all 1: %s", lpost(resop_gp.x, no_dens, gpmodel))
+		logging.debug("opt. model vector: %s", gpmodel.get_parameter_vector())
+		gpmodel.compute(no_ys_train, no_errs_train)
+		logging.debug("opt. log posterior trained 2: %s", lpost(gpmodel.get_parameter_vector(), no_dens_train, gpmodel))
+		gpmodel.compute(no_ys_test, no_errs_test)
+		logging.debug("opt. log posterior test 2: %s", lpost(gpmodel.get_parameter_vector(), no_dens_test, gpmodel))
+		gpmodel.compute(no_ys, no_errs)
+		logging.debug("opt. log posterior all 2: %s", lpost(gpmodel.get_parameter_vector(), no_dens, gpmodel))
 		pre_opt = resop_gp.success
 	try:
 		logging.info("GM lt: %s", gpmodel.get_parameter("mean:GM:tau0"))
@@ -430,7 +464,8 @@ def main():
 					.format(gpmodel_name, lat * 10, alt, ksub))
 
 	if args.mcmc:
-		samples, lnp = mcmc_sample_model(gpmodel, no_dens, 1.0,
+		gpmodel.compute(no_ys_train, no_errs_train)
+		samples, lnp = mcmc_sample_model(gpmodel, no_dens_train, 1.0,
 				args.walkers, args.burn_in,
 				args.production, args.threads, show_progress=args.progress,
 				optimized=pre_opt, bounds=bounds, return_logpost=True)
@@ -465,6 +500,10 @@ def main():
 					gpmodel, alt, lat, samples, scale=args.scale, compressed=True)
 		# MCMC finished here
 
+	# reset the mean model internals to use the full data set for plotting
+	gpmodel.mean.t = no_ys
+	gpmodel.mean.f = no_dens
+	gpmodel.mean.fe = no_errs
 	if args.save_model:
 		# pickle and save the model
 		with open(filename_base.format("model") + ".pkl", "wb") as f:

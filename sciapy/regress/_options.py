@@ -111,6 +111,10 @@ parser.add_argument("-r", "--random_subsample", metavar="factor",
 		type=int, default=1,
 		help="Randomly subsample the data by the given factor "
 		"(default: 1, no subsampling)")
+parser.add_argument("--train_fraction", metavar="factor",
+		type=float, default=1,
+		help="Use the given fraction of the data points to train the model "
+		"(default: 1, train on all points)")
 parser.add_argument("--scheduler_address", metavar="address:port",
 		default=None,
 		help="Connect to dask scheduler at address:port "
