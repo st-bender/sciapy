@@ -22,6 +22,7 @@ import pickle
 import autograd.numpy as np
 import scipy.optimize as op
 from scipy.interpolate import interp1d
+from astropy.time import Time
 
 import george
 from george import kernels
@@ -89,6 +90,29 @@ def save_samples_netcdf(filename, model, alt, lat, samples,
 					for var in smpl_ds.data_vars}
 	smpl_ds.to_netcdf(filename, encoding=_encoding)
 	smpl_ds.close()
+
+
+def _r_sun_earth(time, tfmt="jd"):
+	"""First order approximation of the Sun-Earth distance
+
+	The Sun-to-Earth distance can be used to (un-)normalize proxies
+	to the actual distance to the Sun instead of 1 AU.
+
+	Parameters
+	----------
+	time : float
+		Time value in the units given by 'tfmt'.
+	tfmt : str, optional
+		The units of 'time' as supported by the
+		astropy.time time formats. Default: 'jd'.
+
+	Returns
+	-------
+	dist : float
+		The Sun-Earth distance at the given day of year in AU.
+	"""
+	doy = Time(time, format=tfmt).to_datetime().timetuple().tm_yday
+	return 1 - 0.01672 * np.cos(2 * np.pi / 365.256363 * (doy - 4))
 
 
 def main():
@@ -208,6 +232,9 @@ def main():
 	for pn, pf in proxy_dict.items():
 		pt, pp = load_solar_gm_table(pf, cols=[0, 1], names=["time", pn], tfmt=args.time_format)
 		pv = np.log(pp[pn]) if pn in args.log_proxies.split(',') else pp[pn]
+		if pn in args.norm_proxies_distSEsq:
+			rad_sun_earth = np.vectorize(_r_sun_earth)(pt, tfmt=args.time_format)
+			pv /= rad_sun_earth**2
 		proxy_models.append((pn,
 			ProxyModel(pt, pv,
 				center=pn in args.center_proxies.split(','),
