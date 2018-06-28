@@ -53,6 +53,13 @@ class HarmonicModelCosineSine(Model):
 	def get_phase(self):
 		return np.arctan2(np.sin, np.cos)
 
+	def compute_gradient(self, t):
+		dcos = np.cos(self.freq * 2 * np.pi * t)
+		dsin = np.sin(self.freq * 2 * np.pi * t)
+		df = 2 * np.pi * t * (self.sin * dcos - self.cos * dsin)
+		return np.array([df, dcos, dsin])
+
+
 class HarmonicModelAmpPhase(Model):
 	"""Model for harmonic terms
 
@@ -78,6 +85,13 @@ class HarmonicModelAmpPhase(Model):
 
 	def get_phase(self):
 		return self.phase
+
+	def compute_gradient(self, t):
+		damp = np.cos(self.freq * 2 * np.pi * t + self.phase)
+		dphi = -self.amp * np.sin(self.freq * 2 * np.pi * t + self.phase)
+		df = 2 * np.pi * t * dphi
+		return np.array([df, damp, dphi])
+
 
 class ProxyModel(Model):
 	"""Model for proxy terms
@@ -194,6 +208,57 @@ class ProxyModel(Model):
 				proxy_val += self.intp(t - self.lag - b / self.days_per_time_unit) * taufac
 		return self.amp * proxy_val
 
+	def compute_gradient(self, t):
+		proxy_val = self.intp(t - self.lag)
+		proxy_val_grad0 = self.intp(t - self.lag)
+		# annual variation of the proxy lifetime
+		if self.sza_intp is not None:
+			# using the solar zenith angle
+			dtau_cos1 = np.cos(np.radians(self.sza_intp(t)))
+			dtau_sin1 = np.sin(np.radians(self.sza_intp(t)))
+			dtau_cos2 = np.zeros_like(t)
+			dtau_sin2 = np.zeros_like(t)
+			tau_cs = self.taucos1 * dtau_cos1 + self.tausin1 * dtau_sin1
+		elif self.fit_phase:
+			# using time (cos) and phase (sin)
+			dtau_cos1 = np.cos(1 * self.omega * t + self.tausin1)
+			dtau_sin1 = -self.taucos1 * np.sin(1 * self.omega * t + self.tausin1)
+			dtau_cos2 = np.cos(2 * self.omega * t + self.tausin2)
+			dtau_sin2 = -self.taucos2 * np.sin(2 * self.omega * t + self.tausin2)
+			tau_cs = self.taucos1 * dtau_cos1 + self.taucos2 * dtau_cos2
+		else:
+			# using time
+			dtau_cos1 = np.cos(1 * self.omega * t)
+			dtau_sin1 = np.sin(1 * self.omega * t)
+			dtau_cos2 = np.cos(2 * self.omega * t)
+			dtau_sin2 = np.sin(2 * self.omega * t)
+			tau_cs = (self.taucos1 * dtau_cos1 + self.tausin1 * dtau_sin1 +
+					self.taucos2 * dtau_cos2 + self.tausin2 * dtau_sin2)
+		tau_cs[tau_cs < 0] = 0.  # clip to zero
+		tau = self.tau0 + tau_cs
+		if self.ltscan > 0:
+			_ltscn = int(np.floor(self.ltscan))
+		else:
+			# infer the scan time from the maximal lifetime
+			_ltscn = 3 * int(np.ceil(self.tau0 +
+						np.sqrt(self.taucos1**2 + self.tausin1**2)))
+		if np.all(tau > 0):
+			for b in np.arange(1, _ltscn + 1, 1):
+				taufac = np.exp(-b / tau)
+				proxy_ti = self.intp(t - self.lag - b / self.days_per_time_unit) * taufac
+				proxy_val += proxy_ti
+				proxy_val_grad0 += proxy_ti * b / tau**2
+		return np.array([proxy_val,
+				# set the gradient wrt lag to zero for now
+				np.zeros_like(t),
+				self.amp * proxy_val_grad0,
+				self.amp * proxy_val_grad0 * dtau_cos1,
+				self.amp * proxy_val_grad0 * dtau_sin1,
+				self.amp * proxy_val_grad0 * dtau_cos2,
+				self.amp * proxy_val_grad0 * dtau_sin2,
+				# set the gradient wrt lifetime scan to zero for now
+				np.zeros_like(t)])
+
 	def _log_prior_normal(self):
 		l_prior = super(ProxyModel, self).log_prior()
 		if not np.isfinite(l_prior):
@@ -236,3 +301,9 @@ class CeleriteModelSet(ModelSet):
 		for m in self.models.values():
 			v += m.get_value(t)
 		return v
+
+	def compute_gradient(self, t):
+		grad = []
+		for m in self.models.values():
+			grad.extend(list(m.compute_gradient(t)))
+		return np.array(grad)
