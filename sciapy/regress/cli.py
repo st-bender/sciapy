@@ -411,7 +411,13 @@ def main():
 			return -lp if np.isfinite(lp) else 1e25
 
 		def grad_nlpost(p, y, gp):
-			return -gp.grad_log_likelihood(y)[1]
+			gp.set_parameter_vector(p)
+			grad_ll = gp.grad_log_likelihood(y)
+			if isinstance(grad_ll, tuple):
+				# celerite
+				return -grad_ll[1]
+			# george
+			return -grad_ll
 
 		if args.optimize == 1:
 			resop_gp = op.minimize(
