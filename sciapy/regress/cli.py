@@ -380,7 +380,6 @@ def main():
 		bounds = gpmodel.get_parameter_bounds()[:-len(kernel_bounds)] + kernel_bounds
 	else:
 		gpmodel = celerite.GP(cel_terms, mean=model,
-			#log_white_noise=np.log(1.e-25),
 			fit_white_noise=args.fit_white,
 			fit_mean=True)
 		gpname = cel_name
