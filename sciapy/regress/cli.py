@@ -144,8 +144,11 @@ def main():
 		except:
 			logging.info("Setting number of openblas threads failed.")
 
-	proxies = args.proxies.split(',')
-	proxy_dict = dict(_p.split(':') for _p in proxies)
+	if args.proxies:
+		proxies = args.proxies.split(',')
+		proxy_dict = dict(_p.split(':') for _p in proxies)
+	else:
+		proxy_dict = {}
 	lag_dict = {pn: 0 for pn in proxy_dict.keys()}
 
 	# Post-processing of arguments...
