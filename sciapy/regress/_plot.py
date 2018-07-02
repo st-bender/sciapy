@@ -49,7 +49,7 @@ def plot_single_sample_and_residuals(model, sample, filename):
 	ax = plt.subplot(gs[0])
 	ax2 = plt.subplot(gs[1])
 	# Plot the data.
-	ax.errorbar(tm, model.mean.f, yerr=model.mean.fe, fmt=".k", zorder=8)
+	ax.errorbar(tm, model.mean.f, yerr=2 * model.mean.fe, fmt=".k", zorder=8)
 	# Compute the prediction conditioned on the observations and plot it.
 	mum = model.predict(model.mean.f, t=tm, return_cov=False)
 	mup = model.mean.get_value(t)
@@ -65,8 +65,8 @@ def plot_single_sample_and_residuals(model, sample, filename):
 	ax.plot(t, mu, alpha=0.75, color="C0", zorder=10,
 			label="logl: {0:.3f}".format(log_lh))
 	ax.fill_between(t, mu - 2. * std, mu + 2. * std, color="C0", alpha=0.3, zorder=10)
-	ax2.errorbar(tm, model.mean.f - mum, yerr=model.mean.fe, fmt=".k", zorder=12, alpha=0.5)
-	ax2.errorbar(tm, model.mean.f - mum2, yerr=model.mean.fe, fmt=".C1", zorder=8, ms=4)
+	ax2.errorbar(tm, model.mean.f - mum, yerr=2 * model.mean.fe, fmt=".k", zorder=12, alpha=0.5)
+	ax2.errorbar(tm, model.mean.f - mum2, yerr=2 * model.mean.fe, fmt=".C1", zorder=8, ms=4)
 	ax2.axhline(y=0, color='k', alpha=0.5)
 	ax.legend()
 	fig.savefig(filename, transparent=True)
@@ -96,7 +96,7 @@ def plot_residual(model, sample, scale, filename):
 	# Compute the prediction conditioned on the observations
 	mu = model.predict(model.mean.f, t=model.mean.t, return_cov=False)
 	# Plot the residuals with error bars
-	ax.errorbar(model.mean.t, model.mean.f - mu, yerr=model.mean.fe, fmt=".k", zorder=8)
+	ax.errorbar(model.mean.t, model.mean.f - mu, yerr=2 * model.mean.fe, fmt=".k", zorder=8)
 	ax.axhline(y=0, color='k', alpha=0.5)
 	ax.set_xlabel("time [years]")
 	ax.set_ylabel("number density residual [10$^{{{0:.0f}}}$ cm$^{{-3}}$]"
@@ -128,7 +128,7 @@ def plot_single_sample(model, times, data, errs, sample, filename):
 	# Plot
 	fig, ax = plt.subplots()
 	# Plot the data.
-	ax.errorbar(times, data, yerr=errs, fmt="o", ms=4, zorder=4)
+	ax.errorbar(times, data, yerr=2 * errs, fmt="o", ms=4, zorder=4)
 	# Compute the prediction conditioned on the observations and plot it.
 	mu, cov = model.predict(data, t=t)
 	_sample = np.random.multivariate_normal(mu, cov, 1)[0]
@@ -167,7 +167,7 @@ def plot_random_samples(model, times, data, errs,
 					times.max() + extra_years[1], 2000)
 	fig, ax = plt.subplots()
 	# Plot the data.
-	ax.errorbar(times, data, yerr=errs, fmt=".k", zorder=8)
+	ax.errorbar(times, data, yerr=2 * errs, fmt=".k", zorder=8)
 	ax.set_xlim(np.min(t), np.max(t))
 	ax.set_xlabel("time [years]")
 	ax.set_ylabel("number density [10$^{{{0:.0f}}}$ cm$^{{-3}}$]"
