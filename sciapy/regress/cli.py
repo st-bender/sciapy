@@ -11,7 +11,7 @@
 # See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 """SCIAMACHY data regression command line interface
 
-Command line main programm for regression analysis of SCIAMACHY
+Command line main program for regression analysis of SCIAMACHY
 daily zonal mean time series (NO for now).
 """
 
