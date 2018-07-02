@@ -281,7 +281,7 @@ def main():
 		if pn in fit_lags:
 			model.thaw_parameter("{0}:lag".format(pn))
 		if pn in fit_lifetimes:
-			# model.set_parameter("{0}:tau0".format(pn), 1.)
+			model.set_parameter("{0}:tau0".format(pn), 1e-4)
 			model.thaw_parameter("{0}:tau0".format(pn))
 			if pn in fit_annlifetimes:
 				model.thaw_parameter("{0}:taucos1".format(pn))
