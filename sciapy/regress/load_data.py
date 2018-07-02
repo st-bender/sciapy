@@ -198,22 +198,22 @@ def load_scia_dzm(filename, alt, lat, tfmt="jyear",
 		the number densities, and their uncertainties.
 	"""
 	logging.info("Opening dataset: '%s'", filename)
-	NO_ds = xr.open_dataset(filename, decode_times=False,
+	NO_ds = xr.open_mfdataset(filename, decode_times=False,
 				chunks={"time": 400, "latitude": 9, "altitude": 11})
 	logging.info("done.")
+	# Decode time coordinate for selection
+	try:
+		# xarray <= 0.9.6
+		NO_ds["time"] = xr.conventions.decode_cf_variable(NO_ds.time)
+	except TypeError:
+		# xarray => 0.10.0
+		NO_ds["time"] = xr.conventions.decode_cf_variable("time", NO_ds.time)
 
 	NO_mean = 0.
 	if center:
 		NO_mean = NO_ds.NO_DENS.mean()
 		logging.info("Centering with global mean: %s", NO_mean.values)
 	NO_tds = NO_ds.sel(latitude=lat, altitude=alt)
-	# Decode time coordinate for selection
-	try:
-		# xarray <= 0.9.6
-		NO_tds["time"] = xr.conventions.decode_cf_variable(NO_tds.time)
-	except TypeError:
-		# xarray => 0.10.0
-		NO_tds["time"] = xr.conventions.decode_cf_variable("time", NO_tds.time)
 
 	# Exclude SPEs first if requested
 	if SPEs:
