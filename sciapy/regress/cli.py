@@ -428,9 +428,10 @@ def main():
 				args=(no_dens_train, gpmodel),
 				bounds=bounds,
 				# method="l-bfgs-b", options=dict(disp=True, maxcor=100, eps=1e-9, ftol=2e-15, gtol=1e-8))
+				method="l-bfgs-b", jac=grad_nlpost)
 				# method="tnc", options=dict(disp=True, maxiter=500, xtol=1e-12))
 				# method="nelder-mead", options=dict(disp=True, maxfev=100000, fatol=1.49012e-8, xatol=1.49012e-8))
-				method="Powell", options=dict(ftol=1.49012e-08, xtol=1.49012e-08))
+				# method="Powell", options=dict(ftol=1.49012e-08, xtol=1.49012e-08))
 		if args.optimize == 2:
 			resop_gp = op.differential_evolution(
 				nlpost,
@@ -447,9 +448,10 @@ def main():
 					bounds=bounds,
 					# method="tnc"))
 					# method="l-bfgs-b", options=dict(maxcor=100)))
+					method="l-bfgs-b", jac=grad_nlpost))
 					# method="Nelder-Mead"))
 					# method="BFGS"))
-					method="Powell", options=dict(ftol=1.49012e-08, xtol=1.49012e-08)))
+					# method="Powell", options=dict(ftol=1.49012e-08, xtol=1.49012e-08)))
 			logging.debug("optimization result: %s", resop_bh)
 			resop_gp = resop_bh.lowest_optimization_result
 		if args.optimize == 4:
