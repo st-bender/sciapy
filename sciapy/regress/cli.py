@@ -518,12 +518,6 @@ def main():
 					hist_args=dict(normed=True))
 			fig.savefig(filename_base.format("corner") + ".pdf", transparent=True)
 
-		if args.plot_samples:
-			plot_random_samples(gpmodel, no_ys, no_dens, no_errs,
-					samples, args.scale,
-					filename_base.format("sampls") + ".pdf",
-					size=4, extra_years=[4, 2])
-
 		if args.save_samples:
 			if args.samples_format in ["npz"]:
 				# save the samples compressed to save space.
@@ -541,10 +535,17 @@ def main():
 	gpmodel.mean.t = no_ys
 	gpmodel.mean.f = no_dens
 	gpmodel.mean.fe = no_errs
+	gpmodel.compute(no_ys, no_errs)
 	if args.save_model:
 		# pickle and save the model
 		with open(filename_base.format("model") + ".pkl", "wb") as f:
 			pickle.dump((gpmodel), f, -1)
+
+	if args.plot_samples and args.mcmc:
+		plot_random_samples(gpmodel, no_ys, no_dens, no_errs,
+				samples, args.scale,
+				filename_base.format("sampls") + ".pdf",
+				size=4, extra_years=[4, 2])
 
 	if args.plot_median:
 		plot_single_sample_and_residuals(gpmodel, sampl_percs[1],
