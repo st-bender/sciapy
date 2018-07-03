@@ -23,8 +23,6 @@ from __future__ import absolute_import, division, print_function
 
 import numpy as np
 
-from ._types import _float_type, _limb_data_dtype
-
 __all__ = ["scia_limb_point", "scia_limb_scan"]
 
 def _equation_of_time(doy):
