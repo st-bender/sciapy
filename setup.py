@@ -55,6 +55,6 @@ setup(name='sciapy',
 		],
 		ext_modules=[extnrlmsise00],
 		entry_points={'console_scripts':
-			['scia_regress = sciapy.regress.cli:main']
+			['scia_regress = sciapy.regress.__main__:main']
 		},
 		zip_safe=False)
