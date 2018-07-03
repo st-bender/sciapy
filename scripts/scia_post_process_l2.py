@@ -46,19 +46,19 @@ except ImportError:
 
 this_dir = os.path.realpath(os.path.dirname(__file__))
 f107_data = dict(np.genfromtxt(
-	os.path.join(this_dir, "../data/f107_noontime_flux_obs.txt"),
+	os.path.join(this_dir, "../data/indices/f107_noontime_flux_obs.txt"),
 	usecols=[0, 2], dtype=None))
 f107a_data = dict(np.genfromtxt(
-	os.path.join(this_dir, "../data/f107a_noontime_flux_obs.txt"),
+	os.path.join(this_dir, "../data/indices/f107a_noontime_flux_obs.txt"),
 	usecols=[0, 2], dtype=None))
 ap_data = dict(np.genfromtxt(
-	os.path.join(this_dir, "../data/spidr_ap_2000-2012.dat"),
+	os.path.join(this_dir, "../data/indices/spidr_ap_2000-2012.dat"),
 	usecols=[0, 2], dtype=None))
 f107_adj = dict(np.genfromtxt(
-	os.path.join(this_dir, "../data/spidr_f107_2000-2012.dat"),
+	os.path.join(this_dir, "../data/indices/spidr_f107_2000-2012.dat"),
 	usecols=[0, 2], dtype=None))
 kp_data = dict(np.genfromtxt(
-	os.path.join(this_dir, "../data/spidr_kp_2000-2012.dat"),
+	os.path.join(this_dir, "../data/indices/spidr_kp_2000-2012.dat"),
 	usecols=[0, 2], dtype=None))
 
 phi_fac = 11.91
