@@ -82,22 +82,6 @@ class scia_densities_pp(scia_densities):
 	def __init__(self, ref_date="2000-01-01",
 			ver=None, data_ver=None):
 		self.filename = None
-		self.version = ver
-		self.data_version = data_ver
-		self.date0 = (dt.datetime.strptime(ref_date, "%Y-%m-%d")
-					.replace(tzinfo=dt.timezone.utc))
-		self.nalt = 0
-		self.nlat = 0
-		self.nlon = 0
-		self.alts_min = np.array([])
-		self.alts = np.array([])
-		self.alts_max = np.array([])
-		self.lats_min = np.array([])
-		self.lats = np.array([])
-		self.lats_max = np.array([])
-		self.lons = None
-		self.akdiag = None
-		self.apriori = None
 		self.temperature = None
 		self.noem_no = None
 		self.vmr = None
@@ -110,6 +94,8 @@ class scia_densities_pp(scia_densities):
 		self.gmlons = None
 		self.aacgmgmlats = None
 		self.aacgmgmlons = None
+		super(scia_densities_pp, self).__init__(
+				ref_date=ref_date, ver=ver, data_ver=data_ver)
 
 	def write_to_textfile(self, filename):
 		"""Write the variables to ascii table files
