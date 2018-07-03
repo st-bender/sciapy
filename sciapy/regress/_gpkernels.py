@@ -21,8 +21,7 @@ from george import kernels
 from celerite import terms
 
 __all__ = ["george_kernels", "george_solvers",
-		"celerite_terms", "celerite_terms_freeze_params",
-		"celerite_terms_params_bounds"]
+		"celerite_terms", "celerite_terms_freeze_params"]
 
 george_kernels = {
 	"Exp2": kernels.ExpSquaredKernel(10**2),
