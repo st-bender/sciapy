@@ -184,7 +184,7 @@ class scia_densities_pp(scia_densities):
 					print(" " + oformata % self.aacgmgmlons[j], end="", file=f)
 				print("", file=f)
 
-	def write_to_netcdf(self, filename):
+	def write_to_netcdf(self, filename, close=True):
 		"""Write variables to netcdf files
 
 		This function has no stream, i.e. file object, support.
@@ -287,9 +287,12 @@ class scia_densities_pp(scia_densities):
 			faacgmgmlons.units = 'degrees_east'
 			faacgmgmlons[0, :] = self.aacgmgmlons
 
-		ncf.close()
+		if close:
+			ncf.close()
+		else:
+			return ncf
 
-	def read_from_netcdf(self, filename):
+	def read_from_netcdf(self, filename, close=True):
 		"""Read post-processed level 2 orbit files
 
 		Parameters
@@ -341,7 +344,11 @@ class scia_densities_pp(scia_densities):
 			self.utcdays = ncf.variables['utc_days'][:]
 		except:
 			pass
-		ncf.close()
+
+		if close:
+			ncf.close()
+		else:
+			return ncf
 
 	def to_xarray(self, dateo, orbit):
 		"""Convert the data to an `xarray.Dataset`
