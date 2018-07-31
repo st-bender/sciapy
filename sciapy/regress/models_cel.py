@@ -201,11 +201,12 @@ class ProxyModel(Model):
 			_ltscn = 3 * int(np.ceil(self.tau0 +
 						np.sqrt(self.taucos1**2 + self.tausin1**2)))
 		if np.all(tau > 0):
-			tauexp = np.exp(-1. / tau)
-			taufac = 1.
-			for b in range(1, _ltscn + 1):
-				taufac *= tauexp
-				proxy_val += self.intp(t - self.lag - b / self.days_per_time_unit) * taufac
+			bs = np.arange(1, _ltscn + 1, 1.)[:, None]
+			taufacs = np.exp(-bs / tau[None, :])
+			proxy_val += np.sum(
+					self.intp(t[None, :] - self.lag -
+						bs / self.days_per_time_unit) * taufacs,
+					axis=0)
 		return self.amp * proxy_val
 
 	def compute_gradient(self, t):
@@ -243,11 +244,12 @@ class ProxyModel(Model):
 			_ltscn = 3 * int(np.ceil(self.tau0 +
 						np.sqrt(self.taucos1**2 + self.tausin1**2)))
 		if np.all(tau > 0):
-			for b in np.arange(1, _ltscn + 1, 1):
-				taufac = np.exp(-b / tau)
-				proxy_ti = self.intp(t - self.lag - b / self.days_per_time_unit) * taufac
-				proxy_val += proxy_ti
-				proxy_val_grad0 += proxy_ti * b / tau**2
+			bs = np.arange(1, _ltscn + 1, 1.)[:, None]
+			taufacs = np.exp(-bs / tau[None, :])
+			proxy_ts = self.intp(t[None, :] - self.lag -
+					bs / self.days_per_time_unit) * taufacs
+			proxy_val += np.sum(proxy_ts, axis=0)
+			proxy_val_grad0 += np.sum(proxy_ts * bs / tau[None, :]**2, axis=0)
 		return np.array([proxy_val,
 				# set the gradient wrt lag to zero for now
 				np.zeros_like(t),
