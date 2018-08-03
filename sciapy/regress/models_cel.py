@@ -291,13 +291,6 @@ class ProxyModel(Model):
 
 class CeleriteModelSet(ModelSet):
 
-	def __init__(self, times, data, errs,
-			models=None,
-			*args, **kwargs):
-		self.t, self.f, self.fe = times, data, errs
-		super(CeleriteModelSet, self).__init__(
-				models, *args, **kwargs)
-
 	def get_value(self, t):
 		v = np.zeros_like(t)
 		for m in self.models.values():

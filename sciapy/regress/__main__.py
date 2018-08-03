@@ -270,8 +270,7 @@ def main():
 			ConstantModel(value=0.,
 					bounds={"value": [-max_amp, max_amp]}))]
 
-	model = NOModel(no_ys_train, no_dens_train, no_errs_train,
-			offset_model + harmonic_models + proxy_models)
+	model = NOModel(offset_model + harmonic_models + proxy_models)
 
 	logging.debug("model dict: %s", model.get_parameter_dict())
 	model.freeze_all_parameters()
@@ -531,10 +530,7 @@ def main():
 					gpmodel, alt, lat, samples, scale=args.scale, compressed=True)
 		# MCMC finished here
 
-	# reset the mean model internals to use the full data set for plotting
-	gpmodel.mean.t = no_ys
-	gpmodel.mean.f = no_dens
-	gpmodel.mean.fe = no_errs
+	# set the model times and errors to use the full data set for plotting
 	gpmodel.compute(no_ys, no_errs)
 	if args.save_model:
 		# pickle and save the model
@@ -548,16 +544,20 @@ def main():
 				size=4, extra_years=[4, 2])
 
 	if args.plot_median:
-		plot_single_sample_and_residuals(gpmodel, sampl_percs[1],
+		plot_single_sample_and_residuals(gpmodel, no_ys, no_dens, no_errs,
+				sampl_percs[1],
 				filename_base.format("median") + ".pdf")
 	if args.plot_residuals:
-		plot_residual(gpmodel, sampl_percs[1], args.scale,
+		plot_residual(gpmodel, no_ys, no_dens, no_errs,
+				sampl_percs[1], args.scale,
 				filename_base.format("medres") + ".pdf")
 	if args.plot_maxlnp:
-		plot_single_sample_and_residuals(gpmodel, samples[np.argmax(lnp)],
+		plot_single_sample_and_residuals(gpmodel, no_ys, no_dens, no_errs,
+				samples[np.argmax(lnp)],
 				filename_base.format("maxlnp") + ".pdf")
 	if args.plot_maxlnpres:
-		plot_residual(gpmodel, samples[np.argmax(lnp)], args.scale,
+		plot_residual(gpmodel, no_ys, no_dens, no_errs,
+				samples[np.argmax(lnp)], args.scale,
 				filename_base.format("mlpres") + ".pdf")
 
 	labels = gpmodel.get_parameter_names()

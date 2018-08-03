@@ -22,13 +22,20 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
 
-def plot_single_sample_and_residuals(model, sample, filename):
+def plot_single_sample_and_residuals(model, times, data, errs,
+		sample, filename):
 	"""Plot one sample and residuals in one figure
 
 	Parameters
 	----------
 	model: `celerite.Model`, `george.Model`, or `celerite.ModelSet`
 		The Gaussian Process model to plot samples from.
+	times: array_like
+		Time axis values.
+	data: array_like
+		Data values.
+	errs: array_like
+		Data uncertainties for the errorbars.
 	sample: array_like
 		The (MCMC) sample of the parameter vector.
 	filename: string
@@ -37,24 +44,23 @@ def plot_single_sample_and_residuals(model, sample, filename):
 	# Set up the GP for this sample.
 	logging.debug("sample values: %s", sample)
 	model.set_parameter_vector(sample)
-	log_lh = model.log_likelihood(model.mean.f)
+	log_lh = model.log_likelihood(data)
 	logging.debug("sample log likelihood: %s", log_lh)
-	logging.debug("half data variance: %s", 0.5 * np.var(model.mean.f))
-	tm = model.mean.t
-	t = np.sort(np.append(tm,
-			np.linspace(model.mean.t.min(), model.mean.t.max(), 1000)))
+	logging.debug("half data variance: %s", 0.5 * np.var(data))
+	t = np.sort(np.append(times,
+			np.linspace(times.min(), times.max(), 1000)))
 	# Plot
 	fig = plt.figure()
 	gs = gridspec.GridSpec(2, 1, height_ratios=[3, 1])
 	ax = plt.subplot(gs[0])
 	ax2 = plt.subplot(gs[1])
 	# Plot the data.
-	ax.errorbar(tm, model.mean.f, yerr=2 * model.mean.fe, fmt=".k", zorder=8)
+	ax.errorbar(times, data, yerr=2 * errs, fmt=".k", zorder=8)
 	# Compute the prediction conditioned on the observations and plot it.
-	mum = model.predict(model.mean.f, t=tm, return_cov=False)
+	mum = model.predict(data, t=times, return_cov=False)
 	mup = model.mean.get_value(t)
-	mum2 = model.mean.get_value(tm)
-	mu, cov = model.predict(model.mean.f, t=t)
+	mum2 = model.mean.get_value(times)
+	mu, cov = model.predict(data, t=t)
 	try:
 		cov[np.diag_indices_from(cov)] += model.kernel.jitter
 	except AttributeError:
@@ -65,20 +71,26 @@ def plot_single_sample_and_residuals(model, sample, filename):
 	ax.plot(t, mu, alpha=0.75, color="C0", zorder=10,
 			label="logl: {0:.3f}".format(log_lh))
 	ax.fill_between(t, mu - 2. * std, mu + 2. * std, color="C0", alpha=0.3, zorder=10)
-	ax2.errorbar(tm, model.mean.f - mum, yerr=2 * model.mean.fe, fmt=".k", zorder=12, alpha=0.5)
-	ax2.errorbar(tm, model.mean.f - mum2, yerr=2 * model.mean.fe, fmt=".C1", zorder=8, ms=4)
+	ax2.errorbar(times, data - mum, yerr=2 * errs, fmt=".k", zorder=12, alpha=0.5)
+	ax2.errorbar(times, data - mum2, yerr=2 * errs, fmt=".C1", zorder=8, ms=4)
 	ax2.axhline(y=0, color='k', alpha=0.5)
 	ax.legend()
 	fig.savefig(filename, transparent=True)
 
 
-def plot_residual(model, sample, scale, filename):
+def plot_residual(model, times, data, errs, sample, scale, filename):
 	"""Plot the residuals of one sample
 
 	Parameters
 	----------
 	model: `celerite.Model`, `george.Model`, or `celerite.ModelSet`
 		The Gaussian Process model to plot samples from.
+	times: array_like
+		Time axis values.
+	data: array_like
+		Data values.
+	errs: array_like
+		Data uncertainties for the errorbars.
 	sample: array_like
 		The (MCMC) sample of the parameter vector.
 	scale: float
@@ -89,14 +101,14 @@ def plot_residual(model, sample, scale, filename):
 	# Set up the GP for this sample.
 	logging.debug("sample values: %s", sample)
 	model.set_parameter_vector(sample)
-	logging.debug("sample log likelihood: %s", model.log_likelihood(model.mean.f))
+	logging.debug("sample log likelihood: %s", model.log_likelihood(data))
 	# Plot
 	fig, ax = plt.subplots()
 	# Plot the data.
 	# Compute the prediction conditioned on the observations
-	mu = model.predict(model.mean.f, t=model.mean.t, return_cov=False)
+	mu = model.predict(data, t=times, return_cov=False)
 	# Plot the residuals with error bars
-	ax.errorbar(model.mean.t, model.mean.f - mu, yerr=2 * model.mean.fe, fmt=".k", zorder=8)
+	ax.errorbar(times, data - mu, yerr=2 * errs, fmt=".k", zorder=8)
 	ax.axhline(y=0, color='k', alpha=0.5)
 	ax.set_xlabel("time [years]")
 	ax.set_ylabel("number density residual [10$^{{{0:.0f}}}$ cm$^{{-3}}$]"

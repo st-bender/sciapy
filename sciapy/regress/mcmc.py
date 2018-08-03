@@ -191,11 +191,13 @@ def mcmc_sample_model(model, y, beta=1.,
 
 	max_lp, max_lp_pos = np.max(lnp), samples[np.argmax(lnp)]
 	model.set_parameter_vector(max_lp_pos)
-	model.compute(model.mean.t, model.mean.fe)
-	resid_mod = model.mean.get_value(model.mean.t) - y
-	cost_gp = np.sum((model.predict(y, t=model.mean.t, return_cov=False) - y)**2)
+	resid_mod = model.mean.get_value(model._t) - y
+	gppred, gpcov = model.predict(y, t=model._t, return_cov=True)
+	resid_gp = gppred - y
+	resid_triv = y.mean() - y
 	cost_mod = np.sum(resid_mod**2)
 	chi_sq = model.solver.dot_solve(resid_mod)
+	cost_gp = np.sum(resid_gp**2)
 	try:
 		# celerite
 		logdet = model.solver.log_determinant()
