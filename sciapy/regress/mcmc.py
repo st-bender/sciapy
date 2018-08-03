@@ -117,7 +117,7 @@ def mcmc_sample_model(model, y, beta=1.,
 		# latin hypercube sampling as starting positions.
 		# We just use their initialization to avoid duplicating code.
 		if bounds is None:
-			bounds = model.get_parameter_bounds(),
+			bounds = model.get_parameter_bounds()
 		de_solver = DifferentialEvolutionSolver(_lpost,
 					bounds=bounds,
 					popsize=nwalkers // ndim)
