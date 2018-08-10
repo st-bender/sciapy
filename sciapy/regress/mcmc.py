@@ -29,9 +29,14 @@ import emcee
 
 __all__ = ["mcmc_sample_model"]
 
+
 def _lpost(p, model, y=None, beta=1.):
 	model.set_parameter_vector(p)
-	return beta * (model.log_likelihood(y, quiet=True) + model.log_prior())
+	lprior = model.log_prior()
+	if not np.isfinite(lprior):
+		return -np.inf
+	return beta * (model.log_likelihood(y, quiet=True) + lprior)
+
 
 def mcmc_sample_model(model, y, ye, beta=1.,
 		nwalkers=100, nburnin=200, nprod=800,
