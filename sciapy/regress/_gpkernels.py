@@ -48,8 +48,8 @@ celerite_terms = {
 	"W": terms.JitterTerm(log_sigma=-25,
 				bounds={"log_sigma": [-30, 30]}),
 	"Mat32": terms.Matern32Term(
-				log_sigma=-6,
-				log_rho=2. * np.log(0.5),
+				log_sigma=1.,
+				log_rho=1.,
 				bounds={"log_sigma": [-30, 30],
 						"log_rho": [-30, 30]}),
 	"SHO0": terms.SHOTerm(log_S0=-6, log_Q=1.0 / np.sqrt(2.), log_omega0=0.,
