@@ -191,8 +191,16 @@ def mcmc_sample_model(model, y, beta=1.,
 
 	max_lp, max_lp_pos = np.max(lnp), samples[np.argmax(lnp)]
 	model.set_parameter_vector(max_lp_pos)
-	resid_mod = model.mean.get_value(model._t) - y
-	gppred, gpcov = model.predict(y, t=model._t, return_cov=True)
+	if hasattr(model, "_t"):
+		# celerite
+		model_times = model._t.ravel()
+	elif hasattr(model, "_x"):
+		# george
+		model_times = model._x.ravel()
+	else:
+		model_times = None
+	resid_mod = model.mean.get_value(model_times) - y
+	gppred, gpcov = model.predict(y, t=model_times, return_cov=True)
 	resid_gp = gppred - y
 	resid_triv = y.mean() - y
 	cost_mod = np.sum(resid_mod**2)
