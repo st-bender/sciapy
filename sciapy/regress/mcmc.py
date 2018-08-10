@@ -35,7 +35,7 @@ def _lpost(p, model, y=None, beta=1.):
 
 def mcmc_sample_model(model, y, beta=1.,
 		nwalkers=100, nburnin=200, nprod=800,
-		nthreads=2, optimized=False,
+		nthreads=1, optimized=False,
 		bounds=None,
 		return_logpost=False,
 		show_progress=False, progress_mod=10):
@@ -66,7 +66,7 @@ def mcmc_sample_model(model, y, beta=1.,
 		The number of production samples to draw, default: 800.
 	nthreads : int, optional
 		The number of threads to use with a `multiprocessing.Pool`,
-		used as `pool` for `emcee.EnsembleSampler`. Default: 2.
+		used as `pool` for `emcee.EnsembleSampler`. Default: 1.
 	optimized : bool, optional
 		Indicate whether the actual (starting) position was determined with an
 		optimization algorithm beforehand. If `False` (the default), a
