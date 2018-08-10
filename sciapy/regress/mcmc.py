@@ -33,7 +33,7 @@ def _lpost(p, model, y=None, beta=1.):
 	model.set_parameter_vector(p)
 	return beta * (model.log_likelihood(y, quiet=True) + model.log_prior())
 
-def mcmc_sample_model(model, y, beta=1.,
+def mcmc_sample_model(model, y, ye, beta=1.,
 		nwalkers=100, nburnin=200, nprod=800,
 		nthreads=1, optimized=False,
 		bounds=None,
@@ -54,6 +54,8 @@ def mcmc_sample_model(model, y, beta=1.,
 		via `__call__()`.
 	y : (N,) array_like
 		The data to condition the probabilities on.
+	ye : (N,) array_like
+		The data uncertainties to add to the covariance.
 	beta : float, optional
 		Tempering factor for the probability, default: 1.
 	nwalkers : int, optional

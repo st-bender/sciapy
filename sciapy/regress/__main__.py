@@ -501,9 +501,12 @@ def main():
 
 	if args.mcmc:
 		gpmodel.compute(no_ys_train, no_errs_train)
-		samples, lnp = mcmc_sample_model(gpmodel, no_dens_train, 1.0,
-				args.walkers, args.burn_in,
-				args.production, args.threads, show_progress=args.progress,
+		samples, lnp = mcmc_sample_model(gpmodel,
+				no_dens_train, no_errs_train,
+				beta=1.0,
+				nwalkers=args.walkers, nburnin=args.burn_in,
+				nprod=args.production, nthreads=args.threads,
+				show_progress=args.progress,
 				optimized=pre_opt, bounds=bounds, return_logpost=True)
 
 		sampl_percs = np.percentile(samples, [2.5, 50, 97.5], axis=0)
