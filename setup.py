@@ -19,8 +19,10 @@ extnrlmsise00 = Extension(
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 	long_description = f.read()
 
-setup(name='sciapy',
-		version='0.0.4',
+if __name__ == "__main__":
+	from sciapy import __version__
+	setup(name='sciapy',
+		version=__version__,
 		description='Python tools for (some) SCIAMACHY data',
 		long_description=long_description,
 		url='http://github.com/st-bender/sciapy',
