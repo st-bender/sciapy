@@ -5,6 +5,12 @@ and to process level 2 number density data (only NO for now).
 """
 __version__ = "0.0.4"
 
-from . import level1c
-from . import level2
-from . import regress
+try:
+	__SCIAPY_SETUP__
+except NameError:
+	__SCIAPY_SETUP__ = False
+
+if not __SCIAPY_SETUP__:
+	from . import level1c
+	from . import level2
+	from . import regress

@@ -1,5 +1,6 @@
 from codecs import open
 from os import path
+from sys import version_info
 # Always prefer setuptools over distutils
 from setuptools import find_packages, setup
 from distutils.core import Extension
@@ -20,7 +21,16 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 	long_description = f.read()
 
 if __name__ == "__main__":
+	# Approach copied from dfm (celerite, emcee, and george)
+	# Hackishly inject a constant into builtins to enable importing of the
+	# package before the library is built.
+	if version_info[0] < 3:
+		import __builtin__ as builtins
+	else:
+		import builtins
+	builtins.__SCIAPY_SETUP__ = True
 	from sciapy import __version__
+
 	setup(name='sciapy',
 		version=__version__,
 		description='Python tools for (some) SCIAMACHY data',
