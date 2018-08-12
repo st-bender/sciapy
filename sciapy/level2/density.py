@@ -34,7 +34,18 @@ except ImportError:
 
 __all__ = ["scia_density", "scia_densities"]
 
-_UTC = dt.timezone.utc
+try:
+	_UTC = dt.timezone.utc
+except AttributeError:
+	# python 2.7
+	class UTC(dt.tzinfo):
+		def utcoffset(self, d):
+			return dt.timedelta(0)
+		def tzname(self, d):
+			return "UTC"
+		def dst(self, d):
+			return dt.timedelta(0)
+	_UTC = UTC()
 
 _meas_dtypes = [[('gp_id', int),
 		('alt_max', float), ('alt', float), ('alt_min', float),
