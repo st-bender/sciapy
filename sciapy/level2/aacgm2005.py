@@ -13,7 +13,7 @@ See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 from __future__ import absolute_import, division, print_function
 
 import logging
-import os
+from pkg_resources import resource_filename
 
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
@@ -46,9 +46,7 @@ def gmag_aacgm2005(lat, lon, aacgm_name="AACGM2005_80km_grid.nc"):
 	aacgmlon: numpy.ndarray or float
 		The AACGM 2005 geomagnetic longitude(s)
 	"""
-	aacgm_file = os.path.join(
-			os.path.realpath(os.path.dirname(__file__)),
-			aacgm_name)
+	aacgm_file = resource_filename(__name__, aacgm_name)
 	logging.debug("aacgm_file: %s", aacgm_file)
 	# Fix longitudes to +- 180
 	lon = np.asarray(lon) % -180.
