@@ -23,8 +23,8 @@ https://doi.org/10.1186/s40623-015-0228-9
 """
 from __future__ import absolute_import, division, print_function
 
-import os
 import logging
+from pkg_resources import resource_filename
 
 import numpy as np
 from collections import namedtuple
@@ -214,7 +214,7 @@ def igrf_mag(date, lat, lon, alt, filename="IGRF.tab"):
 			r, grad, rho, np.degrees(np.arccos(cos_theta)), 90. - glat)
 
 	# evaluate the IGRF model in spherical coordinates
-	igrf_file = os.path.join(os.path.realpath(os.path.dirname(__file__)), filename)
+	igrf_file = resource_filename(__name__, filename)
 	igrf_coeffs = _load_igrf_file(igrf_file)(frac_year)
 	Bx, By, Bz = _igrf_model(igrf_coeffs, 13, r, np.radians(90. - glat), np.radians(glon))
 	logging.debug("spherical geomagnetic field (Bx, By, Bz): %s, %s, %s", Bx, By, Bz)
@@ -254,8 +254,7 @@ def gmpole(date, r_e=Earth_ellipsoid["re"], filename="IGRF.tab"):
 	B_0: float
 		The magnitude of the magnetic field.
 	"""
-	igrf_file = os.path.join(
-			os.path.realpath(os.path.dirname(__file__)), filename)
+	igrf_file = resource_filename(__name__, filename)
 	gh_func = _load_igrf_file(igrf_file)
 
 	frac_year = _date_to_frac_year(date.year, date.month, date.day)
@@ -343,12 +342,9 @@ def gmag_igrf(date, lat, lon, alt=0.,
 		Geomagnetic longitude in eccentric dipole coordinates,
 		centered dipole coordinates if `centered_dipole` is True.
 	"""
-	igrf_file = os.path.join(
-			os.path.realpath(os.path.dirname(__file__)),
-			igrf_name)
 	ellip = _ellipsoid()
 	glat, glon, grad = _geod_to_spher(lat, lon, ellip, alt)
-	(lat_GMP, lon_GMP), _, (dX, dY, dZ), B_0 = gmpole(date, ellip.re, igrf_file)
+	(lat_GMP, lon_GMP), _, (dX, dY, dZ), B_0 = gmpole(date, ellip.re, igrf_name)
 	latr, lonr = np.radians(glat), np.radians(glon)
 	lat_GMPr, lon_GMPr = np.radians(lat_GMP), np.radians(lon_GMP)
 	sin_lat_gmag = (np.sin(latr) * np.sin(lat_GMPr)
