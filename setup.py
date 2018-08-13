@@ -42,8 +42,9 @@ if __name__ == "__main__":
 		scripts=['scripts/scia_binary_util.py',
 			'scripts/scia_conv_hdf5_limb.py',
 			'scripts/scia_post_process_l2.py'],
-		package_data={'sciapy': ['sciapy/level2/IGRF.tab',
-				'sciapy/level2/AACGM2005_80km_grid.nc']},
+		package_data={'sciapy.level2': ['IGRF.tab',
+				'AACGM2005_80km_grid.nc'],
+			'sciapy': ['data/indices/*.dat', 'data/indices/*.txt']},
 		install_requires=[
 			'numpy',
 			'netCDF4',
