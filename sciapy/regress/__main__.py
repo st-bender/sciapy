@@ -88,7 +88,7 @@ def save_samples_netcdf(filename, model, alt, lat, samples,
 	smpl_ds.close()
 
 
-def _r_sun_earth(time, tfmt="jd"):
+def _r_sun_earth(time, tfmt="jyear"):
 	"""First order approximation of the Sun-Earth distance
 
 	The Sun-to-Earth distance can be used to (un-)normalize proxies
@@ -100,7 +100,7 @@ def _r_sun_earth(time, tfmt="jd"):
 		Time value in the units given by 'tfmt'.
 	tfmt : str, optional
 		The units of 'time' as supported by the
-		astropy.time time formats. Default: 'jd'.
+		astropy.time time formats. Default: 'jyear'.
 
 	Returns
 	-------
@@ -108,7 +108,9 @@ def _r_sun_earth(time, tfmt="jd"):
 		The Sun-Earth distance at the given day of year in AU.
 	"""
 	from astropy.time import Time
-	doy = Time(time, format=tfmt).to_datetime().timetuple().tm_yday
+	tdoy = Time(time, format=tfmt)
+	tdoy.format = "yday"
+	doy = int(tdoy.value.split(':')[1])
 	return 1 - 0.01672 * np.cos(2 * np.pi / 365.256363 * (doy - 4))
 
 
