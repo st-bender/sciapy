@@ -55,6 +55,7 @@ if __name__ == "__main__":
 			'pysolar',
 			'parse',
 			'celerite>=0.3.0',
+			'corner',
 			'george',
 			'emcee'],
 		license='GPLv2',
