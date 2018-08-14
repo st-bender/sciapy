@@ -24,10 +24,10 @@ https://doi.org/10.1186/s40623-015-0228-9
 from __future__ import absolute_import, division, print_function
 
 import logging
+from collections import namedtuple
 from pkg_resources import resource_filename
 
 import numpy as np
-from collections import namedtuple
 from scipy.interpolate import interp1d
 from scipy.special import lpmn
 
