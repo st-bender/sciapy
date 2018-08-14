@@ -32,14 +32,16 @@ def _bin_stats(ds,
 	# normalize weights (sum(weights) = 1)
 	_weights /= _weights.sum(dim=stacked)
 	_ssqw = (_weights**2).sum(dim=stacked)
-	mean_ds = (ds * _weights).sum(dim=stacked)
+	mean_ds = (ds * _weights).sum(dim=stacked) if area_weighted \
+			else ds.mean(dim=stacked)
 	mean_ds["wsqsum"] = _ssqw
 	mean_ds["wsqsum"].attrs = {
 			"long_name": "sum of squared weights",
 			"units": "1"}
 	# unbiased standard deviations
-	sdev_ds = ((_weights * (ds - mean_ds)**2).sum(dim=stacked) /
-			(1. - _ssqw)).apply(np.sqrt)
+	var_ds = ((_weights * (ds - mean_ds)**2).sum(dim=stacked) /
+			(1. - _ssqw)) if area_weighted else ds.var(dim=stacked, ddof=1)
+	sdev_ds = var_ds.apply(np.sqrt)
 	cnts_ds = ds.count(dim=stacked)
 	if set_attrs:
 		for var in ds.data_vars:
