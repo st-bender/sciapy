@@ -201,10 +201,7 @@ def main():
 		no_dens_test = no_dens
 		no_errs_test = no_errs
 
-	sza_intp = None
-	if args.use_sza:
-		logging.info("using solar zenith angle instead of time")
-		sza_intp = interp1d(no_ys, no_szas, fill_value="extrapolate")
+	sza_intp = interp1d(no_ys, no_szas, fill_value="extrapolate")
 
 	max_amp = 1e10 * args.scale
 	max_days = 100
@@ -238,7 +235,7 @@ def main():
 		proxy_models.append((pn,
 			ProxyModel(pt, pv,
 				center=pn in args.center_proxies.split(','),
-				sza_intp=sza_intp,
+				sza_intp=sza_intp if args.use_sza else None,
 				fit_phase=args.fit_phase,
 				lifetime_prior=args.lifetime_prior,
 				lifetime_metric=args.lifetime_metric,
