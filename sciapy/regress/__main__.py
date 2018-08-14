@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim:fileencoding=utf-8
 #
@@ -19,10 +18,9 @@ import ctypes
 import logging
 import pickle
 
-import autograd.numpy as np
+import numpy as np
 import scipy.optimize as op
 from scipy.interpolate import interp1d
-from astropy.time import Time
 
 import george
 from george import kernels
@@ -33,8 +31,6 @@ from celerite import terms
 import matplotlib as mpl
 # switch off X11 rendering
 mpl.use("Agg")
-
-import corner
 
 from .load_data import load_solar_gm_table, load_scia_dzm
 from .models_cel import CeleriteModelSet as NOModel
@@ -111,6 +107,7 @@ def _r_sun_earth(time, tfmt="jd"):
 	dist : float
 		The Sun-Earth distance at the given day of year in AU.
 	"""
+	from astropy.time import Time
 	doy = Time(time, format=tfmt).to_datetime().timetuple().tm_yday
 	return 1 - 0.01672 * np.cos(2 * np.pi / 365.256363 * (doy - 4))
 
@@ -511,6 +508,7 @@ def main():
 
 		sampl_percs = np.percentile(samples, [2.5, 50, 97.5], axis=0)
 		if args.plot_corner:
+			import corner
 			# Corner plot of the sampled parameters
 			fig = corner.corner(samples,
 					quantiles=[0.025, 0.5, 0.975],
