@@ -95,6 +95,11 @@ parser.add_argument("--norm_proxies_distSEsq", default="", type=str,
 		help="Comma-separated list of proxies to be normalized by the "
 		"Sun-Earth distance squared, for example the Lyman-alpha radiation "
 		"(default: %(default)s)")
+parser.add_argument("--norm_proxies_SZA", default="", type=str,
+		help="Comma-separated list of proxies to be normalized by the "
+		"the solar zenith angle, for example to adjust the Lyman-alpha "
+		"radiation for the seasonal effects at different latitudes "
+		"(default: %(default)s)")
 parser.add_argument("--time_format", default="jyear", type=str,
 		choices=['jyear', 'decimalyear', 'jd', 'mjd'],
 		help="Treat the time units (proxy and data) according to the given "

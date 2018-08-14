@@ -232,6 +232,8 @@ def main():
 		if pn in args.norm_proxies_distSEsq:
 			rad_sun_earth = np.vectorize(_r_sun_earth)(pt, tfmt=args.time_format)
 			pv /= rad_sun_earth**2
+		if pn in args.norm_proxies_SZA:
+			pv *= np.cos(sza_intp(pt))
 		proxy_models.append((pn,
 			ProxyModel(pt, pv,
 				center=pn in args.center_proxies.split(','),
