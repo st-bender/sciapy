@@ -23,10 +23,7 @@ import scipy.optimize as op
 from scipy.interpolate import interp1d
 
 import george
-from george import kernels
-
 import celerite
-from celerite import terms
 
 import matplotlib as mpl
 # switch off X11 rendering
