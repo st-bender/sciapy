@@ -16,7 +16,7 @@ Command line options for the command line tool.
 import argparse
 from distutils.util import strtobool
 
-from ._gpkernels import george_kernels
+from ._gpkernels import george_kernels, celerite_terms
 
 __all__ = ["parser"]
 
@@ -195,7 +195,9 @@ group_gp.add_argument("-g", "--george", action="store_true", default=False,
 group_gp.add_argument("-K", "--kernels", default="", type=str,
 		help="Comma separated list of Gaussian Process kernels to use. "
 		"They will be combined linearly (default: %(default)s) "
-		"Possible choices are: {0}".format(sorted(map(str, george_kernels.keys()))))
+		"Possible choices are: {0} for george (-g) and {1} for celerite"
+		.format(sorted(map(str, george_kernels.keys())),
+			sorted(map(str, celerite_terms.keys()))))
 group_gp.add_argument("-B", "--fit_bias", action="store_true", default=False,
 		help="Fit bias using a constant kernel (default: %(default)s)")
 group_gp.add_argument("-W", "--fit_white", action="store_true", default=False,
