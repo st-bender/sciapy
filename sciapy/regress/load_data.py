@@ -71,6 +71,24 @@ _SPEs = [pd.date_range("2002-04-20", "2002-05-01"),
 		pd.date_range("2012-01-22", "2012-02-07"),
 		pd.date_range("2012-03-06", "2012-03-27")]
 
+
+def load_dailymeanAE(
+		filename="../../data/indices/AE_Kyoto_1980-2016_daily2_shift12h.dat",
+		name="AE", tfmt="jyear"):
+	from pkg_resources import resource_filename
+	AEfilename = resource_filename(__name__, filename)
+	return load_solar_gm_table(AEfilename, cols=[0, 1],
+			names=["time", name], tfmt=tfmt)
+
+
+def load_dailymeanLya(filename="../../data/indices/lisird_lya3_1980-2017.dat",
+		name="Lya", tfmt="jyear"):
+	from pkg_resources import resource_filename
+	AEfilename = resource_filename(__name__, filename)
+	return load_solar_gm_table(AEfilename, cols=[0, 1],
+			names=["time", name], tfmt=tfmt)
+
+
 def load_solar_gm_table(filename, cols, names, sep="\t", tfmt="jyear"):
 	"""Load proxy tables from ascii files
 
