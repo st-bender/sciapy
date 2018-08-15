@@ -21,7 +21,8 @@ from george import kernels
 from celerite import terms
 
 __all__ = ["george_kernels", "george_solvers",
-		"celerite_terms", "celerite_terms_freeze_params"]
+		"celerite_terms",
+		"setup_george_kernel", "setup_celerite_terms"]
 
 george_kernels = {
 	"Exp2": kernels.ExpSquaredKernel(10**2),
@@ -73,7 +74,7 @@ celerite_terms = {
 			terms.SHOTerm(log_S0=1, log_Q=1.0 / np.sqrt(2.), log_omega0=0.,
 				bounds={"log_omega0": [-5, 5]}),
 }
-celerite_terms_freeze_params = {
+_celerite_terms_freeze_params = {
 	"N": [],
 	"B": ["log_c"],
 	"W": [],
@@ -83,3 +84,100 @@ celerite_terms_freeze_params = {
 	"SHO2": [],
 	"SHO3": ["k2:log_S0", "k2:log_Q"],
 }
+
+
+def setup_george_kernel(kernelnames, kernel_base=1, fit_bias=False):
+	"""Setup the Gaussian Process kernel for george
+
+	Parameters
+	----------
+	kernelnames : list of str
+		List of abbreviated names for the kernels, choices:
+		'Exp2' for a `ExpSquaredKernel`, 'ESin2' for a `ExpSine2Kernel`,
+		'Exp2ESin2' for a `ExpSquaredKernel` multiplied by a `ExpSine2Kernel`,
+		'RatQ' for a `RationalQuadraticKernel`, 'Mat32' for a `Matern32Kernel`,
+		'Exp' for `ExpKernel`, and 'B' for a `ConstantKernel` (bias).
+	kernel_base : float, optional
+		The initial "strength" of the kernels.
+	fit_bias : bool, optional
+		Adds a `ConstantKernel` if kernel does not already contain one.
+
+	Returns
+	-------
+	name : The kernel names concatenated by an underscore and prepended by '_gp'
+	kernel : The covariance kernel for use with george.GP
+	"""
+	kernel = None
+	kname = "_gp"
+	for kn in kernelnames:
+		krn = george_kernels.get(kn, None)
+		if krn is None:
+			# not found in the list of available kernels
+			continue
+		if kn in ["B", "W"]:
+			# don't scale the constant or white kernels
+			krnl = krn(0.25 * kernel_base)
+		else:
+			krnl = kernel_base * krn
+		kernel = kernel + krnl if hasattr(kernel, "is_kernel") else krnl
+		kname += "_" + kn
+
+	if fit_bias and "B" not in kernelnames:
+		krnl = kernels.ConstantKernel(kernel_base)
+		kernel = kernel + krnl if hasattr(kernel, "is_kernel") else krnl
+		kname += "_b"
+
+	return kname, kernel
+
+
+def setup_celerite_terms(termnames, fit_bias=False, fit_white=False):
+	"""Setup the Gaussian Process terms for celerite
+
+	Parameters
+	----------
+	termnames : list of str
+		List of abbreviated names for the `celerite.terms`, choices:
+		'N' for an empty `Term`, 'B' for a constant term (bias),
+		'W' for a `JitterTerm` (white noise), 'Mat32' for a `Matern32Term`,
+		'SHO0'...'SHO3' for `SHOTerm`s (harmonic oscillators) with different
+		frozen parameters.
+	fit_bias : bool, optional
+		Adds a constant term (`RealTerm` with log_c fixed to -np.inf) if the
+		terms do not already contain one.
+	fit_white : bool, optional
+		Adds a `JitterTerm` if not already included.
+
+	Returns
+	-------
+	name : The term names concatenated by an underscore and prepended by '_cel'
+	terms : The covariance terms for use with celerite.GP
+	"""
+	# celerite terms
+	cel_terms = None
+	cel_name = "_cel"
+	for tn in termnames:
+		trm = celerite_terms.get(tn, None)
+		if trm is None:
+			# not found in the list of available terms
+			continue
+		for freeze_p in _celerite_terms_freeze_params[tn]:
+			trm.freeze_parameter(freeze_p)
+		cel_terms = cel_terms + trm if cel_terms is not None else trm
+		cel_name += "_" + tn
+
+	# avoid double initialisation of White and Constant kernels
+	# if already set above
+	if fit_white and "W" not in termnames:
+		trm = celerite_terms["W"]
+		cel_terms = cel_terms + trm if cel_terms is not None else trm
+		cel_name += "_w"
+	if fit_bias and "B" not in termnames:
+		trm = celerite_terms["B"]
+		trm.freeze_parameter("log_c")
+		cel_terms = cel_terms + trm if cel_terms is not None else trm
+		cel_name += "_b"
+
+	if cel_terms is None:
+		cel_terms = terms.Term()
+
+	return cel_name, cel_terms

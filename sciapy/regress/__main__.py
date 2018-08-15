@@ -38,8 +38,8 @@ from .models_cel import ConstantModel, ProxyModel
 from .models_cel import HarmonicModelCosineSine, HarmonicModelAmpPhase
 from .mcmc import mcmc_sample_model
 
-from ._gpkernels import (george_kernels, george_solvers,
-		celerite_terms, celerite_terms_freeze_params)
+from ._gpkernels import (george_solvers,
+		setup_george_kernel, setup_celerite_terms)
 from ._plot import (plot_single_sample_and_residuals,
 		plot_residual, plot_single_sample, plot_random_samples)
 from ._options import parser
@@ -307,60 +307,6 @@ def main():
 
 	# setup the Gaussian Process kernel
 	kernel_base = (1e7 * args.scale)**2
-
-	# george kernels
-	kernel = None
-	kname = "_gp"
-	kernel_bounds = []
-	for k in kernls:
-		try:
-			krn = george_kernels[k]
-		except KeyError:
-			continue
-		if k in ["B", "W"]:
-			# don't scale the constant or white kernels
-			krnl = krn(0.25 * kernel_base)
-		else:
-			krnl = kernel_base * krn
-		kernel = kernel + krnl if hasattr(kernel, "is_kernel") else krnl
-		kname += "_" + k
-		# the george interface does not allow setting the bounds
-		# in the kernel initialization so we prepare a simple default
-		# bounds list to be used later
-		kernel_bounds.extend([[-0.3 * max_amp, 0.3 * max_amp]
-					for _ in krnl.get_parameter_names()])
-
-	# celerite terms
-	cel_terms = None
-	cel_name = "_cel"
-	for k in kernls:
-		try:
-			trm = celerite_terms[k]
-		except KeyError:
-			continue
-		for freeze_p in celerite_terms_freeze_params[k]:
-			trm.freeze_parameter(freeze_p)
-		cel_terms = cel_terms + trm if cel_terms is not None else trm
-		cel_name += "_" + k
-
-	# avoid double initialisation of White and Constant kernels
-	# if already set above
-	if args.fit_white and "W" not in kernls:
-		trm = celerite_terms["W"]
-		cel_terms = cel_terms + trm if cel_terms is not None else trm
-		cel_name += "_w"
-	if args.fit_bias and "B" not in kernls:
-		krnl = kernels.ConstantKernel(kernel_base)
-		kernel = kernel + krnl if hasattr(kernel, "is_kernel") else krnl
-		kname += "_b"
-		trm = celerite_terms["B"]
-		trm.freeze_parameter("log_c")
-		cel_terms = cel_terms + trm if cel_terms is not None else trm
-		cel_name += "_b"
-
-	if cel_terms is None:
-		cel_terms = terms.Term()
-
 	ksub = args.name_suffix
 
 	solver = "basic"
@@ -370,16 +316,22 @@ def main():
 		#skwargs = {"tol": 1e-3}
 
 	if args.george:
+		gpname, kernel = setup_george_kernel(kernls,
+				kernel_base=kernel_base, fit_bias=args.fit_bias)
 		gpmodel = george.GP(kernel, mean=model,
 			white_noise=1.e-25, fit_white_noise=args.fit_white,
 			solver=george_solvers[solver], **skwargs)
-		gpname = kname
-		bounds = gpmodel.get_parameter_bounds()[:-len(kernel_bounds)] + kernel_bounds
+		# the george interface does not allow setting the bounds in
+		# the kernel initialization so we prepare simple default bounds
+		kernel_bounds = [(-0.3 * max_amp, 0.3 * max_amp)
+				for _ in gpmodel.kernel.get_parameter_names()]
+		bounds = gpmodel.mean.get_parameter_bounds() + kernel_bounds
 	else:
+		gpname, cel_terms = setup_celerite_terms(kernls,
+				fit_bias=args.fit_bias, fit_white=args.fit_white)
 		gpmodel = celerite.GP(cel_terms, mean=model,
 			fit_white_noise=args.fit_white,
 			fit_mean=True)
-		gpname = cel_name
 		bounds = gpmodel.get_parameter_bounds()
 	gpmodel.compute(no_ys_train, no_errs_train)
 	logging.debug("gpmodel params: %s", gpmodel.get_parameter_dict())
