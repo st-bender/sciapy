@@ -84,6 +84,37 @@ def save_samples_netcdf(filename, model, alt, lat, samples,
 	smpl_ds.close()
 
 
+def _train_test_split(times, data, errs, train_frac,
+		test_frac, randomize):
+	# split the data into training and test subsets according to the
+	# fraction given (default is 1, i.e. no splitting)
+	ndata = len(times)
+	train_size = int(ndata * train_frac)
+	test_size = min(ndata - train_size, int(ndata * test_frac))
+	# randomize if requested
+	if randomize:
+		permut_idx = np.random.permutation(np.arange(ndata))
+	else:
+		permut_idx = np.arange(ndata)
+	train_idx = np.sort(permut_idx[:train_size])
+	test_idx = np.sort(permut_idx[train_size:train_size + test_size])
+	times_train = times[train_idx]
+	data_train = data[train_idx]
+	errs_train = errs[train_idx]
+	if test_size > 0:
+		times_test = times[test_idx]
+		data_test = data[test_idx]
+		errs_test = errs[test_idx]
+	else:
+		times_test = times
+		data_test = data
+		errs_test = errs
+	logging.info("using %s of %s samples for training.", len(times_train), ndata)
+	logging.info("using %s of %s samples for testing.", len(times_test), ndata)
+	return (times_train, data_train, errs_train,
+			times_test, data_test, errs_test)
+
+
 def _r_sun_earth(time, tfmt="jyear"):
 	"""First order approximation of the Sun-Earth distance
 
@@ -182,34 +213,10 @@ def main():
 			season=args.season,
 			SPEs=args.exclude_spe)
 
-	# split the data into training and test subsets according to the
-	# fraction given (default is 1, i.e. no splitting)
-	ndata = len(no_ys)
-	train_frac = args.train_fraction
-	test_frac = args.test_fraction
-	train_size = int(ndata * train_frac)
-	test_size = min(ndata - train_size, int(ndata * test_frac))
-	# randomize if requested
-	if args.random_train_test:
-		permut_idx = np.random.permutation(np.arange(ndata))
-	else:
-		permut_idx = np.arange(ndata)
-	train_idx = np.sort(permut_idx[:train_size])
-	test_idx = np.sort(permut_idx[train_size:train_size + test_size])
-	no_ys_train = no_ys[train_idx]
-	no_dens_train = no_dens[train_idx]
-	no_errs_train = no_errs[train_idx]
-	if test_size > 0:
-		no_ys_test = no_ys[test_idx]
-		no_dens_test = no_dens[test_idx]
-		no_errs_test = no_errs[test_idx]
-	else:
-		# use the full data set if the test set would be empty
-		no_ys_test = no_ys
-		no_dens_test = no_dens
-		no_errs_test = no_errs
-	logging.info("using %s of %s samples for training.", len(no_ys_train), ndata)
-	logging.info("using %s of %s samples for testing.", len(no_ys_test), ndata)
+	(no_ys_train, no_dens_train, no_errs_train,
+		no_ys_test, no_dens_test, no_errs_test) = _train_test_split(
+				no_ys, no_dens, no_errs, args.train_fraction,
+				args.test_fraction, args.random_train_test)
 
 	sza_intp = interp1d(no_ys, no_szas, fill_value="extrapolate")
 
