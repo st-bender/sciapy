@@ -16,7 +16,6 @@ daily zonal mean time series (NO for now).
 
 import ctypes
 import logging
-import pickle
 
 import numpy as np
 import scipy.optimize as op
@@ -484,6 +483,12 @@ def main():
 	# set the model times and errors to use the full data set for plotting
 	gpmodel.compute(no_ys, no_errs)
 	if args.save_model:
+		try:
+			# python 2
+			import cPickle as pickle
+		except ImportError:
+			# python 3
+			import pickle
 		# pickle and save the model
 		with open(filename_base.format("model") + ".pkl", "wb") as f:
 			pickle.dump((gpmodel), f, -1)
