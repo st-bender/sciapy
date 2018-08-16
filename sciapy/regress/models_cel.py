@@ -48,10 +48,10 @@ class HarmonicModelCosineSine(Model):
 				self.sin * np.sin(self.freq * 2 * np.pi * t))
 
 	def get_amplitude(self):
-		return np.sqrt(np.cos**2 + np.sin**2)
+		return np.sqrt(self.cos**2 + self.sin**2)
 
 	def get_phase(self):
-		return np.arctan2(np.sin, np.cos)
+		return np.arctan2(self.sin, self.cos)
 
 	def compute_gradient(self, t):
 		dcos = np.cos(self.freq * 2 * np.pi * t)
