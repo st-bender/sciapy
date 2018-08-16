@@ -150,6 +150,17 @@ parser.add_argument("--train_fraction", metavar="factor",
 		type=float, default=1, choices=Range(0., 1.),
 		help="Use the given fraction of the data points to train the model "
 		"(default: 1, train on all points)")
+parser.add_argument("--test_fraction", metavar="factor",
+		type=float, default=1, choices=Range(0., 1.),
+		help="Use the given fraction of the data points to test the model "
+		"(default: test on (1 - train_fraction) or all points)")
+parser.add_argument("--random_train_test", dest="random_train_test",
+		action="store_true")
+parser.add_argument("--no-random_train_test", dest="random_train_test",
+		action="store_false",
+		help="Randomize the data before splitting into train and test sets "
+		"(default: %(default)s).")
+parser.set_defaults(random_train_test=False)
 parser.add_argument("--scheduler_address", metavar="address:port",
 		default=None,
 		help="Connect to dask scheduler at address:port "

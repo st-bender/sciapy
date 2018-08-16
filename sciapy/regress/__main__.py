@@ -184,20 +184,32 @@ def main():
 
 	# split the data into training and test subsets according to the
 	# fraction given (default is 1, i.e. no splitting)
+	ndata = len(no_ys)
 	train_frac = args.train_fraction
-	train_size = int(len(no_ys) * train_frac)
-	logging.info("using %s of %s samples for training.", train_size, len(no_ys))
-	no_ys_train = no_ys[:train_size]
-	no_dens_train = no_dens[:train_size]
-	no_errs_train = no_errs[:train_size]
-	if train_frac < 1:
-		no_ys_test = no_ys[train_size:]
-		no_dens_test = no_dens[train_size:]
-		no_errs_test = no_errs[train_size:]
+	test_frac = args.test_fraction
+	train_size = int(ndata * train_frac)
+	test_size = min(ndata - train_size, int(ndata * test_frac))
+	# randomize if requested
+	if args.random_train_test:
+		permut_idx = np.random.permutation(np.arange(ndata))
 	else:
+		permut_idx = np.arange(ndata)
+	train_idx = np.sort(permut_idx[:train_size])
+	test_idx = np.sort(permut_idx[train_size:train_size + test_size])
+	no_ys_train = no_ys[train_idx]
+	no_dens_train = no_dens[train_idx]
+	no_errs_train = no_errs[train_idx]
+	if test_size > 0:
+		no_ys_test = no_ys[test_idx]
+		no_dens_test = no_dens[test_idx]
+		no_errs_test = no_errs[test_idx]
+	else:
+		# use the full data set if the test set would be empty
 		no_ys_test = no_ys
 		no_dens_test = no_dens
 		no_errs_test = no_errs
+	logging.info("using %s of %s samples for training.", len(no_ys_train), ndata)
+	logging.info("using %s of %s samples for testing.", len(no_ys_test), ndata)
 
 	sza_intp = interp1d(no_ys, no_szas, fill_value="extrapolate")
 
