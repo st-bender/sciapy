@@ -19,7 +19,7 @@ install:
 script:
   - py.test -v
   - pytest --cov=./
-after_sucess:
+after_success:
   - codecov
   - coveralls
 notifications:
