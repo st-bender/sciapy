@@ -5,7 +5,6 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-  - "3.7"
 env:
   global:
     LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
@@ -15,11 +14,10 @@ before_install:
   - lsb_release -a
 install:
   - pip install pytest coveralls
-  - "python setup.py install"
   - pip install tox-travis
+  - pip install .
 script:
   - py.test -v
-  - coverage run --source sciapy -m py.test
 after_sucess: coveralls
 notifications:
   email:
