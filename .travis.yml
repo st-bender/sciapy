@@ -15,10 +15,9 @@ before_install:
 install:
   - pip install pytest pytest-cov codecov coveralls
   - pip install tox-travis
-  - pip install .
+  - pip install -e .
 script:
-  - py.test -v
-  - pytest --cov=./
+  - py.test -v --cov sciapy
 after_success:
   - codecov
   - coveralls
