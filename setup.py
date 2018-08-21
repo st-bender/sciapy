@@ -3,6 +3,7 @@ from os import path
 from sys import version_info
 # Always prefer setuptools over distutils
 from setuptools import find_packages, setup
+from subprocess import check_call
 from distutils.core import Extension
 
 here = path.abspath(path.dirname(__file__))
@@ -30,6 +31,10 @@ if __name__ == "__main__":
 		import builtins
 	builtins.__SCIAPY_SETUP__ = True
 	from sciapy import __version__
+
+	# update git submodules
+	if path.exists(".git"):
+		check_call(["git", "submodule", "update", "--init", "--recursive"])
 
 	setup(name='sciapy',
 		version=__version__,
