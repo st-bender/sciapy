@@ -46,6 +46,7 @@ if __name__ == "__main__":
 		packages=find_packages(),
 		scripts=['scripts/scia_binary_util.py',
 			'scripts/scia_conv_hdf5_limb.py',
+			'scripts/scia_daily_zonal_mean.py',
 			'scripts/scia_post_process_l2.py'],
 		package_data={'sciapy.level2': ['IGRF.tab',
 				'AACGM2005_80km_grid.nc'],
