@@ -537,7 +537,7 @@ def main():
 	if args.mcmc:
 		gpmodel.compute(no_ys_train, no_errs_train)
 		samples, lnp = mcmc_sample_model(gpmodel,
-				no_dens_train, no_errs_train,
+				no_dens_train,
 				beta=1.0,
 				nwalkers=args.walkers, nburnin=args.burn_in,
 				nprod=args.production, nthreads=args.threads,
