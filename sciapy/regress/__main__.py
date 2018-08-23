@@ -115,6 +115,76 @@ def _train_test_split(times, data, errs, train_frac,
 			times_test, data_test, errs_test)
 
 
+def _log_statistics(model, times, data, errs, samples, lnp, median=False):
+	"""Log the statistics of the model against the provided data
+
+	Logs some statistical information about the model and the
+	sampled parameter distribution with respect to the provided
+	data and its variance.
+	"""
+	ndat = len(times)
+	ndim = len(model.get_parameter_vector())
+	mdim = len(model.mean.get_parameter_vector())
+	samples_max_lp = np.max(lnp)
+	if median:
+		sample_pos = np.nanmedian(samples)
+	else:
+		sample_pos = samples[np.argmax(lnp)]
+	model.compute(times, errs)
+	model.set_parameter_vector(sample_pos)
+	test_loglh = model.log_likelihood(data)
+	test_logpost = model.log_prior() + test_loglh
+	# calculate the GP predicted values and covariance
+	gppred, gpcov = model.predict(data, t=times, return_cov=True)
+	# the predictive covariance should include the data variance
+	pcov_gp = gpcov + np.diag(errs)**2
+	# residuals
+	resid_mod = model.mean.get_value(times) - data  # GP mean model
+	resid_gp = gppred - data  # GP prediction
+	resid_triv = data.mean() - data  # trivial model
+	# cost values
+	cost_mod = np.sum(resid_mod**2)
+	cost_triv = np.sum(resid_triv**2)
+	cost_gp = np.sum(resid_gp**2)
+	# chi^2 (variance corrected costs)
+	chisq_mod_gp = model.solver.dot_solve(resid_mod)
+	chisq_mod_ye = np.sum((resid_mod / errs)**2)
+	chisq_triv = np.sum((resid_triv / errs)**2)
+	chisq_gpcov = resid_mod.dot(np.linalg.solve(pcov_gp, resid_mod))
+	# adjust for degrees of freedom
+	cost_gp_dof = cost_gp / (ndat - ndim)
+	cost_mod_dof = cost_mod / (ndat - mdim)
+	cost_triv_dof = cost_triv / (ndat - 1)
+	# reduced chi^2
+	chisq_red_mod_gp = chisq_mod_gp / (ndat - ndim)
+	chisq_red_mod_ye = chisq_mod_ye / (ndat - mdim)
+	chisq_red_triv = chisq_triv / (ndat - 1)
+	chisq_red_gpcov = chisq_gpcov / (ndat - ndim)
+	# sent to the logger
+	logging.info("train max logpost: %s", samples_max_lp)
+	logging.info("test log_lh: %s, log_post: %s", test_loglh, test_logpost)
+	logging.debug("1a cost mean model: %s, dof adj: %s", cost_mod, cost_mod_dof)
+	logging.debug("1c cost gp predict: %s, dof adj: %s", cost_gp, cost_gp_dof)
+	logging.debug("1b cost triv model: %s, dof adj: %s", cost_triv, cost_triv_dof)
+	logging.info("2a adjR2 mean model: %s, adjR2 gp predict: %s",
+			1 - cost_mod_dof / cost_triv_dof, 1 - cost_gp_dof / cost_triv_dof)
+	logging.info("2b red chi^2 mod: %s / triv: %s = %s",
+			chisq_red_mod_ye, chisq_red_triv, chisq_red_mod_ye / chisq_red_triv)
+	logging.info("3a stand. red chi^2: %s", chisq_red_gpcov / chisq_red_triv)
+	logging.info("3b 1 - stand. red chi^2: %s",
+			1 - chisq_red_gpcov / chisq_red_triv)
+	logging.info("4 GPchi^2 mod: %s, red chi^2: %s",
+			chisq_mod_gp, chisq_red_mod_gp)
+	try:
+		# celerite
+		logdet = model.solver.log_determinant()
+	except TypeError:
+		# george
+		logdet = model.solver.log_determinant
+	_const = ndat * np.log(2.0 * np.pi)
+	logging.debug("5 logdet: %s, const 2: %s", logdet, _const)
+
+
 def _r_sun_earth(time, tfmt="jyear"):
 	"""First order approximation of the Sun-Earth distance
 
@@ -473,6 +543,12 @@ def main():
 				nprod=args.production, nthreads=args.threads,
 				show_progress=args.progress,
 				optimized=pre_opt, bounds=bounds, return_logpost=True)
+
+		logging.info("Statistics for the test samples")
+		_log_statistics(gpmodel, no_ys_test, no_dens_test, no_errs_test,
+				samples, lnp)
+		logging.info("Statistics for all samples")
+		_log_statistics(gpmodel, no_ys, no_dens, no_errs, samples, lnp)
 
 		sampl_percs = np.percentile(samples, [2.5, 50, 97.5], axis=0)
 		if args.plot_corner:

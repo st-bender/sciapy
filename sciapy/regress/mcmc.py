@@ -196,40 +196,6 @@ def mcmc_sample_model(model, y, ye, beta=1.,
 	logging.info("poor man's evidence 2 max: %s, std: %s", np.max(np.exp(lnp)), np.std(np.exp(lnp)))
 	logging.info("poor man's evidence 3: %s", np.max(np.exp(lnp)) / np.std(np.exp(lnp)))
 
-	max_lp, max_lp_pos = np.max(lnp), samples[np.argmax(lnp)]
-	model.set_parameter_vector(max_lp_pos)
-	if hasattr(model, "_t"):
-		# celerite
-		model_times = model._t.ravel()
-	elif hasattr(model, "_x"):
-		# george
-		model_times = model._x.ravel()
-	else:
-		model_times = None
-	resid_mod = model.mean.get_value(model_times) - y
-	gppred, gpcov = model.predict(y, t=model_times, return_cov=True)
-	resid_gp = gppred - y
-	resid_triv = y.mean() - y
-	cost_mod = np.sum(resid_mod**2)
-	chi_sq = model.solver.dot_solve(resid_mod)
-	cost_gp = np.sum(resid_gp**2)
-	try:
-		# celerite
-		logdet = model.solver.log_determinant()
-	except TypeError:
-		# george
-		logdet = model.solver.log_determinant
-	_const = len(y) * np.log(2.0 * np.pi)
-	chisq_red_gp = cost_gp / (len(y) - ndim)
-	chisq_red_mod = cost_mod / (len(y) - ndim)
-	chisq_red_gp2 = chi_sq / (len(y) - ndim)
-	logging.info("max logpost: %s, log_lh: %s", max_lp, model.log_likelihood(y))
-	logging.info("1 cost: %s, reduced chi^2: %s", cost_gp, chisq_red_gp)
-	logging.info("2 cost: %s, reduced chi^2: %s", cost_mod, chisq_red_mod)
-	logging.info("3 tot var: %s, res var 2: %s", np.var(y, ddof=1), np.var(resid_mod, ddof=ndim + 1))
-	logging.info("4 chi^2: %s, reduced chi^2: %s", chi_sq, chisq_red_gp2)
-	logging.info("5 logdet: %s, const 2: %s", logdet, _const)
-
 	if return_logpost:
 		return samples, lnp
 	return samples
