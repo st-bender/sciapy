@@ -37,7 +37,7 @@ from .mcmc import mcmc_sample_model
 from ._gpkernels import (george_solvers,
 		setup_george_kernel, setup_celerite_terms)
 from ._plot import (plot_single_sample_and_residuals,
-		plot_residual, plot_single_sample, plot_random_samples)
+		plot_residual, plot_random_samples)
 from ._options import parser
 
 
