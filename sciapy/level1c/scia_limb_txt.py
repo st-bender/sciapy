@@ -17,7 +17,7 @@ import numpy as np
 from ._types import _float_type, _int_type, _limb_data_dtype
 
 def _print_indent(fp, indent):
-	for i in range(indent):
+	for _ in range(indent):
 		print(" ", end="", file=fp)
 
 def _print_array(fp, a, indent):
@@ -54,7 +54,7 @@ def read_from_textfile(self, filename):
 		f = open(filename, 'rb')
 	h_list = []
 	nh = int(f.readline())
-	for i in range(0, nh):
+	for _ in range(nh):
 		h_list.append(bytes(f.readline()).decode().rstrip())
 	self.textheader_length = nh
 	self.textheader = '\n'.join(h_list)
@@ -92,7 +92,7 @@ def read_from_textfile(self, filename):
 	self.limb_data["earth_rad"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
 
 	tmp_list = []
-	for i in range(self.npix):
+	for _ in range(self.npix):
 		input = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
 		self.wls.append(input[0])
 		tmp_list.append(input[1:])
@@ -100,11 +100,11 @@ def read_from_textfile(self, filename):
 	tmp_list[:] = []
 	line = f.readline().strip()
 	if bytes(line) == b"ERRORS":
-		for i in range(self.npix):
+		for _ in range(self.npix):
 			input = np.fromstring(f.readline(), dtype=_float_type, sep=' ')
 			tmp_list.append(input[1:])
 	else:
-		for i in range(self.npix):
+		for _ in range(self.npix):
 			tmp_list.append(np.zeros(self.nalt))
 	tmp_err_arr = np.asarray(tmp_list).reshape(self.npix, self.nalt).transpose()
 

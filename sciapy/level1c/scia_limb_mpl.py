@@ -71,7 +71,7 @@ def read_from_mpl_binary(self, filename):
 	self.textheader_length = int(''.join(nline))
 
 	h_list = []
-	for i in range(self.textheader_length):
+	for _ in range(self.textheader_length):
 		line = ""
 		j = 0
 		flag = 0
