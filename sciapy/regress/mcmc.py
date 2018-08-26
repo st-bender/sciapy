@@ -38,6 +38,19 @@ def _lpost(p, model, y=None, beta=1.):
 	return beta * (model.log_likelihood(y, quiet=True) + lprior)
 
 
+def _sample_mcmc(sampler, nsamples, p0, rst0,
+		show_progress, progress_mod, debug=False):
+	for i, result in enumerate(
+			sampler.sample(p0, rstate0=rst0, iterations=nsamples)):
+		if show_progress and (i + 1) % progress_mod == 0:
+			logging.info("%5.1f%%", 100 * (float(i + 1) / nsamples))
+			if debug:
+				_pos, _logp, _ = result
+				logging.debug("lnpmax: %s, p(lnpmax): %s",
+					np.max(_logp), _pos[np.argmax(_logp)])
+	return result
+
+
 def mcmc_sample_model(model, y, beta=1.,
 		nwalkers=100, nburnin=200, nprod=800,
 		nthreads=1, optimized=False,
@@ -137,13 +150,8 @@ def mcmc_sample_model(model, y, beta=1.,
 			pool=pool)
 
 	logging.info("Running burn-in ({0} samples)".format(nburnin))
-	for i, result in enumerate(sampler.sample(p0, iterations=nburnin)):
-		if show_progress and (i + 1) % progress_mod == 0:
-			logging.info("{0:5.1%}".format(float(i + 1) / nburnin))
-			pp, lnpp, _ = result
-			logging.debug("lnpmax: %s, p(lnpmax): %s",
-					np.max(lnpp), pp[np.argmax(lnpp)])
-	p0, lnp0, rst0 = result
+	p0, lnp0, rst0 = _sample_mcmc(sampler, nburnin, p0, None,
+			show_progress, progress_mod, debug=True)
 	logging.info("Burn-in finished.")
 
 	p = p0[np.argmax(lnp0)]
@@ -157,19 +165,13 @@ def mcmc_sample_model(model, y, beta=1.,
 	if not optimized:
 		p0 = [p + 1e-4 * np.random.randn(ndim) for _ in range(nwalkers)]
 		logging.info("Running second burn-in ({0} samples)".format(nburnin))
-		for i, result in enumerate(
-				sampler.sample(p0, lnp0, rstate0=rst0, iterations=nburnin)):
-			if show_progress and (i + 1) % progress_mod == 0:
-				logging.info("{0:5.1%}".format(float(i + 1) / nburnin))
-		p0, lnp0, rst0 = result
+		p0, lnp0, rst0 = _sample_mcmc(sampler, nburnin, p0, rst0,
+				show_progress, progress_mod)
 		sampler.reset()
 		logging.info("Second burn-in finished.")
 
 	logging.info("Running production chain ({0} samples)".format(nprod))
-	for i, result in enumerate(
-			sampler.sample(p0, lnp0, rstate0=rst0, iterations=nprod)):
-		if show_progress and (i + 1) % progress_mod == 0:
-			logging.info("{0:5.1%}".format(float(i + 1) / nprod))
+	_sample_mcmc(sampler, nprod, p0, rst0, show_progress, progress_mod)
 	logging.info("Production run finished.")
 
 	samples = sampler.flatchain
