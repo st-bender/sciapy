@@ -84,8 +84,8 @@ def load_dailymeanAE(
 def load_dailymeanLya(filename="../../data/indices/lisird_lya3_1980-2017.dat",
 		name="Lya", tfmt="jyear"):
 	from pkg_resources import resource_filename
-	AEfilename = resource_filename(__name__, filename)
-	return load_solar_gm_table(AEfilename, cols=[0, 1],
+	Lyafilename = resource_filename(__name__, filename)
+	return load_solar_gm_table(Lyafilename, cols=[0, 1],
 			names=["time", name], tfmt=tfmt)
 
 
