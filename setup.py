@@ -55,6 +55,7 @@ if __name__ == "__main__":
 			'numpy',
 			'netCDF4',
 			'h5py',
+			'dask',
 			'astropy',
 			'pandas',
 			'xarray',
