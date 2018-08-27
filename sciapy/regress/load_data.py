@@ -73,7 +73,7 @@ _SPEs = [pd.date_range("2002-04-20", "2002-05-01"),
 
 
 def load_dailymeanAE(
-		filename="../../data/indices/AE_Kyoto_1980-2016_daily2_shift12h.dat",
+		filename="../data/indices/AE_Kyoto_1980-2016_daily2_shift12h.dat",
 		name="AE", tfmt="jyear"):
 	from pkg_resources import resource_filename
 	AEfilename = resource_filename(__name__, filename)
@@ -81,7 +81,7 @@ def load_dailymeanAE(
 			names=["time", name], tfmt=tfmt)
 
 
-def load_dailymeanLya(filename="../../data/indices/lisird_lya3_1980-2017.dat",
+def load_dailymeanLya(filename="../data/indices/lisird_lya3_1980-2017.dat",
 		name="Lya", tfmt="jyear"):
 	from pkg_resources import resource_filename
 	Lyafilename = resource_filename(__name__, filename)
