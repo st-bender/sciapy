@@ -229,25 +229,24 @@ def load_scia_dzm(filename, alt, lat, tfmt="jyear",
 
 	NO_mean = 0.
 	if center:
-		NO_mean = NO_ds.NO_DENS.mean()
-		logging.info("Centering with global mean: %s", NO_mean.values)
+		NO_mean = NO_ds.NO_DENS.mean().values
+		logging.info("Centering with global mean: %s", NO_mean)
 	NO_tds = NO_ds.sel(latitude=lat, altitude=alt)
 
 	# Exclude SPEs first if requested
 	if SPEs:
 		logging.info("Removing SPEs.")
-		# Re-index to include all dates for SPE selection
-		# (Dataset.drop() needs to find all dates)
-		NO_tds = NO_tds.reindex({"time":
-					pd.date_range("2002-04-01", "2012-04-30")})
 		for spe in _SPEs:
-			NO_tds = NO_tds.drop(spe, dim="time")
+			NO_tds = NO_tds.drop(
+					NO_tds.sel(time=slice(spe[0], spe[-1])).time.values,
+					dim="time")
 
 	# Filter by season
 	if season in _seasons.keys():
 		logging.info("Restricting to season: %s", season)
 		NO_tds = xr.concat([NO_tds.sel(time=s) for s in _seasons[season]],
 					dim="time")
+		NO_tds.load()
 	else:
 		logging.info("No season selected or unknown season, "
 					"using all available data.")
