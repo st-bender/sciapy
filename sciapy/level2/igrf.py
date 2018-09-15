@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 # vim:fileencoding=utf-8
+#
+# Copyright (c) 2017-2018 Stefan Bender
+#
+# This file is part of sciapy.
+# sciapy is free software: you can redistribute it or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 2.
+# See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 """IGRF geomagnetic coordinates
-
-Copyright (c) 2017-2018 Stefan Bender
-
-This file is part of sciapy.
-sciapy is free software: you can redistribute it or modify it
-under the terms of the GNU General Public License as published by
-the Free Software Foundation, version 2.
-See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 
 This is a python (mix) version of GMPOLE and GMCOORD from
 http://www.ngdc.noaa.gov/geomag/geom_util/utilities_home.shtml

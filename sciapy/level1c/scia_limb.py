@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 # vim:fileencoding=utf-8
+#
+# Copyright (c) 2014-2018 Stefan Bender
+#
+# This module is part of sciapy.
+# sciapy is free software: you can redistribute it or modify
+# it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, version 2.
+# See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 """SCIAMACHY level 1c limb spectra module
-
-Copyright (c) 2014-2018 Stefan Bender
 
 This module contains the class for SCIAMACHY level 1c limb spectra.
 It include some simple conversion routines: from and to ascii,
@@ -10,14 +16,6 @@ from and to binary, from and to netcdf.
 
 A simple import from HDF5 files produced by the SRON nadc_tools
 (https://github.com/rmvanhees/nadc_tools) is also supported.
-
-License
--------
-This module is part of sciapy.
-sciapy is free software: you can redistribute it or modify
-it under the terms of the GNU General Public License as published
-by the Free Software Foundation, version 2.
-See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 """
 from __future__ import absolute_import, division, print_function
 

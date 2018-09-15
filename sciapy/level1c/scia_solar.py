@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
 # vim:fileencoding=utf-8
+#
+# Copyright (c) 2014-2017 Stefan Bender
+#
+# This module is part of sciapy.
+# sciapy is free software: you can redistribute it or modify
+# it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, version 2.
+# See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 """SCIAMACHY level 1c solar spectra module
-
-Copyright (c) 2014-2017 Stefan Bender
 
 This module contains the python class for SCIAMACHY level 1c solar spectra.
 It include some simple conversion routines, from and to ascii and from and to netcdf.
 
 A simple import from SRON nadc_tools (https://github.com/rmvanhees/nadc_tools)
 produced HDF5 is also supported.
-
-License
--------
-This module is part of sciapy.
-sciapy is free software: you can redistribute it or modify
-it under the terms of the GNU General Public License as published
-by the Free Software Foundation, version 2.
-See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 """
 from __future__ import absolute_import, division, print_function
 

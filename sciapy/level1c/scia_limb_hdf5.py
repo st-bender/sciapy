@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 # vim:fileencoding=utf-8
+#
+# Copyright (c) 2017 Stefan Bender
+#
+# This file is part of sciapy.
+# sciapy is free software: you can redistribute it or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 2.
+# See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 """SCIAMACHY level 1c limb spectra hdf5 interface
-
-Copyright (c) 2017 Stefan Bender
-
-This file is part of sciapy.
-sciapy is free software: you can redistribute it or modify it
-under the terms of the GNU General Public License as published by
-the Free Software Foundation, version 2.
-See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 """
 
 from __future__ import absolute_import, division, print_function
