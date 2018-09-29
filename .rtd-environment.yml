@@ -7,3 +7,5 @@ dependencies:
     - python=3.6
     - numpy
     - pybind11
+    - celerite
+    - george
