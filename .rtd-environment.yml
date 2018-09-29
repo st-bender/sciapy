@@ -9,3 +9,5 @@ dependencies:
     - pybind11
     - celerite
     - george
+    - sphinxcontrib-napoleon
+    - numpydoc
