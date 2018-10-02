@@ -11,6 +11,8 @@
 These SCIAMACHY tools are provided as convenience tools for handling
 SCIAMACHY level 1c limb spectra and retrieved level 2 trace-gas densities.
 
+More extensive documentation is provided on [sciapy.rtfd.io](https://sciapy.rtfd.io).
+
 ## Overview
 
 ### Level 1c tools
