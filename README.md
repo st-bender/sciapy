@@ -47,15 +47,53 @@ Further supports covariance modelling via
 and [`george`](https://george.readthedocs.io).
 
 ## Install
-  
-This package can be installed with [pip](https://pip.pypa.io) directly
+
+### Prerequisites
+
+Sciapy uses features from a lot of different packages.
+All dependencies should be installed when using
+`pip install` or `python setup.py`, see below.
+However, to speed up the install or for use
+with a `conda` environment, it may be advantageous to
+install some of the important packages beforehand:
+
+- `numpy` and `scipy` (at least version 0.17.0) for general numerics,
+- `matplotlib` (at least version 2.2) for plotting,
+- `netCDF4` and `h5py` for their low level data interfaces,
+- `dask`, `toolz`, `pandas`, and `xarray` for the higher level data interfaces,
+- `astropy` and `pysolar` for time and solar zenith angle conversions,
+- `parse` for ASCII text parsing in `level1c`,
+- `celerite` (at least version 0.3.0) and `george` for Gaussian process modelling,
+- `emcee` for MCMC sampling and `corner` for the sample histogram plots.
+
+Out of these packages, `numpy` is probably the most important one
+to be installed first because at least `celerite` needs it for setup.
+It may also be a good idea to install
+[`pybind11`](https://pybind11.readthedocs.io)
+because both `celerite` and `george` use its interface,
+and both may fail to install without `pybind11`.
+
+Depending on the setup, `numpy` and `pybind11` can be installed
+via `pip`:
+```sh
+pip install numpy pybind11
+```
+or [`conda`](https://conda.io):
+```sh
+conda install numpy pybind11
+```
+
+### sciapy
+
+There is no `pip` package yet, but
+sciapy can be installed with [`pip`](https://pip.pypa.io) directly
 from github (see <https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support>
 and <https://pip.pypa.io/en/stable/reference/pip_install/#git>):
 ```sh
 $ pip install [-e] git+https://github.com/st-bender/sciapy.git
 ```
 
-Or install from a local clone:
+The other option is to use a local clone:
 ```sh
 $ git clone https://github.com/st-bender/sciapy.git
 $ cd sciapy
@@ -63,11 +101,12 @@ $ cd sciapy
 $ git submodule init
 $ git submodule update
 ```
-and then using `pip` (use `-e` at your own risk, see
+and then using `pip` (optionally using `-e`, see
 <https://pip.pypa.io/en/stable/reference/pip_install/#install-editable>):
 ```sh
-$ pip install -e .
+$ pip install [-e] .
 ```
+
 or using `setup.py`:
 ```sh
 $ python setup.py install
