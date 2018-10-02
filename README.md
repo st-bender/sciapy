@@ -49,8 +49,8 @@ and [`george`](https://george.readthedocs.io).
 ## Install
   
 This package can be installed with [pip](https://pip.pypa.io) directly
-from github (see https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support
-and https://pip.pypa.io/en/stable/reference/pip_install/#git):
+from github (see <https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support>
+and <https://pip.pypa.io/en/stable/reference/pip_install/#git>):
 ```sh
 $ pip install [-e] git+https://github.com/st-bender/sciapy.git
 ```
@@ -64,7 +64,7 @@ $ git submodule init
 $ git submodule update
 ```
 and then using `pip` (use `-e` at your own risk, see
-https://pip.pypa.io/en/stable/reference/pip_install/#install-editable):
+<https://pip.pypa.io/en/stable/reference/pip_install/#install-editable>):
 ```sh
 $ pip install -e .
 ```
