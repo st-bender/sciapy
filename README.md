@@ -115,7 +115,7 @@ $ python setup.py install
 ## Usage
 
 The whole module as well as the individual submodules can be loaded as usual:
-```py
+```python
 >>> import sciapy
 >>> import sciapy.level1c
 >>> import sciapy.level2
