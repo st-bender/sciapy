@@ -92,37 +92,43 @@ def load_dailymeanLya(filename="../data/indices/lisird_lya3_1980-2017.dat",
 def load_solar_gm_table(filename, cols, names, sep="\t", tfmt="jyear"):
 	"""Load proxy tables from ascii files
 
-	This function wraps `pandas.read_table()`[1] with
+	This function wraps :func:`pandas.read_table()` [#]_ with
 	pre-defined settings to match the file format.
 	It explicitly returns the times as UTC decimal years or julian epochs.
 
-	[1](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_table.html)
+	.. [#] https://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_table.html
 
 	Parameters
 	----------
-	filename: string
+	filename: str
 		The file to read
 	cols: array-like or callable
 		The columns in the file to use, passed to `pandas.read_table`'s
 		`usecols` keyword.
 	names: array-like
 		The column names, passed as `names` to `pandas.read_table()`.
-	sep: string, optional
+	sep: str, optional
 		The column separator character, passed as `sep`.
 		Default: `\t`
-	tfmt: string, optional
+	tfmt: str, optional
 		The astropy.time "Time Format" for the time units,
 		for example, "jyear", "decimalyear", "jd", "mjd", etc.
 		See:
-		http://docs.astropy.org/en/stable/time/index.html#id3
+		http://docs.astropy.org/en/stable/time/index.html#time-format
 		Default: "jyear"
 
 	Returns
 	-------
 	(times, table): tuple
-		The measurement times according to the 'julian' keyword (UTC),
-		the proxy values as a `pandas.DataFrame` returned by
-		`pandas.read_table()`.
+		The proxy times according to the `tfmt` keyword (UTC),
+		the proxy values as a :class:`pandas.DataFrame` returned by
+		:func:`pandas.read_table()`.
+
+	See Also
+	--------
+	pandas.read_table
+	:class:`pandas.DataFrame`
+	:class:`astropy.time.Time`
 	"""
 	tab = pd.read_table(filename, index_col=0, parse_dates=[0],
 			comment="#",
@@ -170,15 +176,15 @@ def load_scia_dzm(filename, alt, lat, tfmt="jyear",
 	"""Load SCIAMACHY daily zonal mean data
 
 	Interface function for SCIAMACHY daily zonal mean data files version 6.x.
-	Uses `xarray`[1] to load and select the data. Possible selections are by
+	Uses :mod:`xarray` [#]_ to load and select the data. Possible selections are by
 	hemispheric summer (NH summer ~ SH winter and SH summer ~ NH winter) and
 	exclusion of strong solar proton events (SPE).
 
-	[1](https://xarray.pydata.org)
+	.. [#] https://xarray.pydata.org
 
 	Parameters
 	----------
-	filename: string
+	filename: str
 		The input filename
 	alt: float
 		The altitude
@@ -188,7 +194,7 @@ def load_scia_dzm(filename, alt, lat, tfmt="jyear",
 		The astropy.time "Time Format" for the time units,
 		for example, "jyear", "decimalyear", "jd", "mjd", etc.
 		See:
-		http://docs.astropy.org/en/stable/time/index.html#id3
+		http://docs.astropy.org/en/stable/time/index.html#time-format
 		Default: "jyear"
 	scale: float, optional
 		Scale factor of the data (default: 1)
@@ -204,7 +210,7 @@ def load_scia_dzm(filename, alt, lat, tfmt="jyear",
 	center: bool, optional
 		Center the data by subtracting the global mean.
 		(default: False)
-	season: {'summerNH', 'summerSH', None}, optional
+	season: "summerNH", "summerSH", or `None`, optional
 		Select the named season or `None` for all data (default: None)
 	SPEs: bool, optional
 		Set to `True` to exclude strong SPE events (default: False)
@@ -212,7 +218,7 @@ def load_scia_dzm(filename, alt, lat, tfmt="jyear",
 	Returns
 	-------
 	(times, dens, errs): tuple of (N,) array_like
-		The measurement times according to the 'julian' keyword,
+		The measurement times according to the `tfmt` keyword,
 		the number densities, and their uncertainties.
 	"""
 	logging.info("Opening dataset: '%s'", filename)
