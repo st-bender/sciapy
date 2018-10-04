@@ -66,7 +66,7 @@ def bin_lat_timeavg(ds, binvar="latitude", tvar="time",
 		load=True, save_progress=False):
 	"""Latitudinally bin and time average xarray dataset(s)
 
-	Time-averages the variables in an xarray.Dataset in the given
+	Time-averages the variables in an :class:`xarray.Dataset` in the given
 	latitude bins. This should be applied to daily-binned datasets from
 	a groupby object (via .apply()) to yield daily zonal means.
 
@@ -76,15 +76,15 @@ def bin_lat_timeavg(ds, binvar="latitude", tvar="time",
 
 	Parameters
 	----------
-	ds : xarray.Dataset or GroupBy instance
+	ds : xarray.Dataset or xarray.DatasetGroupBy instance
 		The dataset (or GroupBy) instance to bin latitudinally.
-	binvar : string
+	binvar : str
 		The name of the variable used for binning, default: "latitude".
-	tvar : string
+	tvar : str
 		The name of the time variable of the GroupBy object,
 		default: "time".
-	bins : ndarray
-		The bin (latitudinal) bin edges, default: `np.r_[-90:91:5]`.
+	bins : numpy.ndarray
+		The (latitudinal) bin edges, default: `np.r_[-90:91:5]`.
 	labels : list or None
 		The bin labels, if set to `None` (the default), the labels are
 		set to the central bin values.
