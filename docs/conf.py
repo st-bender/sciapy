@@ -107,8 +107,12 @@ intersphinx_mapping = {
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
     'iris': ('http://scitools.org.uk/iris/docs/latest/', None),
     'numpy': ('https://docs.scipy.org/doc/numpy/', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy/reference/', None),
     'numba': ('https://numba.pydata.org/numba-doc/latest/', None),
     'matplotlib': ('https://matplotlib.org/', None),
     'astropy': ('http://docs.astropy.org/en/stable/', None),
     'xarray': ('https://xarray.pydata.org/en/stable/', None),
+    'celerite': ('https://celerite.readthedocs.io/en/stable/', None),
+    'george': ('https://george.readthedocs.io/en/stable/', None),
+    'emcee': ('https://emcee.readthedocs.io/en/stable/', None),
 }
