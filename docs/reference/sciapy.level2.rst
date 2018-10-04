@@ -54,14 +54,6 @@ sciapy.level2.msis
     :undoc-members:
     :show-inheritance:
 
-sciapy.level2.post\_process
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. automodule:: sciapy.level2.post_process
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 sciapy.level2.scia\_akm
 ^^^^^^^^^^^^^^^^^^^^^^^
 
