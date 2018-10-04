@@ -50,17 +50,17 @@ class scia_solar(object):
 	----------
 	textheader_length : int
 		The number of lines of the text header.
-	textheader : string
+	textheader : str
 		The header containing the solar spectrum meta data.
 	npix : int
 		The number of spectral points.
-	solar_id : string
+	solar_id : str
 		The solar reference spectrum ID,
 		choices: "D0", "D1", "D2", "E0", "E1", "A0", "A1",
-			"N1", "N2", "N3", "N4", "N5".
+		"N1", "N2", "N3", "N4", "N5".
 	orbit : int
 		The SCIAMACHY/Envisat orbit number.
-	time : datetime.datetime instance
+	time : :class:`datetime.datetime`
 		The sensing start time of the (semi-)orbit.
 	wls : (M,) array_like
 		The spectral wavelengths.
@@ -86,7 +86,7 @@ class scia_solar(object):
 
 		Parameters
 		----------
-		filename : string
+		filename : str
 			The netcdf filename to read the data from.
 
 		Returns
@@ -111,7 +111,7 @@ class scia_solar(object):
 
 		Parameters
 		----------
-		filename : string
+		filename : str
 			The (plain) ascii table filename to read the data from.
 
 		Returns
@@ -150,7 +150,7 @@ class scia_solar(object):
 		----------
 		hf : opened file
 			Pointer to the opened level 1c HDF5 file
-		ref : string
+		ref : str
 			The solar reference spectra id name,
 			choose from: "D0", "D1", "D2", "E0", "E1", "A0", "A1",
 			"N1", "N2", "N3", "N4", "N5". Defaults to "D0".
@@ -220,7 +220,7 @@ class scia_solar(object):
 
 		Parameters
 		----------
-		filename : string
+		filename : str
 			The filename to read from.
 
 		Returns
@@ -239,7 +239,7 @@ class scia_solar(object):
 
 		Parameters
 		----------
-		filename : string
+		filename : str
 			The netcdf filename to write the data to.
 
 		Returns
@@ -273,7 +273,7 @@ class scia_solar(object):
 
 		Parameters
 		----------
-		filename : string
+		filename : str
 			The (plain) ascii table filename to write the data to.
 			Passing sys.STDOUT writes to the console.
 
