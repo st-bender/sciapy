@@ -19,8 +19,8 @@ import xarray as xr
 def read_akm(filename, nalt, nlat):
 	"""Read SCIAMACHY level 2 averaging kernels into numpy array
 
-	Supports plain ascii (text) tables using `numpy.genfromtxt`
-	and netcdf files using xarray.
+	Supports plain ascii (text) tables using :func:`numpy.genfromtxt`
+	and netcdf files using :mod:`xarray`.
 
 	Parameters
 	----------
