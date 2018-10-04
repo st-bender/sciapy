@@ -45,8 +45,8 @@ class scia_densities_pp(scia_densities):
 	This class only supports writing ascii files but reading to
 	and writing from netcdf.
 
-	Additional Attributes
-	---------------------
+	Attributes
+	----------
 	temperature
 		NRLMSISE-00 temperatures
 	noem_no
@@ -351,10 +351,10 @@ class scia_densities_pp(scia_densities):
 			return ncf
 
 	def to_xarray(self, dateo, orbit):
-		"""Convert the data to an `xarray.Dataset`
+		"""Convert the data to :class:`xarray.Dataset`
 
 		This is a very simple approach, it dumps the data to a temporary
-		netcdf file and reads that using `xarray.open_dataset()`.
+		netcdf file and reads that using :func:`xarray.open_dataset()`.
 
 		Parameters
 		----------
@@ -367,7 +367,7 @@ class scia_densities_pp(scia_densities):
 
 		Returns
 		-------
-		dataset: `xarray.Dataset`
+		dataset: xarray.Dataset
 		"""
 		import tempfile
 		try:
@@ -479,7 +479,8 @@ class scia_density_day(object):
 
 		Parameters
 		----------
-		cdata: `scia_densities_pp` instance
+		cdata: :class:`scia_densities_pp` instance
+			Post-processed level 2 orbital data.
 		"""
 		self.time.extend(cdata.time)
 		self.date.extend(cdata.date)
@@ -515,8 +516,8 @@ class scia_density_day(object):
 		orbit: int
 			SCIAMACHY/Envisat orbit number
 		equtime: float
-			UTC hour into the day at the equator`
-		scia_dens: `scia_densities_pp` instance
+			UTC hour into the day at the equator
+		scia_dens: :class:`scia_densities_pp` instance
 			The post-processed orbit data set
 		"""
 		self.version = scia_dens.version
@@ -732,14 +733,14 @@ class scia_density_day(object):
 		ncf.close()
 
 	def to_xarray(self):
-		"""Convert combined orbit data to `xarray.Dataset`
+		"""Convert the combined orbit data to :class:`xarray.Dataset`
 
 		Exports the data using the same data variables as
 		when writing to netcdf.
 
 		Returns
 		-------
-		dataset: `xarray.Dataset`
+		dataset: xarray.Dataset
 		"""
 		try:
 			import xarray as xr
