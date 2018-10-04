@@ -52,7 +52,9 @@ if __name__ == "__main__":
 				'AACGM2005_80km_grid.nc'],
 			'sciapy': ['data/indices/*.dat', 'data/indices/*.txt']},
 		install_requires=[
-			'numpy',
+			'numpy>=1.13.0',
+			'scipy>=0.17.0',
+			'matplotlib>=2.2',
 			'netCDF4',
 			'h5py',
 			'dask',
