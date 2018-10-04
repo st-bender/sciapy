@@ -12,9 +12,9 @@
 
 Markov Chain Monte Carlo (MCMC) routines to sample
 the posterior probability of SCIAMACHY data regression fits.
-Uses the `emcee.EnsembleSampler` [1] do do the real work.
+Uses the :class:`emcee.EnsembleSampler` [#]_ do do the real work.
 
-[1](https://emcee.readthedocs.io)
+.. [#] https://emcee.readthedocs.io
 """
 
 import logging
@@ -60,15 +60,15 @@ def mcmc_sample_model(model, y, beta=1.,
 	"""Markov Chain Monte Carlo sampling interface
 
 	MCMC sampling interface to sample posterior probabilities using the
-	`emcee.EnsembleSampler`[1].
+	:class:`emcee.EnsembleSampler` [#]_.
 
-	[1](https://emcee.readthedocs.io)
+	.. [#] https://emcee.readthedocs.io
 
 	Arguments
 	---------
-	model : celerite.GP, george.GP or sciapy.regress.RegressionModel instance
+	model : celerite.GP, george.GP, or sciapy.regress.RegressionModel instance
 		The model to draw posterior samples from. It should provide either
-		`log_likelihood()` and `log_prior()` functions be directly callable
+		`log_likelihood()` and `log_prior()` functions or be directly callable
 		via `__call__()`.
 	y : (N,) array_like
 		The data to condition the probabilities on.
