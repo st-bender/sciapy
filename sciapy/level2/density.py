@@ -326,7 +326,8 @@ class scia_densities(object):
 		Returns
 		-------
 		Nothing if `close` is True. If `close` is False, returns either an
-		`netCDF4.Dataset`, `scipy.io.netcdf.netcdf_file` or
+		`netCDF4.Dataset`,
+		`scipy.io.netcdf.netcdf_file` or
 		`pupynere.netcdf_file` instance depending on availability.
 		"""
 		alts_min_out = np.asarray(self.alts_min).reshape(self.nalt)
@@ -449,7 +450,8 @@ class scia_densities(object):
 		Returns
 		-------
 		Nothing if `close` is True. If `close` is False, returns either an
-		`netCDF4.Dataset`, `scipy.io.netcdf.netcdf_file` or
+		`netCDF4.Dataset`,
+		`scipy.io.netcdf.netcdf_file` or
 		`pupynere.netcdf_file` instance depending on availability.
 		"""
 		ncf = netcdf_file(filename, 'r')
