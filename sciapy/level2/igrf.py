@@ -13,13 +13,13 @@
 This is a python (mix) version of GMPOLE and GMCOORD from
 http://www.ngdc.noaa.gov/geomag/geom_util/utilities_home.shtml
 to transform geodetic to geomagnetic coordinates.
-It uses the IGRF 2012 model and coefficients[1].
+It uses the IGRF 2012 model and coefficients [#]_.
 
-[1]Thébault et al. 2015,
-International Geomagnetic Reference Field: the 12th generation.
-Earth, Planets and Space, 67 (79)
-http://nora.nerc.ac.uk/id/eprint/511258
-https://doi.org/10.1186/s40623-015-0228-9
+.. [#] Thébault et al. 2015,
+	International Geomagnetic Reference Field: the 12th generation.
+	Earth, Planets and Space, 67 (79)
+	http://nora.nerc.ac.uk/id/eprint/511258
+	https://doi.org/10.1186/s40623-015-0228-9
 """
 from __future__ import absolute_import, division, print_function
 
@@ -234,7 +234,7 @@ def gmpole(date, r_e=Earth_ellipsoid["re"], filename="IGRF.tab"):
 
 	Parameters
 	----------
-	date: `datetime.datetime` or `datetime.date` instance
+	date: datetime.datetime or datetime.date
 	r_e: float, optional
 		Earth radius to evaluate the dipole's off-centre shift.
 	filename: str, optional
@@ -318,7 +318,7 @@ def gmag_igrf(date, lat, lon, alt=0.,
 
 	Parameters
 	----------
-	date: `datetime.datetime` instance
+	date: datetime.datetime
 	lat: float
 		Geographic latitude in degrees north
 	lon: float
