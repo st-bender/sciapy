@@ -40,7 +40,7 @@ def read_from_mpl_binary(self, filename):
 
 	Parameters
 	----------
-	filename : string
+	filename : str
 		The binary filename to read the data from.
 
 	Returns
@@ -117,7 +117,7 @@ def write_to_mpl_binary(self, filename):
 
 	Parameters
 	----------
-	filename : string
+	filename : str
 		The binary filename to write the data to.
 
 	Returns

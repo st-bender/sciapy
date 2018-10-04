@@ -32,7 +32,7 @@ def read_from_netcdf(self, filename):
 
 	Parameters
 	----------
-	filename : string
+	filename : str
 		The netcdf filename to read the data from.
 
 	Returns
@@ -102,7 +102,7 @@ def write_to_netcdf(self, filename):
 
 	Parameters
 	----------
-	filename : string
+	filename : str
 		The netcdf filename to write the data to.
 
 	Returns

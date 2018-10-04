@@ -80,6 +80,15 @@ class scia_limb_point(object):
 		self.from_limb_scan(ls, i)
 
 	def from_limb_scan(self, ls, i):
+		"""Import the spectra from a single tangent point of the limb scan
+
+		Parameters
+		----------
+		ls : :class:`~sciapy.level1c.scia_limb_scan`
+			The SCIAMACHY limb scan from which to extract the spectra.
+		i : int
+			The number of the tangent point in the limb scan
+		"""
 		self.date = ls.date
 		self.npix = ls.npix
 		self.orbit = ls.orbit
@@ -117,8 +126,41 @@ class scia_limb_scan(object):
 	----------
 	textheader_length : int
 		The number of lines of the text header.
-	textheader : string
+	textheader : str
 		The header containing the limb scan meta data.
+	metadata : dict
+		Metadata of the limb scan as parsed by
+		:func:`parse_textheader`. Contains:
+
+		datatype_txt: str
+			The name of the data type.
+		l1b_product: str
+			The level 1b product which was calibrated.
+		orbit: int
+			The Envisat/SCIAMACHY orbit number.
+		state_id: int
+			The SCIAMACHY state_id, denotes the measurement type
+			that was carried out, i.e. nominal limb, MLT limb,
+			nadir, sun or moon occultation etc.
+		software_version: str
+			The software used for calibration.
+		keyfile_version: str
+			The keyfile version used in the calibration process.
+		mfactor_version: str
+			The M-factor version used in the calibration process.
+		init_version: str
+			The init version used in the calibration process.
+		decont_flags: str
+			The decont flags used in the calibration process.
+		calibration: str
+			The calibrations that were applied to the level 1b data
+			to produce the level 1c data.
+		date: str
+			The measurement data of the limb scan as "%Y%m%d"
+		nr_profile: int
+			The number of profiles in the scan.
+		act_profile: int
+			The number of the current profile.
 	nalt : int
 		The number of tangent points.
 	npix : int
@@ -140,43 +182,43 @@ class scia_limb_scan(object):
 	limb_data : numpy.recarray
 		The limb data containing the following records:
 
-		sub_sat_lat : (M,) array_like
+		sub_sat_lat: (M,) array_like
 			The latitudes of the satellite ground points (M = nalt).
-		sub_sat_lon : (M,) array_like
+		sub_sat_lon: (M,) array_like
 			The longitudes of the satellite ground points (M = nalt).
-		tp_lat : (M,) array_like
+		tp_lat: (M,) array_like
 			The latitudes of the tangent points (M = nalt).
-		tp_lon : (M,) array_like
+		tp_lon: (M,) array_like
 			The longitudes of the tangent points (M = nalt).
-		tp_alt : (M,) array_like
+		tp_alt: (M,) array_like
 			The tangent altitudes (M = nalt).
-		tp_sza : (M,) array_like
+		tp_sza: (M,) array_like
 			The solar zenith angles at the tangent points (M = nalt).
-		tp_saa : (M,) array_like
+		tp_saa: (M,) array_like
 			The solar azimuth angles at the tangent points (M = nalt).
-		tp_los : (M,) array_like
+		tp_los: (M,) array_like
 			The line-of-sight zenith angles at the tangent points (M = nalt).
-		toa_sza : (M,) array_like
+		toa_sza: (M,) array_like
 			The solar zenith angles at the top-of-atmosphere points (M = nalt).
-		toa_saa : (M,) array_like
+		toa_saa: (M,) array_like
 			The solar azimuth angles at the top-of-atmosphere points (M = nalt).
-		toa_los : (M,) array_like
+		toa_los: (M,) array_like
 			The line-of-sight zenith angles at the top-of-atmosphere points (M = nalt).
-		sat_sza : (M,) array_like
+		sat_sza: (M,) array_like
 			The solar zenith angles at the satellite points (M = nalt).
-		sat_saa : (M,) array_like
+		sat_saa: (M,) array_like
 			The solar azimuth angles at the satellite points (M = nalt).
-		sat_los : (M,) array_like
+		sat_los: (M,) array_like
 			The line-of-sight zenith angles at the satellite points (M = nalt).
-		sat_alt : (M,) array_like
+		sat_alt: (M,) array_like
 			The satellite altitudes (M = nalt).
-		earth_rad : (M,) array_like
+		earth_rad: (M,) array_like
 			The earth radii at the tangent ground points (M = nalt).
-		wls : (N,) array_like
+		wls: (N,) array_like
 			The spectral wavelengths.
-		rad : (M, N) array_like
+		rad: (M, N) array_like
 			The radiances at the tangent points, M = nalt, N = len(wls).
-		err : (M, N) array_like
+		err: (M, N) array_like
 			The relative radiance uncertainties at the tangent points,
 			M = nalt, N = len(wls).
 	"""
@@ -207,6 +249,11 @@ class scia_limb_scan(object):
 		self.wls = []
 
 	def parse_textheader(self):
+		"""Parses the ASCII header metadata
+
+		The ASCII header text contains metadata about the current limb scan.
+		This function reads this metadata into the :attr:`metadata` dictionary.
+		"""
 		from parse import parse
 		split_header = self.textheader.split('\n')
 		line = 0
@@ -239,6 +286,11 @@ class scia_limb_scan(object):
 		self.metadata["act_profile"] = res["ap"]
 
 	def assemble_textheader(self):
+		"""Combines the metadata to ASCII header
+
+		Tranfers the :attr:`metadata` dictionary back to ASCII form
+		for writing to disk.
+		"""
 		# Prepare the header
 		meta = self.metadata
 		if not meta:
@@ -307,6 +359,11 @@ class scia_limb_scan(object):
 		self.textheader = header
 
 	def read_from_file(self, filename):
+		"""SCIAMACHY level 1c limb scan general file import
+
+		Tries `netcdf` first, the custom binary format second if
+		netcdf fails, and finally ASCII import if that also fails.
+		"""
 		try:
 			# try netcdf first
 			self.read_from_netcdf(filename)
@@ -324,10 +381,9 @@ class scia_limb_scan(object):
 		Returns
 		-------
 		(mean_lst, apparent_lst, eot_correction): tuple
-			mean_lst - mean local solar time
-			apparent_lst - apparent local solar time,
-				equation of time corrected
-			eot_correction - equation of time correction in minutes
+			* mean_lst - mean local solar time
+			* apparent_lst - apparent local solar time, equation of time corrected
+			* eot_correction - equation of time correction in minutes
 		"""
 		import datetime as dt
 		import logging

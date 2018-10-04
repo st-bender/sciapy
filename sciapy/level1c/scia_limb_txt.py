@@ -40,7 +40,7 @@ def read_from_textfile(self, filename):
 
 	Parameters
 	----------
-	filename : string
+	filename : str
 		The (plain ascii) table text filename to read the data from.
 
 	Returns
@@ -122,7 +122,7 @@ def write_to_textfile(self, filename):
 
 	Parameters
 	----------
-	filename : string
+	filename : str
 		The (plain ascii) table text filename to write the data to.
 
 	Returns
