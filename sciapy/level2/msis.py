@@ -8,7 +8,9 @@
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2.
 # See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
-"""NRLMSISE-00 wrapper for the C function(s)
+"""NRLMSISE-00 python wrapper for the C version [#]_
+
+.. [#] https://www.brodo.de/space/nrlmsise
 """
 from __future__ import absolute_import, division, print_function
 
@@ -18,9 +20,11 @@ import datetime as dt
 from sciapy.level2.nrlmsise00 import gtd7
 
 def msise_gtd7(date, alt, lat, lon, lst, f107a, f107, ap):
-	"""Direct interface to `gtd7()`
+	"""Direct interface to `gtd7()` [#]_
 
 	Uses only the standard flags and uses only the daily ap index.
+
+	.. [#] https://git.linta.de/?p=~brodo/nrlmsise-00.git;a=blob;f=nrlmsise-00.c#l916
 
 	Parameters
 	----------
@@ -35,27 +39,27 @@ def msise_gtd7(date, alt, lat, lon, lst, f107a, f107, ap):
 	lst: float
 		Local solar time in hours.
 	f107: float
-		The f107 value at date.
+		The observed f107 value at date.
 	f107a: float
-		The f107a (81-day running average of f107) value at date.
+		The observed f107a (81-day running average of f107) value at date.
 	ap: float
 		The ap value at date.
 
 	Returns
 	-------
 	nr_densities: list of floats
-		[0] - He number density(cm^-3)
-		[1] - O number density(cm^-3)
-		[2] - N2 number density(cm^-3)
-		[3] - O2 number density(cm^-3)
-		[4] - AR number density(cm^-3)
-		[5] - total mass density(gm/cm^3) [includes d[8] in td7d]
-		[6] - H number density(cm^-3)
-		[7] - N number density(cm^-3)
-		[8] - Anomalous oxygen number density(cm^-3)
+		0. He number density [cm^-3]
+		1. O number density [cm^-3]
+		2. N2 number density [cm^-3]
+		3. O2 number density [cm^-3]
+		4. AR number density [cm^-3]
+		5. total mass density [g cm^-3] (includes d[8] in td7d)
+		6. H number density [cm^-3]
+		7. N number density [cm^-3]
+		8. Anomalous oxygen number density [cm^-3]
 	temperatures: list of floats
-		[0] - exospheric temperature
-		[1] - temperature at alt
+		0. exospheric temperature [K]
+		1. temperature at alt [K]
 	"""
 	dtdate = dt.datetime.strptime(date, "%Y-%m-%d")
 	year = int(dtdate.strftime("%Y"))
@@ -84,20 +88,20 @@ def msise(date, alt, lat, lon, lst, f107a, f107, ap):
 	lst: float
 		Local solar time in hours.
 	f107: float
-		The f107 value at date.
+		The observed f107 value at date.
 	f107a: float
-		The f107a (81-day running average of f107) value at date.
+		The observed f107a (81-day running average of f107) value at date.
 	ap: float
 		The ap value at date.
 
 	Returns
 	-------
 	temperature: float
-		Temperature at altitude `alt`.
+		Temperature at altitude `alt` [K].
 	density_air: float
-		Total number density of air at the location.
+		Total number density of air at the location [cm^-3].
 	mass_density: float
-		Total mass density of air at the location.
+		Total mass density of air at the location [g cm^-3].
 	"""
 	nr_densities, temperatures = msise_gtd7(
 			date, alt, lat, lon, lst, f107a, f107, ap)
