@@ -11,9 +11,9 @@
 """SCIAMACHY regression models (celerite version)
 
 Model classes for SCIAMACHY data regression fits using the
-`celerite`[1] modeling protocol.
+:mod:`celerite` [#]_ modeling protocol.
 
-[1](https://celerite.readthedocs.io)
+.. [#] https://celerite.readthedocs.io
 """
 from __future__ import absolute_import, division, print_function
 
@@ -139,9 +139,9 @@ class ProxyModel(Model):
 	lifetime_prior : str, optional
 		The prior probability density for each coefficient of the lifetime.
 		Possible types are "flat" or `None` for a flat prior, "exp" for an
-		exponential density ~ exp(-|tau| / metric), and "normal" for a normal
-		distribution ~ exp(-tau^2 / (2 * metric^2)). The distributions are
-		normalized according to the parameter bounds.
+		exponential density ~ :math:`\\text{exp}(-|\\tau| / \\text{metric})`,
+		and "normal" for a normal distribution
+		~ :math:`\\text{exp}(-\\tau^2 / (2 * \\text{metric}^2))`.
 		Default: None (= flat prior).
 	lifetime_metric : float, optional
 		The metric (scale) of the lifetime priors in days, see `prior`.
