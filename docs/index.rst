@@ -44,7 +44,7 @@ The source code is `developed on Github <https://github.com/st-bender/sciapy>`_.
     :maxdepth: 1
     :caption: Tutorials
 
-    tutorials/regress_tutorial
+    tutorials/regress_intro
 
 .. toctree::
     :maxdepth: 2
