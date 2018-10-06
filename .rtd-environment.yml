@@ -10,3 +10,4 @@ dependencies:
     - celerite
     - george
     - numpydoc
+    - ipython
