@@ -4,7 +4,7 @@
 .. module:: sciapy
 
 .. note:: This tutorial was generated from an IPython notebook that can be
-          downloaded `here <../../_static/notebooks/{{ resources.metadata.name }}.ipynb>`_.
+          downloaded `here <../_static/notebooks/{{ resources.metadata.name }}.ipynb>`_.
           Try a live version: |binderbadge|.
 
 .. |binderbadge| image:: https://mybinder.org/badge.svg
