@@ -14,7 +14,7 @@ ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 # the i18n builder cannot share the environment and doctrees with the others
 I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-default: dirhtml
+default: html
 TUTORIALS = tutorials/regress_intro.rst
 
 tutorials/%.rst: _static/notebooks/%.ipynb tutorials/tutorial_rst.tpl
