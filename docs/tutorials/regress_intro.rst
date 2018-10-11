@@ -115,7 +115,9 @@ set them up.
     harm2.freeze_parameter("freq")
 
 Combined model
---------------
+~~~~~~~~~~~~~~
+
+We then combine the separate models into a ``ModelSet``.
 
 .. code:: ipython3
 
