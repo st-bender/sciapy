@@ -14,7 +14,11 @@
 {% endblock %}
 
 {% block any_cell %}
-{%- if cell.metadata.nbsphinx != 'hidden' or not cell.metadata.hide_input -%}
+{%- if (cell.metadata.nbsphinx != 'hidden')
+    and (not cell.metadata.hide_input)
+    and ("hide" not in cell.metadata.tags)
+    and ((cell.metadata.slideshow is not defined)
+        or (cell.metadata.slideshow.slide_type != 'skip')) -%}
 {{ super() }}
 {%- endif -%}
 {% endblock any_cell %}
