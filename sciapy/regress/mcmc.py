@@ -149,7 +149,7 @@ def mcmc_sample_model(model, y, beta=1.,
 	sampler = emcee.EnsembleSampler(nwalkers, ndim, mod_func, args=mod_args,
 			pool=pool)
 
-	logging.info("Running burn-in ({0} samples)".format(nburnin))
+	logging.info("Running burn-in (%s samples)", nburnin)
 	p0, lnp0, rst0 = _sample_mcmc(sampler, nburnin, p0, None,
 			show_progress, progress_mod, debug=True)
 	logging.info("Burn-in finished.")
@@ -164,13 +164,13 @@ def mcmc_sample_model(model, y, beta=1.,
 
 	if not optimized:
 		p0 = [p + 1e-4 * np.random.randn(ndim) for _ in range(nwalkers)]
-		logging.info("Running second burn-in ({0} samples)".format(nburnin))
+		logging.info("Running second burn-in (%s samples)", nburnin)
 		p0, lnp0, rst0 = _sample_mcmc(sampler, nburnin, p0, rst0,
 				show_progress, progress_mod)
 		sampler.reset()
 		logging.info("Second burn-in finished.")
 
-	logging.info("Running production chain ({0} samples)".format(nprod))
+	logging.info("Running production chain (%s samples)", nprod)
 	_sample_mcmc(sampler, nprod, p0, rst0, show_progress, progress_mod)
 	logging.info("Production run finished.")
 

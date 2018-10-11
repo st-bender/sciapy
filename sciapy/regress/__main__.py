@@ -230,7 +230,7 @@ def main():
 	from numpy.distutils.system_info import get_info
 	for oblas_path in get_info("openblas")["library_dirs"]:
 		oblas_name = "{0}/libopenblas.so".format(oblas_path)
-		logging.info("Trying {0}".format(oblas_name))
+		logging.info("Trying %s", oblas_name)
 		try:
 			oblas_lib = ctypes.cdll.LoadLibrary(oblas_name)
 			oblas_cores = oblas_lib.openblas_get_num_threads()
@@ -272,7 +272,7 @@ def main():
 
 	lat = args.latitude
 	alt = args.altitude
-	logging.info("location: {0:.0f}°N {1:.0f} km".format(lat, alt))
+	logging.info("location: %.0f°N %.0f km", lat, alt)
 
 	no_ys, no_dens, no_errs, no_szas = load_scia_dzm(args.file, alt, lat,
 			tfmt=args.time_format,
@@ -348,7 +348,7 @@ def main():
 					("tausin2", [-np.pi, np.pi] if args.fit_phase else [-max_days, max_days]),
 					("ltscan", [0, 200])])
 			)))
-		logging.info("{0} mean: {1}".format(pn, proxy_models[-1][1].mean))
+		logging.info("%s mean: %s", pn, proxy_models[-1][1].mean)
 	offset_model = [("offset",
 			ConstantModel(value=0.,
 					bounds={"value": [-max_amp, max_amp]}))]

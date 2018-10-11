@@ -109,7 +109,7 @@ if __name__ == "__main__":
 	else:
 		logging.debug("using default geographic latitudes")
 		binvar = "latitude"
-	logging.info("binning according to {0}".format(binvar))
+	logging.info("binning according to \"%s\"", binvar)
 	lats_rename_dict = {"{0}_bins".format(binvar): "latitude"}
 
 	if args.area_weighted:
