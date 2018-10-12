@@ -279,6 +279,8 @@ def main():
 			scale=args.scale,
 			#subsample_factor=args.random_subsample,
 			#subsample_method="random",
+			akd_threshold=args.akd_threshold,
+			cnt_threshold=args.cnt_threshold,
 			center=args.center_data,
 			season=args.season,
 			SPEs=args.exclude_spe)

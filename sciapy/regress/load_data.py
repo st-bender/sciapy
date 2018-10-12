@@ -172,6 +172,7 @@ def _greedy_idxs_post(x, xerr, size):
 
 def load_scia_dzm(filename, alt, lat, tfmt="jyear",
 		scale=1, subsample_factor=1, subsample_method="greedy",
+		akd_threshold=0.002, cnt_threshold=0,
 		center=False, season=None, SPEs=False):
 	"""Load SCIAMACHY daily zonal mean data
 
@@ -266,7 +267,8 @@ def load_scia_dzm(filename, alt, lat, tfmt="jyear",
 	NO_tds = NO_tds.where(
 				np.isfinite(NO_tds.NO_DENS) &
 				(NO_tds.NO_DENS_std != 0) &
-				(NO_counts > 0) &
+				(NO_tds.NO_AKDIAG > akd_threshold) &
+				(NO_counts > cnt_threshold) &
 				(NO_tds.NO_MASK == 0),
 				drop=True)
 
