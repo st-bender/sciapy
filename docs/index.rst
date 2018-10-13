@@ -45,6 +45,7 @@ The source code is `developed on Github <https://github.com/st-bender/sciapy>`_.
     :caption: Tutorials
 
     tutorials/regress_intro
+    tutorials/regress_model_fit
 
 .. toctree::
     :maxdepth: 2
