@@ -38,7 +38,7 @@ used proxy timeseries.
 
 .. code:: ipython3
 
-    plt.rcParams["figure.dpi"] = 96
+    plt.rcParams["figure.dpi"] = 120
 
 Model interface
 ---------------
@@ -58,15 +58,15 @@ We start with the Lyman-\ :math:`\alpha` proxy, it is not centered
     # load proxy data
     plat, plap = load_dailymeanLya()
     # setup the model
-    lya_mod = sciapy.regress.ProxyModel(plat,
-                                        plap["Lya"],
-                                        center=False,
-                                        amp=0,
-                                        lag=0,
-                                        tau0=0,
-                                        taucos1=0, tausin1=0,
-                                        taucos2=0, tausin2=0,
-                                        ltscan=60)
+    lya_model = sciapy.regress.ProxyModel(plat,
+                                          plap["Lya"],
+                                          center=False,
+                                          amp=0,
+                                          lag=0,
+                                          tau0=0,
+                                          taucos1=0, tausin1=0,
+                                          taucos2=0, tausin2=0,
+                                          ltscan=60)
 
 AE proxy with lifetime
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -79,15 +79,15 @@ as above.
     # load proxy data
     paet, paep = load_dailymeanAE()
     # setup the model
-    ae_mod = sciapy.regress.ProxyModel(paet,
-                                       paep["AE"],
-                                       center=False,
-                                       amp=0,
-                                       lag=0,
-                                       tau0=0,
-                                       taucos1=0, tausin1=0,
-                                       taucos2=0, tausin2=0,
-                                       ltscan=60)
+    ae_model = sciapy.regress.ProxyModel(paet,
+                                         paep["AE"],
+                                         center=False,
+                                         amp=0,
+                                         lag=0,
+                                         tau0=0,
+                                         taucos1=0, tausin1=0,
+                                         taucos2=0, tausin2=0,
+                                         ltscan=60)
 
 Offset
 ~~~~~~
@@ -121,15 +121,15 @@ We then combine the separate models into a ``ModelSet``.
 
 .. code:: ipython3
 
-    no_mod = sciapy.regress.CeleriteModelSet([("offset", offset_model),
-                                              ("Lya", lya_mod), ("GM", ae_mod),
-                                              ("f1", harm1), ("f2", harm2)])
+    model = sciapy.regress.CeleriteModelSet([("offset", offset_model),
+                                             ("Lya", lya_model), ("GM", ae_model),
+                                             ("f1", harm1), ("f2", harm2)])
 
 The full model has the following parameters:
 
 .. code:: ipython3
 
-    no_mod.get_parameter_dict()
+    model.get_parameter_dict()
 
 
 
@@ -166,19 +166,19 @@ unused parameters).
 
 .. code:: ipython3
 
-    no_mod.freeze_all_parameters()
-    no_mod.thaw_parameter("offset:value")
-    no_mod.thaw_parameter("Lya:amp")
-    no_mod.thaw_parameter("GM:amp")
-    no_mod.thaw_parameter("GM:tau0")
-    no_mod.thaw_parameter("GM:taucos1")
-    no_mod.thaw_parameter("GM:tausin1")
+    model.freeze_all_parameters()
+    model.thaw_parameter("offset:value")
+    model.thaw_parameter("Lya:amp")
+    model.thaw_parameter("GM:amp")
+    model.thaw_parameter("GM:tau0")
+    model.thaw_parameter("GM:taucos1")
+    model.thaw_parameter("GM:tausin1")
 
 Cross check that only the used parameters are really active:
 
 .. code:: ipython3
 
-    no_mod.get_parameter_dict()
+    model.get_parameter_dict()
 
 
 
@@ -205,11 +205,11 @@ order as listed above:
 
 .. code:: ipython3
 
-    no_mod.set_parameter_vector([-25.6, 6.26, 0.0874, 1.54, 10.52, -0.714])
+    model.set_parameter_vector([-25.6, 6.26, 0.0874, 1.54, 10.52, -0.714])
 
 .. code:: ipython3
 
-    no_mod.get_parameter_dict()
+    model.get_parameter_dict()
 
 
 
@@ -226,18 +226,18 @@ order as listed above:
 
 
 With the parameters properly set, we can now “predict” the density for
-any time we wish. Here we take 15 years daily:
+any time we wish. Here we take 25 years half-daily:
 
 .. code:: ipython3
 
     times = np.arange(1992, 2017.01, 0.5 / 365.25)
-    pred_no = no_mod.get_value(times)
+    pred = model.get_value(times)
 
 and then plot the result:
 
 .. code:: ipython3
 
-    plt.plot(times, pred_no, label="model")
+    plt.plot(times, pred, label="model")
     plt.xlabel("time [Julian epoch]")
     # The data were scaled by 10^-6 before fitting
     plt.ylabel("NO number density [10$^6$ cm$^{{-3}}$]")
@@ -270,17 +270,27 @@ into the same folder as this notebook.
 
     import requests
     import netCDF4
+    
+    def load_data_store(store, variables=None):
+        with xr.open_dataset(store, chunks={"lat": 9, "alt": 8}) as data_ds:
+            if variables is not None:
+                data_ds = data_ds[variables]
+            data_ds.load()
+            return data_ds
+    
+    def load_data_url(url, variables=None):
+        with requests.get(url, stream=True) as response:
+            nc4_ds = netCDF4.Dataset("data", memory=response.content)
+            store = xr.backends.NetCDF4DataStore(nc4_ds)
+            return load_data_store(store, variables)
 
 .. code:: ipython3
 
     zenodo_url = "https://zenodo.org/record/1342701/files/NO_regress_quantiles_pGM_Lya_ltcs_exp1dscan60d_km32.nc"
     
-    response = requests.get(zenodo_url)
-    nc4_ds = netCDF4.Dataset("quantiles", memory=response.content)
-    store = xr.backends.NetCDF4DataStore(nc4_ds)
-    
-    # If you downloaded a copy, replace `store` by "/path/to/<filename.nc>"
-    quants = xr.open_dataset(store, decode_cf=False)
+    # If you downloaded a copy, use load_data_store()
+    # and replace the url by "/path/to/<filename.nc>"
+    quants = load_data_url(zenodo_url)
 
 The data file contains the median together with the (0.16, 0.84),
 (0.025, 0.975), and (0.001, 0.999) quantiles corresponding to the
@@ -303,14 +313,14 @@ regions. In particular, the contents of the quantiles dataset are:
       * lat                (lat) float64 -85.0 -75.0 -65.0 -55.0 ... 65.0 75.0 85.0
       * quantile           (quantile) float64 0.001 0.025 0.16 0.5 0.84 0.975 0.999
     Data variables:
-        kernel:log_rho     (lat, alt, quantile) float64 ...
-        kernel:log_sigma   (lat, alt, quantile) float64 ...
-        mean:GM:amp        (lat, alt, quantile) float64 ...
-        mean:GM:tau0       (lat, alt, quantile) float64 ...
-        mean:GM:taucos1    (lat, alt, quantile) float64 ...
-        mean:GM:tausin1    (lat, alt, quantile) float64 ...
-        mean:Lya:amp       (lat, alt, quantile) float64 ...
-        mean:offset:value  (lat, alt, quantile) float64 ...
+        kernel:log_rho     (lat, alt, quantile) float64 -5.52 -5.484 ... -5.161
+        kernel:log_sigma   (lat, alt, quantile) float64 2.889 2.915 ... 2.757 2.79
+        mean:GM:amp        (lat, alt, quantile) float64 1.3e-06 ... 0.01928
+        mean:GM:tau0       (lat, alt, quantile) float64 0.0007629 0.01872 ... 3.671
+        mean:GM:taucos1    (lat, alt, quantile) float64 -24.84 -15.97 ... 39.56
+        mean:GM:tausin1    (lat, alt, quantile) float64 -7.186 -4.072 ... -1.669
+        mean:Lya:amp       (lat, alt, quantile) float64 -19.22 -17.11 ... -3.432
+        mean:offset:value  (lat, alt, quantile) float64 5.568 13.26 ... 55.0 62.05
 
 
 
@@ -331,17 +341,15 @@ The dimensions of the available parameters are:
      Coordinates:
        * lat      (lat) float64 -85.0 -75.0 -65.0 -55.0 -45.0 ... 55.0 65.0 75.0 85.0
      Attributes:
-         _FillValue:  nan
-         long_name:   latitude
-         units:       degrees_north, <xarray.DataArray 'alt' (alt: 16)>
+         long_name:  latitude
+         units:      degrees_north, <xarray.DataArray 'alt' (alt: 16)>
      array([60., 62., 64., 66., 68., 70., 72., 74., 76., 78., 80., 82., 84., 86.,
             88., 90.])
      Coordinates:
        * alt      (alt) float64 60.0 62.0 64.0 66.0 68.0 ... 82.0 84.0 86.0 88.0 90.0
      Attributes:
-         _FillValue:  nan
-         long_name:   altitude
-         units:       km)
+         long_name:  altitude
+         units:      km)
 
 
 
@@ -357,15 +365,15 @@ the variables from the mean model.
     latitude = 65
     altitude = 70
     
-    for v in no_mod.get_parameter_names():
-        no_mod.set_parameter(v, quants["mean:{0}".format(v)].sel(alt=altitude, lat=latitude, quantile=0.5))
+    for v in model.get_parameter_names():
+        model.set_parameter(v, quants["mean:{0}".format(v)].sel(alt=altitude, lat=latitude, quantile=0.5))
 
 The parameters from the file are (actually pretty close to the ones
 above):
 
 .. code:: ipython3
 
-    no_mod.get_parameter_dict()
+    model.get_parameter_dict()
 
 
 
@@ -381,18 +389,18 @@ above):
 
 
 
-We take the same times as above (15 years daily) to predict the model
-values:
+We take the same times as above (25 years half-daily) to predict the
+model values:
 
 .. code:: ipython3
 
-    pred_no = no_mod.get_value(times)
+    pred = model.get_value(times)
 
 and then plot the result again:
 
 .. code:: ipython3
 
-    plt.plot(times, pred_no, label="model")
+    plt.plot(times, pred, label="model")
     plt.xlabel("time [Julian epoch]")
     # Again, the data were scaled by 10^-6 before fitting, so adjust the X-Axis label
     plt.ylabel("NO number density [10$^6$ cm$^{{-3}}$]")
