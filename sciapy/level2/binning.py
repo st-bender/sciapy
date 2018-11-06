@@ -111,7 +111,7 @@ def bin_lat_timeavg(ds, binvar="latitude", tvar="time",
 		# load the chunk into memory to speed up binning
 		ds.load()
 	# adjust the time variable
-	if np.issubdtype(ds[tvar].values[0], float):
+	if np.issubdtype(ds[tvar].values[0], np.floating):
 		# convert floats to datetime first (probably MLT states)
 		try:
 			# xarray <= 0.9.6
