@@ -186,7 +186,7 @@ if __name__ == "__main__":
 	logging.info("finished binning.")
 	del ds_bins_daily_gb
 
-	ds_bins_daily.rename(time_rename_dict, inplace=True)
+	ds_bins_daily = ds_bins_daily.rename(time_rename_dict)
 	ds_bins_daily["time"].attrs = ds["time"].attrs
 	ds_bins_daily["time"].attrs.update(
 		{"axis": "T", "long_name": "measurement date"})

@@ -56,8 +56,8 @@ def _bin_stats(ds,
 						key: ds[var].attrs[key] + " counts"})
 				except KeyError:
 					pass
-	sdev_ds.rename({v: v + "_std" for v in sdev_ds.data_vars}, inplace=True)
-	cnts_ds.rename({v: v + "_cnt" for v in cnts_ds.data_vars}, inplace=True)
+	sdev_ds = sdev_ds.rename({v: v + "_std" for v in sdev_ds.data_vars})
+	cnts_ds = cnts_ds.rename({v: v + "_cnt" for v in cnts_ds.data_vars})
 	return xr.merge([mean_ds, sdev_ds, cnts_ds])
 
 def bin_lat_timeavg(ds, binvar="latitude", tvar="time",
