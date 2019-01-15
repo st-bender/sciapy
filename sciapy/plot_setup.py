@@ -29,7 +29,6 @@ LINE_TICKS = {"xtick.top": False,
 def plot_setup():
 	rcParams["figure.dpi"] = 96
 	rcParams["figure.figsize"] = [8, 5]
-	rcParams["figure.constrained_layout.use"] = True
 	rcParams["font.size"] = 16
 	rcParams['mathtext.default'] = 'regular'
 	rcParams['savefig.dpi'] = 600
@@ -55,3 +54,8 @@ def plot_setup():
 	rcParams["axes.spines.bottom"] = False
 	rcParams["axes.spines.top"] = False
 	rcParams["axes.spines.right"] = False
+	# use constrained layout if available (matplotlib >= 2.2)
+	try:
+		rcParams["figure.constrained_layout.use"] = True
+	except KeyError:
+		pass
