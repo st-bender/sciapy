@@ -73,3 +73,11 @@ def test_modelmodule_method_structure():
 	assert sciapy.regress.models_cel.HarmonicModelCosineSine.compute_gradient
 	assert sciapy.regress.models_cel.ProxyModel.get_value
 	assert sciapy.regress.models_cel.ProxyModel.compute_gradient
+
+
+def test_main_help():
+	from subprocess import Popen
+	p = Popen(["python", "-m", "sciapy.regress", "-h"])
+	p.communicate()
+	p.wait()
+	assert p.returncode == 0

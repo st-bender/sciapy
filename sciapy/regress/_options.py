@@ -141,7 +141,7 @@ parser.add_argument("--exclude_spe", action="store_true", default=False,
 		help="Exclude pre-defined SPE events (default: %(default)s)")
 parser.add_argument("--akd_threshold", default=0.002, type=float,
 		help="Exclude data with an averaging kernel diagonal element "
-		"smaller than the given threshold (default: %*default)s)")
+		"smaller than the given threshold (default: %(default)s)")
 parser.add_argument("--cnt_threshold", default=0, type=int,
 		help="Exclude data with less than the given number of measurement points "
 		"in the averaged bin (default: %(default)s)")
