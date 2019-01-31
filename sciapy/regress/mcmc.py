@@ -160,9 +160,26 @@ def mcmc_sample_model(model, y, beta=1.,
 	sampler = emcee.EnsembleSampler(nwalkers, ndim, mod_func, args=mod_args,
 			pool=pool)
 
+	rst0 = np.random.get_state()
+
+	if not optimized:
+		logging.info("Running MCMC fit (%s samples)", nburnin)
+		p0, lnp0, rst0 = _sample_mcmc(sampler, nburnin, p0, rst0,
+				show_progress, progress_mod, debug=True)
+		logging.info("MCMC fit finished.")
+
+		p = p0[np.argmax(lnp0)]
+		logging.info("Fit max logpost: %s, params: %s, exp(params): %s",
+					np.max(lnp0), p, np.exp(p))
+		model.set_parameter_vector(p)
+		logging.debug("params: %s", model.get_parameter_dict())
+		logging.debug("log_likelihood: %s", model.log_likelihood(y))
+		p0 = [p + 1e-4 * np.random.randn(ndim) for _ in range(nwalkers)]
+		sampler.reset()
+
 	logging.info("Running burn-in (%s samples)", nburnin)
-	p0, lnp0, rst0 = _sample_mcmc(sampler, nburnin, p0, None,
-			show_progress, progress_mod, debug=True)
+	p0, lnp0, rst0 = _sample_mcmc(sampler, nburnin, p0, rst0,
+			show_progress, progress_mod)
 	logging.info("Burn-in finished.")
 
 	p = p0[np.argmax(lnp0)]
@@ -172,14 +189,6 @@ def mcmc_sample_model(model, y, beta=1.,
 	logging.debug("params: %s", model.get_parameter_dict())
 	logging.debug("log_likelihood: %s", model.log_likelihood(y))
 	sampler.reset()
-
-	if not optimized:
-		p0 = [p + 1e-4 * np.random.randn(ndim) for _ in range(nwalkers)]
-		logging.info("Running second burn-in (%s samples)", nburnin)
-		p0, lnp0, rst0 = _sample_mcmc(sampler, nburnin, p0, rst0,
-				show_progress, progress_mod)
-		sampler.reset()
-		logging.info("Second burn-in finished.")
 
 	logging.info("Running production chain (%s samples)", nprod)
 	_sample_mcmc(sampler, nprod, p0, rst0, show_progress, progress_mod)
