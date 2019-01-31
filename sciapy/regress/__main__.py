@@ -240,6 +240,9 @@ def main():
 		except:
 			logging.info("Setting number of openblas threads failed.")
 
+	if args.random_seed is not None:
+		np.random.seed(args.random_seed)
+
 	if args.proxies:
 		proxies = args.proxies.split(',')
 		proxy_dict = dict(_p.split(':') for _p in proxies)

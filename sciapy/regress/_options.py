@@ -184,6 +184,10 @@ parser.add_argument("-O", "--optimize", metavar="m", type=int, default="1",
 parser.add_argument("-N", "--openblas_threads", metavar="N",
 		type=int, default=1,
 		help="Use N OpenBlas threads (default: %(default)s)")
+parser.add_argument("-S", "--random_seed", metavar="NNNN",
+		type=int, default=None,
+		help="Use a particular random seed to obtain "
+		"reproducible results (default: %(default)s)")
 group_mcmc = parser.add_argument_group(title="MCMC parameters",
 		description="Fine-tuning of the (optional) MCMC run.")
 group_mcmc.add_argument("-M", "--mcmc", type=strtobool, default="true",
