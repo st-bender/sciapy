@@ -27,6 +27,13 @@ import celerite
 import george
 import emcee
 
+try:
+	from tqdm import tqdm
+	have_tqdm = True
+except ImportError:
+	have_tqdm = False
+
+
 __all__ = ["mcmc_sample_model"]
 
 
@@ -40,13 +47,17 @@ def _lpost(p, model, y=None, beta=1.):
 
 def _sample_mcmc(sampler, nsamples, p0, rst0,
 		show_progress, progress_mod, debug=False):
-	for i, result in enumerate(
-			sampler.sample(p0, rstate0=rst0, iterations=nsamples)):
+	smpl = sampler.sample(p0, rstate0=rst0, iterations=nsamples)
+	if have_tqdm:
+		smpl = tqdm(smpl, total=nsamples, disable=None)
+	for i, result in enumerate(smpl):
 		if show_progress and (i + 1) % progress_mod == 0:
-			logging.info("%5.1f%%", 100 * (float(i + 1) / nsamples))
+			if not have_tqdm and not debug:
+				logging.info("%5.1f%%", 100 * (float(i + 1) / nsamples))
 			if debug:
 				_pos, _logp, _ = result
-				logging.debug("lnpmax: %s, p(lnpmax): %s",
+				logging.debug("%5.1f%% lnpmax: %s, p(lnpmax): %s",
+					100 * (float(i + 1) / nsamples),
 					np.max(_logp), _pos[np.argmax(_logp)])
 	return result
 
