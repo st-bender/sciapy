@@ -42,8 +42,9 @@ def _lpost(p, model, y=None, beta=1.):
 	model.set_parameter_vector(p)
 	lprior = model.log_prior()
 	if not np.isfinite(lprior):
-		return -np.inf
-	return beta * (model.log_likelihood(y, quiet=True) + lprior)
+		return (-np.inf, np.nan)
+	log_likelihood = model.log_likelihood(y, quiet=True)
+	return (beta * (log_likelihood + lprior), log_likelihood)
 
 
 def _sample_mcmc(sampler, nsamples, p0, rst0,
@@ -56,7 +57,7 @@ def _sample_mcmc(sampler, nsamples, p0, rst0,
 			if not have_tqdm and not debug:
 				logging.info("%5.1f%%", 100 * (float(i + 1) / nsamples))
 			if debug:
-				_pos, _logp, _ = result
+				_pos, _logp, _, _ = result
 				logging.debug("%5.1f%% lnpmax: %s, p(lnpmax): %s",
 					100 * (float(i + 1) / nsamples),
 					np.max(_logp), _pos[np.argmax(_logp)])
@@ -165,7 +166,7 @@ def mcmc_sample_model(model, y, beta=1.,
 
 	if not optimized:
 		logging.info("Running MCMC fit (%s samples)", nburnin)
-		p0, lnp0, rst0 = _sample_mcmc(sampler, nburnin, p0, rst0,
+		p0, lnp0, rst0, _ = _sample_mcmc(sampler, nburnin, p0, rst0,
 				show_progress, progress_mod, debug=True)
 		logging.info("MCMC fit finished.")
 
@@ -179,7 +180,7 @@ def mcmc_sample_model(model, y, beta=1.,
 		sampler.reset()
 
 	logging.info("Running burn-in (%s samples)", nburnin)
-	p0, lnp0, rst0 = _sample_mcmc(sampler, nburnin, p0, rst0,
+	p0, lnp0, rst0, _ = _sample_mcmc(sampler, nburnin, p0, rst0,
 			show_progress, progress_mod)
 	logging.info("Burn-in finished.")
 
@@ -197,6 +198,8 @@ def mcmc_sample_model(model, y, beta=1.,
 
 	samples = sampler.flatchain
 	lnp = sampler.flatlnprobability
+	lnlh = np.array(sampler.blobs).ravel()
+	post_expect_loglh = np.nanmean(lnlh)
 	logging.info("total samples: %s", samples.shape)
 
 	samplmean = np.mean(samples, axis=0)
@@ -222,6 +225,7 @@ def mcmc_sample_model(model, y, beta=1.,
 	logging.info("poor man's evidence 4 sum: %s",
 			logsumexp(lnp, b=1. / lnp.shape[0], axis=0))
 
+	# mode
 	model.set_parameter_vector(samples[np.argmax(lnp)])
 	log_lh = model.log_likelihood(y)
 	# Use the likelihood instead of the posterior
@@ -234,8 +238,10 @@ def mcmc_sample_model(model, y, beta=1.,
 	dic = 2 * sample_deviance - deviance_at_sample
 	logging.info("max logpost log_lh: %s, AIC: %s, DIC: %s, pd: %s",
 			model.log_likelihood(y), 2 * ndim - 2 * log_lh, dic, pd)
+	# mean
 	model.set_parameter_vector(samplmean)
 	log_lh = model.log_likelihood(y)
+	log_lh_mean = log_lh
 	# DIC
 	sample_deviance = -2 * np.nanmean(lnp)
 	deviance_at_sample = -2 * (model.log_prior() + log_lh)
@@ -243,6 +249,7 @@ def mcmc_sample_model(model, y, beta=1.,
 	dic = 2 * sample_deviance - deviance_at_sample
 	logging.info("mean log_lh: %s, AIC: %s, DIC: %s, pd: %s",
 			model.log_likelihood(y), 2 * ndim - 2 * log_lh, dic, pd)
+	# median
 	model.set_parameter_vector(samplmedian)
 	log_lh = model.log_likelihood(y)
 	# DIC
@@ -252,6 +259,12 @@ def mcmc_sample_model(model, y, beta=1.,
 	pd = sample_deviance - deviance_at_sample
 	logging.info("median log_lh: %s, AIC: %s, DIC: %s, pd: %s",
 			model.log_likelihood(y), 2 * ndim - 2 * log_lh, dic, pd)
+	# (4)--(6) in Ando2011 doi:10.1080/01966324.2011.10737798
+	pd_ando = 2 * (log_lh_mean - post_expect_loglh)
+	ic5 = - 2 * post_expect_loglh + 2 * pd_ando
+	ic6 = - 2 * post_expect_loglh + 2 * ndim
+	logging.info("Ando2011: pd: %s, IC(5): %s, IC(6): %s",
+			pd_ando, ic5, ic6)
 
 	if return_logpost:
 		return samples, lnp
