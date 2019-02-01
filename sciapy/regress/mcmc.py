@@ -22,6 +22,7 @@ from multiprocessing import Pool
 
 import numpy as np
 from scipy.optimize._differentialevolution import DifferentialEvolutionSolver
+from scipy.special import logsumexp
 
 import celerite
 import george
@@ -212,9 +213,45 @@ def mcmc_sample_model(model, y, beta=1.,
 
 	logging.info("AIC: %s", 2 * ndim - 2 * np.max(lnp))
 	logging.info("BIC: %s", np.log(len(y)) * ndim - 2 * np.max(lnp))
-	logging.info("poor man's evidence 1 sum: %s, mean: %s", np.sum(np.exp(lnp)), np.mean(np.exp(lnp)))
-	logging.info("poor man's evidence 2 max: %s, std: %s", np.max(np.exp(lnp)), np.std(np.exp(lnp)))
-	logging.info("poor man's evidence 3: %s", np.max(np.exp(lnp)) / np.std(np.exp(lnp)))
+	logging.info("poor man's evidence 1 sum: %s, mean: %s",
+			np.sum(np.exp(lnp)), np.mean(np.exp(lnp)))
+	logging.info("poor man's evidence 2 max: %s, std: %s",
+			np.max(np.exp(lnp)), np.std(np.exp(lnp)))
+	logging.info("poor man's evidence 3: %s",
+			np.max(np.exp(lnp)) / np.std(np.exp(lnp)))
+	logging.info("poor man's evidence 4 sum: %s",
+			logsumexp(lnp, b=1. / lnp.shape[0], axis=0))
+
+	model.set_parameter_vector(samples[np.argmax(lnp)])
+	log_lh = model.log_likelihood(y)
+	# Use the likelihood instead of the posterior
+	# https://doi.org/10.3847/1538-3881/aa9332
+	logging.info("BIC lh: %s", np.log(len(y)) * ndim - 2 * log_lh)
+	# DIC
+	sample_deviance = -2 * np.max(lnp)
+	deviance_at_sample = -2 * (model.log_prior() + log_lh)
+	pd = sample_deviance - deviance_at_sample
+	dic = 2 * sample_deviance - deviance_at_sample
+	logging.info("max logpost log_lh: %s, AIC: %s, DIC: %s, pd: %s",
+			model.log_likelihood(y), 2 * ndim - 2 * log_lh, dic, pd)
+	model.set_parameter_vector(samplmean)
+	log_lh = model.log_likelihood(y)
+	# DIC
+	sample_deviance = -2 * np.nanmean(lnp)
+	deviance_at_sample = -2 * (model.log_prior() + log_lh)
+	pd = sample_deviance - deviance_at_sample
+	dic = 2 * sample_deviance - deviance_at_sample
+	logging.info("mean log_lh: %s, AIC: %s, DIC: %s, pd: %s",
+			model.log_likelihood(y), 2 * ndim - 2 * log_lh, dic, pd)
+	model.set_parameter_vector(samplmedian)
+	log_lh = model.log_likelihood(y)
+	# DIC
+	sample_deviance = -2 * np.nanmedian(lnp)
+	deviance_at_sample = -2 * (model.log_prior() + log_lh)
+	dic = 2 * sample_deviance - deviance_at_sample
+	pd = sample_deviance - deviance_at_sample
+	logging.info("median log_lh: %s, AIC: %s, DIC: %s, pd: %s",
+			model.log_likelihood(y), 2 * ndim - 2 * log_lh, dic, pd)
 
 	if return_logpost:
 		return samples, lnp
