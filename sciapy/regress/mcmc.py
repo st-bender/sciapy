@@ -44,7 +44,7 @@ def _lpost(p, model, y=None, beta=1.):
 	if not np.isfinite(lprior):
 		return (-np.inf, np.nan)
 	log_likelihood = model.log_likelihood(y, quiet=True)
-	return (beta * (log_likelihood + lprior), log_likelihood)
+	return (beta * (log_likelihood + lprior), [log_likelihood])
 
 
 def _sample_mcmc(sampler, nsamples, p0, rst0,
@@ -198,8 +198,9 @@ def mcmc_sample_model(model, y, beta=1.,
 
 	samples = sampler.flatchain
 	lnp = sampler.flatlnprobability
-	lnlh = np.array(sampler.blobs).ravel()
-	post_expect_loglh = np.nanmean(lnlh)
+	# first column in the blobs are the log likelihoods
+	lnlh = np.array(sampler.blobs)[..., 0].ravel().astype(float)
+	post_expect_loglh = np.nanmean(np.array(lnlh))
 	logging.info("total samples: %s", samples.shape)
 
 	samplmean = np.mean(samples, axis=0)
