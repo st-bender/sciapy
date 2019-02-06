@@ -32,6 +32,39 @@ def mcmc_statistics(model, times, data, errs,
 
 	Statistical information about the model and the sampled parameter
 	distributions with respect to the provided data and its variance.
+
+	Sends the calculated values to the logger, includes the mean
+	standardized log loss as described in R&W, 2006, section 2.5, (2.34),
+	and some slightly adapted $\\chi^2_{\\text{red}}$ and $R^2$ scores.
+
+	Parameters
+	----------
+	model : `celerite.GP`, `george.GP` or `CeleriteModelSet` instance
+		The model instance whose parameter distribution was drawn.
+	times : (M,) array_like
+		The test coordinates to predict or evaluate the model on.
+	data : (M,) array_like
+		The test data to test the model against.
+	errs : (M,) array_like
+		The errors (variances) of the test data.
+	train_times : (N,) array_like
+		The coordinates on which the model was trained.
+	train_data : (N,) array_like
+		The data on which the model was trained.
+	train_errs : (N,) array_like
+		The errors (variances) of the training data.
+	samples : (K, L) array_like
+		The `K` MCMC samples of the `L` parameter distributions.
+	lnp : (K,) array_like
+		The posterior log probabilities of the `K` MCMC samples.
+	median : bool, optional
+		Whether to use the median of the sampled distributions or
+		the maximum posterior sample (the default) to evaluate the
+		statistics.
+
+	Returns
+	-------
+	nothing
 	"""
 	ndat = len(times)
 	ndim = len(model.get_parameter_vector())
@@ -54,7 +87,8 @@ def mcmc_statistics(model, times, data, errs,
 	test_logpred = -0.5 * (resid_gp.dot(np.linalg.solve(gpcov, resid_gp))
 			+ np.trace(np.log(gpcov))
 			+ _const)
-	# MSLL
+	# MSLL -- mean standardized log loss
+	# as described in R&W, 2006, section 2.5, (2.34)
 	var_mod = np.nanvar(resid_mod, ddof=mdim)  # mean model variance
 	var_gp = np.nanvar(resid_gp, ddof=ndim)  # gp model variance
 	var_triv = np.nanvar(train_data, ddof=1)  # trivial model variance
