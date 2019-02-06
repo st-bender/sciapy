@@ -17,20 +17,21 @@ import logging
 
 import numpy as np
 
+__all__ = ["mcmc_statistics"]
+
 
 def _log_prob(resid, var):
 	return -0.5 * (np.log(2 * np.pi * var) + resid**2 / var)
 
 
-def _log_statistics(model, times, data, errs,
+def mcmc_statistics(model, times, data, errs,
 		train_times, train_data, train_errs,
 		samples, lnp,
 		median=False):
-	"""Log the statistics of the model against the provided data
+	"""Statistics for the (GP) model against the provided data
 
-	Logs some statistical information about the model and the
-	sampled parameter distribution with respect to the provided
-	data and its variance.
+	Statistical information about the model and the sampled parameter
+	distributions with respect to the provided data and its variance.
 	"""
 	ndat = len(times)
 	ndim = len(model.get_parameter_vector())

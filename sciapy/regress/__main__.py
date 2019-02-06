@@ -33,6 +33,7 @@ from .models_cel import CeleriteModelSet as NOModel
 from .models_cel import ConstantModel, ProxyModel
 from .models_cel import HarmonicModelCosineSine, HarmonicModelAmpPhase
 from .mcmc import mcmc_sample_model
+from .statistics import mcmc_statistics
 
 from ._gpkernels import (george_solvers,
 		setup_george_kernel, setup_celerite_terms)
@@ -481,13 +482,13 @@ def main():
 
 		if args.train_fraction < 1. or args.test_fraction < 1.:
 			logging.info("Statistics for the test samples")
-			_log_statistics(gpmodel,
+			mcmc_statistics(gpmodel,
 					no_ys_test, no_dens_test, no_errs_test,
 					no_ys_train, no_dens_train, no_errs_train,
 					samples, lnp,
 			)
 		logging.info("Statistics for all samples")
-		_log_statistics(gpmodel,
+		mcmc_statistics(gpmodel,
 				no_ys, no_dens, no_errs,
 				no_ys_train, no_dens_train, no_errs_train,
 				samples, lnp,
