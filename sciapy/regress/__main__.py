@@ -64,6 +64,8 @@ def save_samples_netcdf(filename, model, alt, lat, samples,
 			"mean": {
 				"log": "log(10$^{{{0:.0f}}}$ cm$^{{-3}}$)"
 						.format(-np.log10(scale)),
+				"cos": "10$^{{{0:.0f}}}$ cm$^{{-3}}$".format(-np.log10(scale)),
+				"sin": "10$^{{{0:.0f}}}$ cm$^{{-3}}$".format(-np.log10(scale)),
 				"val": "10$^{{{0:.0f}}}$ cm$^{{-3}}$".format(-np.log10(scale)),
 				"amp": "10$^{{{0:.0f}}}$ cm$^{{-3}}$".format(-np.log10(scale)),
 				"tau": "d"}}
