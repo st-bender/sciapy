@@ -256,7 +256,7 @@ def mcmc_statistics(model, times, data, errs,
 	resid_gp = gppred - data  # GP prediction
 	resid_triv = np.nanmean(train_data) - data  # trivial model
 	_const = ndat * np.log(2.0 * np.pi)
-	test_logpred = -0.5 * (resid_gp.dot(np.linalg.solve(gpcov, resid_gp))
+	test_logpred = -0.5 * (resid_gp.dot(linalg.solve(gpcov, resid_gp))
 			+ np.trace(np.log(gpcov))
 			+ _const)
 	# MSLL -- mean standardized log loss
@@ -282,7 +282,7 @@ def mcmc_statistics(model, times, data, errs,
 	# chi^2 (variance corrected costs)
 	chisq_mod_ye = np.sum((resid_mod / errs)**2)
 	chisq_triv = np.sum((resid_triv / errs)**2)
-	chisq_gpcov = resid_mod.dot(np.linalg.solve(gpcov, resid_mod))
+	chisq_gpcov = resid_mod.dot(linalg.solve(gpcov, resid_mod))
 	# adjust for degrees of freedom
 	cost_gp_dof = cost_gp / (ndat - ndim)
 	cost_mod_dof = cost_mod / (ndat - mdim)
