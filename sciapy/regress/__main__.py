@@ -267,7 +267,7 @@ def main():
 				no_ys, no_dens, no_errs, args.train_fraction,
 				args.test_fraction, args.random_train_test)
 
-	sza_intp = interp1d(no_ys, no_szas, fill_value="extrapolate")
+	sza_intp = interp1d(no_ys, no_szas, bounds_error=False)
 
 	max_amp = 1e10 * args.scale
 	max_days = 100
