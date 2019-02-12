@@ -50,9 +50,9 @@ def _log_pred_pt(gp, train_data, times, data, errs, s):
 
 
 def waic_loo(model, times, data, errs,
-		train_data,
 		samples,
 		method="likelihood",
+		train_data=None,
 		noisy_targets=True,
 		nthreads=1,
 		use_dask=False,
@@ -81,8 +81,6 @@ def waic_loo(model, times, data, errs,
 		The test data to test the model against.
 	errs : (M,) array_like
 		The errors (variances) of the test data.
-	train_data : (N,) array_like
-		The data on which the model was trained.
 	samples : (K, L) array_like
 		The `K` MCMC samples of the `L` parameter distributions.
 	method : str ("likelihood" or "predict"), optional
@@ -91,6 +89,9 @@ def waic_loo(model, times, data, errs,
 		"predict" uses the actual GP prediction, might be useful if the IC
 		should be estimated for actual test data that was not used to train
 		the model.
+	train_data : (N,) array_like, optional
+		The data on which the model was trained, needed if method="predict" is
+		used, otherwise None is the default and the likelihood is used.
 	noisy_targets : bool, optional
 		Include the given errors when calculating the predictive probability.
 	nthreads : int, optional
@@ -124,9 +125,8 @@ def waic_loo(model, times, data, errs,
 		errs = 1.123e-12
 
 	# point-wise posterior/predictive probabilities
-	if method == "likelihood":
-		_log_p_pt = partial(_log_lh_pt, model, times, data, errs)
-	elif method == "predict":
+	_log_p_pt = partial(_log_lh_pt, model, times, data, errs)
+	if method == "predict" and train_data is not None:
 		_log_p_pt = partial(_log_pred_pt, model, train_data, times, data, errs)
 
 	# calculate the point-wise probabilities and stack them together
