@@ -56,6 +56,7 @@ def waic_loo(model, times, data, errs,
 		noisy_targets=True,
 		nthreads=1,
 		use_dask=False,
+		dask_cluster=None,
 		):
 	"""Watanabe-Akaike information criterion (WAIC) and LOO IC of the (GP) model
 
@@ -101,6 +102,10 @@ def waic_loo(model, times, data, errs,
 		Use `dask.distributed` to distribute the point-wise probability
 		calculations to `nthreads` workers. The default is to use
 		`multiprocessing.pool.Pool()`.
+	dask_cluster: str, or `dask.distributed.Cluster` instance, optional
+		Will be passed to `dask.distributed.Client()`
+		This can be the address of a Scheduler server like a string
+		'127.0.0.1:8786' or a cluster object like `dask.distributed.LocalCluster()`.
 
 	Returns
 	-------
@@ -132,8 +137,12 @@ def waic_loo(model, times, data, errs,
 	# calculate the point-wise probabilities and stack them together
 	if nthreads > 1:
 		if use_dask:
-			# local dask cluster
-			_cl = LocalCluster(n_workers=nthreads, threads_per_worker=1)
+			if dask_cluster is None:
+				# start local dask cluster
+				_cl = LocalCluster(n_workers=nthreads, threads_per_worker=1)
+			else:
+				# use provided dask cluster
+				_cl = dask_cluster
 			_c = Client(_cl)
 			_log_pred = _c.map(_log_p_pt, samples)
 			progress(_log_pred)
@@ -189,7 +198,8 @@ def waic_loo(model, times, data, errs,
 	if nthreads > 1:
 		if use_dask:
 			_c.close()
-			_cl.close()
+			if dask_cluster is None:
+				_cl.close()
 		else:
 			_p.close()
 			_p.join()
