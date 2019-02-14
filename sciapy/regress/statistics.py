@@ -115,10 +115,13 @@ def waic_loo(model, times, data, errs,
 		The LOO IC, its standard error, and the estimated
 		effective number of parameters, p_loo.
 	"""
-	from tqdm.autonotebook import tqdm
-	from scipy.special import logsumexp
-	from multiprocessing import pool
 	from functools import partial
+	from multiprocessing import pool
+	from scipy.special import logsumexp
+	try:
+		from tqdm.autonotebook import tqdm
+	except ImportError:
+		tqdm = None
 	try:
 		from dask.distributed import Client, LocalCluster, progress
 	except ImportError:
@@ -150,10 +153,13 @@ def waic_loo(model, times, data, errs,
 		else:
 			# multiprocessing.pool
 			_p = pool.Pool(processes=nthreads)
-			log_pred = np.stack(list(tqdm(
-				_p.imap_unordered(_log_p_pt, samples), total=len(samples))))
+			_mapped = _p.imap_unordered(_log_p_pt, samples)
+			if tqdm is not None:
+				_mapped = tqdm(_mapped, total=len(samples))
+			log_pred = np.stack(list(_mapped))
 	else:
-		samples = tqdm(samples, total=len(samples))
+		if tqdm is not None:
+			samples = tqdm(samples, total=len(samples))
 		log_pred = np.stack(list(map(_log_p_pt, samples)))
 
 	lppd_i = logsumexp(log_pred, b=1. / log_pred.shape[0], axis=0)
