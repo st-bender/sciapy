@@ -150,6 +150,9 @@ def waic_loo(model, times, data, errs,
 			_log_pred = _c.map(_log_p_pt, samples)
 			progress(_log_pred)
 			log_pred = np.stack(_c.gather(_log_pred))
+			_c.close()
+			if dask_cluster is None:
+				_cl.close()
 		else:
 			# multiprocessing.pool
 			_p = pool.Pool(processes=nthreads)
@@ -157,6 +160,8 @@ def waic_loo(model, times, data, errs,
 			if tqdm is not None:
 				_mapped = tqdm(_mapped, total=len(samples))
 			log_pred = np.stack(list(_mapped))
+			_p.close()
+			_p.join()
 	else:
 		if tqdm is not None:
 			samples = tqdm(samples, total=len(samples))
@@ -200,15 +205,6 @@ def waic_loo(model, times, data, errs,
 	hy2 = -np.nanmedian(lppd_i)
 	logging.info("H(Y): mean %s, median: %s", hy1, hy2)
 
-	# clean up
-	if nthreads > 1:
-		if use_dask:
-			_c.close()
-			if dask_cluster is None:
-				_cl.close()
-		else:
-			_p.close()
-			_p.join()
 	return waic, waic_se, p_waic, loo_ic, loo_ic_se, p_loo
 
 
