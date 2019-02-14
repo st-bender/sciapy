@@ -49,6 +49,52 @@ def _log_pred_pt(gp, train_data, times, data, errs, s):
 	return _log_prob(resid_gp, pvar_gp)
 
 
+def _log_prob_pt_samples_dask(log_p_pt, samples,
+		nthreads=1, cluster=None):
+	from dask.distributed import Client, LocalCluster, progress
+	import dask.bag as db
+
+	# calculate the point-wise probabilities and stack them together
+	if cluster is None:
+		# start local dask cluster
+		_cl = LocalCluster(n_workers=nthreads, threads_per_worker=1)
+	else:
+		# use provided dask cluster
+		_cl = cluster
+
+	with Client(_cl):
+		_log_pred = db.from_sequence(samples).map(log_p_pt)
+		progress(_log_pred)
+		ret = np.stack(_log_pred.compute())
+
+	if cluster is None:
+		_cl.close()
+
+	return ret
+
+
+def _log_prob_pt_samples_mt(log_p_pt, samples, nthreads=1):
+	from multiprocessing import pool
+	try:
+		from tqdm.autonotebook import tqdm
+	except ImportError:
+		tqdm = None
+
+	# multiprocessing.pool
+	_p = pool.Pool(processes=nthreads)
+
+	_mapped = _p.imap_unordered(log_p_pt, samples)
+	if tqdm is not None:
+		_mapped = tqdm(_mapped, total=len(samples))
+
+	ret = np.stack(list(_mapped))
+
+	_p.close()
+	_p.join()
+
+	return ret
+
+
 def waic_loo(model, times, data, errs,
 		samples,
 		method="likelihood",
@@ -116,16 +162,7 @@ def waic_loo(model, times, data, errs,
 		effective number of parameters, p_loo.
 	"""
 	from functools import partial
-	from multiprocessing import pool
 	from scipy.special import logsumexp
-	try:
-		from tqdm.autonotebook import tqdm
-	except ImportError:
-		tqdm = None
-	try:
-		from dask.distributed import Client, LocalCluster, progress
-	except ImportError:
-		use_dask = False
 
 	# the predictive covariance should include the data variance
 	# set to a small value if we don't want to account for them
@@ -138,34 +175,12 @@ def waic_loo(model, times, data, errs,
 		_log_p_pt = partial(_log_pred_pt, model, train_data, times, data, errs)
 
 	# calculate the point-wise probabilities and stack them together
-	if nthreads > 1:
-		if use_dask:
-			if dask_cluster is None:
-				# start local dask cluster
-				_cl = LocalCluster(n_workers=nthreads, threads_per_worker=1)
-			else:
-				# use provided dask cluster
-				_cl = dask_cluster
-			_c = Client(_cl)
-			_log_pred = _c.map(_log_p_pt, samples)
-			progress(_log_pred)
-			log_pred = np.stack(_c.gather(_log_pred))
-			_c.close()
-			if dask_cluster is None:
-				_cl.close()
-		else:
-			# multiprocessing.pool
-			_p = pool.Pool(processes=nthreads)
-			_mapped = _p.imap_unordered(_log_p_pt, samples)
-			if tqdm is not None:
-				_mapped = tqdm(_mapped, total=len(samples))
-			log_pred = np.stack(list(_mapped))
-			_p.close()
-			_p.join()
+	if nthreads > 1 and use_dask:
+		log_pred = _log_prob_pt_samples_dask(_log_p_pt, samples,
+				nthreads=nthreads, cluster=dask_cluster)
 	else:
-		if tqdm is not None:
-			samples = tqdm(samples, total=len(samples))
-		log_pred = np.stack(list(map(_log_p_pt, samples)))
+		log_pred = _log_prob_pt_samples_mt(_log_p_pt, samples,
+				nthreads=nthreads)
 
 	lppd_i = logsumexp(log_pred, b=1. / log_pred.shape[0], axis=0)
 	p_waic_i = np.nanvar(log_pred, ddof=1, axis=0)
