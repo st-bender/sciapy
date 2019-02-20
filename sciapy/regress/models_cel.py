@@ -119,8 +119,9 @@ class ProxyModel(Model):
 	tausin2 : float
 		The amplitude of the sine part of the semi-annual life time variation.
 	ltscan : float
-		The number of days to sum the previous proxy values. If it is zero or
+		The number of days to sum the previous proxy values. If it is
 		negative, the value will be set to three times the maximal lifetime.
+		No lifetime adjustemets are calculated when set to zero.
 	center : bool, optional
 		Centers the proxy values by subtracting the overall mean. The mean is
 		calculated from the whole `proxy_vals` array and is stored in the
@@ -177,6 +178,9 @@ class ProxyModel(Model):
 
 	def get_value(self, t):
 		proxy_val = self.intp(t - self.lag)
+		if self.ltscan == 0:
+			# no lifetime, nothing else to do
+			return self.amp * proxy_val
 		# annual variation of the proxy lifetime
 		if self.sza_intp is not None:
 			# using the solar zenith angle
