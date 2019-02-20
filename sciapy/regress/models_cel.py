@@ -302,3 +302,43 @@ class CeleriteModelSet(ModelSet):
 		for m in self.models.values():
 			grad.extend(list(m.compute_gradient(t)))
 		return np.array(grad)
+
+
+def _setup_proxy_model_with_bounds(times, values,
+		max_amp=1e10, max_days=100,
+		**kwargs):
+	# extract setup from `kwargs`
+	center = kwargs.get("center", False)
+	fit_phase = kwargs.get("fit_phase", False)
+	lag = kwargs.get("lag", 0.)
+	lt_metric = kwargs.get("lifetime_metric", 1)
+	lt_prior = kwargs.get("lifetime_prior", "exp")
+	lt_scan = kwargs.get("lifetime_scan", 60)
+	positive = kwargs.get("positive", False)
+	sza_intp = kwargs.get("sza_intp", None)
+	time_format = kwargs.get("time_format", "jyear")
+
+	return ProxyModel(times, values,
+			center=center,
+			sza_intp=sza_intp,
+			fit_phase=fit_phase,
+			lifetime_prior=lt_prior,
+			lifetime_metric=lt_metric,
+			days_per_time_unit=1 if time_format.endswith("d") else 365.25,
+			amp=0.,
+			lag=lag,
+			tau0=0,
+			taucos1=0, tausin1=0,
+			taucos2=0, tausin2=0,
+			ltscan=lt_scan,
+			bounds=dict([
+				("amp", [0, max_amp] if positive else [-max_amp, max_amp]),
+				("lag", [0, max_days]),
+				("tau0", [0, max_days]),
+				("taucos1", [0, max_days] if fit_phase else [-max_days, max_days]),
+				("tausin1", [-np.pi, np.pi] if fit_phase else [-max_days, max_days]),
+				# semi-annual cycles for the life time
+				("taucos2", [0, max_days] if fit_phase else [-max_days, max_days]),
+				("tausin2", [-np.pi, np.pi] if fit_phase else [-max_days, max_days]),
+				("ltscan", [0, 200])])
+			)
