@@ -144,45 +144,44 @@ def _r_sun_earth(time, tfmt="jyear"):
 	return 1 - 0.01672 * np.cos(2 * np.pi / 365.256363 * (doy - 4))
 
 
-def _prepare_proxy_model(name, times, values,
-		args,
-		lag=0,
-		sza_intp=None,
-		max_amp=1e10, max_days=100):
-	pv = np.log(values) if name in args.log_proxies.split(',') else values
-	if name in args.norm_proxies_distSEsq:
-		rad_sun_earth = np.vectorize(_r_sun_earth)(times, tfmt=args.time_format)
-		pv /= rad_sun_earth**2
-	if name in args.norm_proxies_SZA:
-		pv *= np.cos(np.radians(sza_intp(times)))
-	return (
-		name,
-		ProxyModel(times, pv,
-			center=name in args.center_proxies.split(','),
+def _prepare_proxy_model(times, values,
+		max_amp=1e10, max_days=100,
+		**kwargs):
+	# extract setup from `kwargs`
+	center = kwargs.get("center", False)
+	fit_phase = kwargs.get("fit_phase", False)
+	lag = kwargs.get("lag", 0.)
+	lt_metric = kwargs.get("lifetime_metric", 1)
+	lt_prior = kwargs.get("lifetime_prior", "exp")
+	lt_scan = kwargs.get("lifetime_scan", 60)
+	positive = kwargs.get("positive", False)
+	sza_intp = kwargs.get("sza_intp", None)
+	time_format = kwargs.get("time_format", "jyear")
+
+	return ProxyModel(times, values,
+			center=center,
 			sza_intp=sza_intp,
-			fit_phase=args.fit_phase,
-			lifetime_prior=args.lifetime_prior,
-			lifetime_metric=args.lifetime_metric,
-			days_per_time_unit=1 if args.time_format.endswith("d") else 365.25,
+			fit_phase=fit_phase,
+			lifetime_prior=lt_prior,
+			lifetime_metric=lt_metric,
+			days_per_time_unit=1 if time_format.endswith("d") else 365.25,
 			amp=0.,
 			lag=lag,
 			tau0=0,
 			taucos1=0, tausin1=0,
 			taucos2=0, tausin2=0,
-			ltscan=args.lifetime_scan,
+			ltscan=lt_scan,
 			bounds=dict([
-				("amp",
-					[0, max_amp] if name in args.positive_proxies.split(',')
-					else [-max_amp, max_amp]),
+				("amp", [0, max_amp] if positive else [-max_amp, max_amp]),
 				("lag", [0, max_days]),
 				("tau0", [0, max_days]),
-				("taucos1", [0, max_days] if args.fit_phase else [-max_days, max_days]),
-				("tausin1", [-np.pi, np.pi] if args.fit_phase else [-max_days, max_days]),
+				("taucos1", [0, max_days] if fit_phase else [-max_days, max_days]),
+				("tausin1", [-np.pi, np.pi] if fit_phase else [-max_days, max_days]),
 				# semi-annual cycles for the life time
-				("taucos2", [0, max_days] if args.fit_phase else [-max_days, max_days]),
-				("tausin2", [-np.pi, np.pi] if args.fit_phase else [-max_days, max_days]),
+				("taucos2", [0, max_days] if fit_phase else [-max_days, max_days]),
+				("tausin2", [-np.pi, np.pi] if fit_phase else [-max_days, max_days]),
 				("ltscan", [0, 200])])
-		))
+			)
 
 
 def main():
@@ -294,12 +293,24 @@ def main():
 	proxy_models = []
 	for pn, pf in proxy_dict.items():
 		pt, pp = load_solar_gm_table(pf, cols=[0, 1], names=["time", pn], tfmt=args.time_format)
-		proxy_models.append(
-			_prepare_proxy_model(pn, pt, pp[pn], args,
+		# use log of proxy values
+		pv = np.log(pp[pn]) if pn in args.log_proxies.split(',') else pp[pn]
+		# normalize to sun--earth distance squared
+		if pn in args.norm_proxies_distSEsq.split(','):
+			rad_sun_earth = np.vectorize(_r_sun_earth)(pt, tfmt=args.time_format)
+			pv /= rad_sun_earth**2
+		# normalize by cos(SZA)
+		if pn in args.norm_proxies_SZA.split(',') and sza_intp is not None:
+			pv *= np.cos(np.radians(sza_intp(pt)))
+		proxy_models.append((pn,
+			_prepare_proxy_model(pt, pv,
+				center=pn in args.center_proxies.split(','),
+				positive=pn in args.positive_proxies.split(','),
 				lag=float(lag_dict[pn]),
-				sza_intp=sza_intp if args.use_sza else None,
 				max_amp=max_amp, max_days=max_days,
-			)
+				sza_intp=sza_intp if args.use_sza else None,
+				**vars(args),
+			))
 		)
 		logging.info("%s mean: %s", pn, proxy_models[-1][1].mean)
 	offset_model = [("offset",
