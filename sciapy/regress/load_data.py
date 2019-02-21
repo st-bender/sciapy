@@ -134,8 +134,7 @@ def load_solar_gm_table(filename, cols, names, sep="\t", tfmt="jyear"):
 			comment="#",
 			sep=sep, usecols=cols, names=names)
 	times = Time(tab.tz_localize("UTC").index.to_pydatetime())
-	times.format = tfmt
-	ts = times.value
+	ts = getattr(times, tfmt)
 	return ts, tab
 
 def _greedy_select(ds, size, varname="NO_DENS_std", scale=1.):
@@ -282,8 +281,7 @@ def load_scia_dzm(filename, alt, lat, tfmt="jyear",
 
 	# Convert to astropy.Time for Julian epoch or decimal year
 	no_t = Time(pd.to_datetime(NO_tds.time.values, utc=True).to_pydatetime())
-	no_t.format = tfmt
-	no_ys = no_t.value
+	no_ys = getattr(no_t, tfmt)
 
 	if subsample_factor > 1:
 		new_data_size = no_dens.shape[0] // subsample_factor
