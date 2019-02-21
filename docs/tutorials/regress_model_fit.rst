@@ -161,7 +161,7 @@ with a Gaussian Process covariance matrix for fitting.
 
 .. code:: ipython3
 
-    model = sciapy.regress.CeleriteModelSet([("offset", offset_model),
+    model = sciapy.regress.TraceGasModelSet([("offset", offset_model),
                                              ("Lya", lya_model), ("GM", ae_model),
                                              ("f1", harm1), ("f2", harm2)])
 
