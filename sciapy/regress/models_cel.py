@@ -24,7 +24,9 @@ from celerite.modeling import Model, ModelSet, ConstantModel
 
 __all__ = ["ConstantModel",
 		"HarmonicModelCosineSine", "HarmonicModelAmpPhase",
-		"ProxyModel", "CeleriteModelSet"]
+		"ProxyModel", "TraceGasModelSet",
+		"setup_proxy_model_with_bounds", "trace_gas_model"]
+
 
 class HarmonicModelCosineSine(Model):
 	"""Model for harmonic terms
@@ -299,8 +301,12 @@ class ProxyModel(Model):
 		return _priors[self.lifetime_prior]()
 
 
-class CeleriteModelSet(ModelSet):
+class TraceGasModelSet(ModelSet):
+	"""Combined model class for trace gases (and probably other data)
 
+	Inherited from :class:`celerite.ModelSet`, provides `get_value()`
+	and `compute_gradient()` methods.
+	"""
 	def get_value(self, t):
 		v = np.zeros_like(t)
 		for m in self.models.values():
@@ -314,7 +320,7 @@ class CeleriteModelSet(ModelSet):
 		return np.array(grad)
 
 
-def _setup_proxy_model_with_bounds(times, values,
+def setup_proxy_model_with_bounds(times, values,
 		max_amp=1e10, max_days=100,
 		**kwargs):
 	# extract setup from `kwargs`
@@ -352,3 +358,116 @@ def _setup_proxy_model_with_bounds(times, values,
 				("tausin2", [-np.pi, np.pi] if fit_phase else [-max_days, max_days]),
 				("ltscan", [0, 200])])
 			)
+
+
+def _default_proxy_config(tfmt="jyear"):
+	from .load_data import load_dailymeanLya, load_dailymeanAE
+	proxy_config = {}
+	# Lyman-alpha
+	plyat, plyadf = load_dailymeanLya(tfmt=tfmt)
+	proxy_config.update({"Lya": {
+		"times": plyat,
+		"values": plyadf["Lya"],
+		"center": False,
+		"positive": False,
+		"lifetime_scan": 0,
+		}}
+	)
+	# AE index
+	paet, paedf = load_dailymeanAE(name="GM", tfmt=tfmt)
+	proxy_config.update({"GM": {
+		"times": paet,
+		"values": paedf["GM"],
+		"center": False,
+		"positive": True,
+		"lifetime_scan": 60,
+		}}
+	)
+	return proxy_config
+
+
+def trace_gas_model(constant=True, freqs=None, proxy_config=None, **kwargs):
+	"""Trace gas model setup
+
+	Sets up the trace gas model for easy access. All parameters are optional,
+	defaults to an offset, no harmonics, proxies are uncentered and unscaled
+	Lyman-alpha and AE. AE with only positive amplitude and a seasonally
+	varying lifetime.
+
+	Parameters
+	----------
+	constant : bool, optional
+		Whether or not to include a constant (offset) term, default is True.
+	freqs : list, optional
+		Frequencies of the harmonic terms in 1 / a^-1 (inverse years).
+	proxy_config : dict, optional
+		Proxy configuration if different from the standard setup.
+	**kwargs : optional
+		Additional keyword arguments, all of them are also passed on to
+		the proxy setup. For now, supported are the following which are
+		also passed along to the proxy setup with
+		`setup_proxy_model_with_bounds()`:
+
+		* fit_phase : bool
+			fit amplitude and phase instead of sine and cosine
+		* scale : float
+			the factor by which the data is scaled, used to constrain
+			the maximum and minimum amplitudes to be fitted.
+		* tfmt : string
+			The `astropy.time.Time` format string to setup the time axis.
+		* max_amp : float
+			Maximum magnitude of the coefficients, used to constrain the
+			parameter search.
+		* max_days : float
+			Maximum magnitude of the lifetimes, used to constrain the
+			parameter search.
+
+	Returns
+	-------
+	model : :class:`TraceGasModelSet` (extended :class:`celerite.ModelSet`)
+	"""
+	fit_phase = kwargs.get("fit_phase", False)
+	scale = kwargs.get("scale", 1e-6)
+	tfmt = kwargs.get("time_format", "jyear")
+
+	max_amp = kwargs.pop("max_amp", 1e10 * scale)
+	max_days = kwargs.pop("max_days", 100)
+
+	offset_model = []
+	if constant:
+		offset_model = [("offset",
+				ConstantModel(value=0.,
+						bounds={"value": [-max_amp, max_amp]}))]
+
+	freqs = freqs or []
+	harmonic_models = []
+	for freq in freqs:
+		if not fit_phase:
+			harm = HarmonicModelCosineSine(freq=freq,
+					cos=0, sin=0,
+					bounds=dict([
+						("cos", [-max_amp, max_amp]),
+						("sin", [-max_amp, max_amp])])
+			)
+		else:
+			harm = HarmonicModelAmpPhase(freq=freq,
+					amp=0, phase=0,
+					bounds=dict([
+						("amp", [0, max_amp]),
+						("phase", [-np.pi, np.pi])])
+			)
+		harm.freeze_parameter("freq")
+		harmonic_models.append(("f{0:.0f}".format(freq), harm))
+
+	proxy_config = proxy_config or _default_proxy_config(tfmt=tfmt)
+	proxy_models = []
+	for pn, conf in proxy_config.items():
+		if "max_amp" not in conf:
+			conf.update(dict(max_amp=max_amp))
+		if "max_days" not in conf:
+			conf.update(dict(max_days=max_days))
+		proxy_models.append(
+			(pn, setup_proxy_model_with_bounds(**conf, **kwargs))
+		)
+
+	return TraceGasModelSet(offset_model + harmonic_models + proxy_models)

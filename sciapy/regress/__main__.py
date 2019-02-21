@@ -29,9 +29,7 @@ import matplotlib as mpl
 mpl.use("Agg")
 
 from .load_data import load_solar_gm_table, load_scia_dzm
-from .models_cel import CeleriteModelSet as NOModel
-from .models_cel import ConstantModel, ProxyModel
-from .models_cel import HarmonicModelCosineSine, HarmonicModelAmpPhase
+from .models_cel import trace_gas_model
 from .mcmc import mcmc_sample_model
 from .statistics import mcmc_statistics
 
@@ -231,26 +229,7 @@ def main():
 	max_amp = 1e10 * args.scale
 	max_days = 100
 
-	harmonic_models = []
-	for freq in freqs:
-		if not args.fit_phase:
-			harmonic_models.append(("f{0:.0f}".format(freq),
-				HarmonicModelCosineSine(freq=freq,
-					cos=0, sin=0,
-					bounds=dict([
-						("cos", [-max_amp, max_amp]),
-						("sin", [-max_amp, max_amp])])
-			)))
-		else:
-			harmonic_models.append(("f{0:.0f}".format(freq),
-				HarmonicModelAmpPhase(freq=freq,
-					amp=0, phase=0,
-					bounds=dict([
-						# ("amp", [-max_amp, max_amp]),
-						("amp", [0, max_amp]),
-						("phase", [-np.pi, np.pi])])
-			)))
-	proxy_models = []
+	proxy_config = {}
 	for pn, pf in proxy_dict.items():
 		pt, pp = load_solar_gm_table(pf, cols=[0, 1], names=["time", pn], tfmt=args.time_format)
 		# use log of proxy values
@@ -262,22 +241,18 @@ def main():
 		# normalize by cos(SZA)
 		if pn in args.norm_proxies_SZA.split(',') and sza_intp is not None:
 			pv *= np.cos(np.radians(sza_intp(pt)))
-		proxy_models.append((pn,
-			_setup_proxy_model_with_bounds(pt, pv,
+		proxy_config.update({pn:
+			dict(times=pt, values=pv,
 				center=pn in args.center_proxies.split(','),
 				positive=pn in args.positive_proxies.split(','),
 				lag=float(lag_dict[pn]),
 				max_amp=max_amp, max_days=max_days,
 				sza_intp=sza_intp if args.use_sza else None,
-				**vars(args),
-			))
+			)}
 		)
-		logging.info("%s mean: %s", pn, proxy_models[-1][1].mean)
-	offset_model = [("offset",
-			ConstantModel(value=0.,
-					bounds={"value": [-max_amp, max_amp]}))]
 
-	model = NOModel(offset_model + harmonic_models + proxy_models)
+	model = trace_gas_model(constant=args.fit_offset,
+			proxy_config=proxy_config, **vars(args))
 
 	logging.debug("model dict: %s", model.get_parameter_dict())
 	model.freeze_all_parameters()

@@ -36,12 +36,12 @@ def test_mcmcmodule_method_structure():
 
 
 def test_modelmodule_object_structure():
-	assert sciapy.regress.CeleriteModelSet
+	assert sciapy.regress.TraceGasModelSet
 	assert sciapy.regress.ConstantModel
 	assert sciapy.regress.HarmonicModelAmpPhase
 	assert sciapy.regress.HarmonicModelCosineSine
 	assert sciapy.regress.ProxyModel
-	assert sciapy.regress.models_cel.CeleriteModelSet
+	assert sciapy.regress.models_cel.TraceGasModelSet
 	assert sciapy.regress.models_cel.ConstantModel
 	assert sciapy.regress.models_cel.HarmonicModelAmpPhase
 	assert sciapy.regress.models_cel.HarmonicModelCosineSine
@@ -49,8 +49,8 @@ def test_modelmodule_object_structure():
 
 
 def test_modelmodule_method_structure():
-	assert sciapy.regress.CeleriteModelSet.get_value
-	assert sciapy.regress.CeleriteModelSet.compute_gradient
+	assert sciapy.regress.TraceGasModelSet.get_value
+	assert sciapy.regress.TraceGasModelSet.compute_gradient
 	assert sciapy.regress.HarmonicModelAmpPhase.get_value
 	assert sciapy.regress.HarmonicModelAmpPhase.get_amplitude
 	assert sciapy.regress.HarmonicModelAmpPhase.get_phase
@@ -61,8 +61,8 @@ def test_modelmodule_method_structure():
 	assert sciapy.regress.HarmonicModelCosineSine.compute_gradient
 	assert sciapy.regress.ProxyModel.get_value
 	assert sciapy.regress.ProxyModel.compute_gradient
-	assert sciapy.regress.models_cel.CeleriteModelSet.get_value
-	assert sciapy.regress.models_cel.CeleriteModelSet.compute_gradient
+	assert sciapy.regress.models_cel.TraceGasModelSet.get_value
+	assert sciapy.regress.models_cel.TraceGasModelSet.compute_gradient
 	assert sciapy.regress.models_cel.HarmonicModelAmpPhase.get_value
 	assert sciapy.regress.models_cel.HarmonicModelAmpPhase.get_amplitude
 	assert sciapy.regress.models_cel.HarmonicModelAmpPhase.get_phase
