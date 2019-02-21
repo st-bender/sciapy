@@ -44,6 +44,7 @@ class HarmonicModelCosineSine(Model):
 	parameter_names = ("freq", "cos", "sin")
 
 	def get_value(self, t):
+		t = np.atleast_1d(t)
 		return (self.cos * np.cos(self.freq * 2 * np.pi * t) +
 				self.sin * np.sin(self.freq * 2 * np.pi * t))
 
@@ -54,6 +55,7 @@ class HarmonicModelCosineSine(Model):
 		return np.arctan2(self.sin, self.cos)
 
 	def compute_gradient(self, t):
+		t = np.atleast_1d(t)
 		dcos = np.cos(self.freq * 2 * np.pi * t)
 		dsin = np.sin(self.freq * 2 * np.pi * t)
 		df = 2 * np.pi * t * (self.sin * dcos - self.cos * dsin)
@@ -78,6 +80,7 @@ class HarmonicModelAmpPhase(Model):
 	parameter_names = ("freq", "amp", "phase")
 
 	def get_value(self, t):
+		t = np.atleast_1d(t)
 		return self.amp * np.cos(self.freq * 2 * np.pi * t + self.phase)
 
 	def get_amplitude(self):
@@ -87,6 +90,7 @@ class HarmonicModelAmpPhase(Model):
 		return self.phase
 
 	def compute_gradient(self, t):
+		t = np.atleast_1d(t)
 		damp = np.cos(self.freq * 2 * np.pi * t + self.phase)
 		dphi = -self.amp * np.sin(self.freq * 2 * np.pi * t + self.phase)
 		df = 2 * np.pi * t * dphi
@@ -177,6 +181,7 @@ class ProxyModel(Model):
 		super(ProxyModel, self).__init__(*args, **kwargs)
 
 	def get_value(self, t):
+		t = np.atleast_1d(t)
 		proxy_val = self.intp(t - self.lag)
 		if self.ltscan == 0:
 			# no lifetime, nothing else to do
@@ -214,6 +219,7 @@ class ProxyModel(Model):
 		return self.amp * proxy_val
 
 	def compute_gradient(self, t):
+		t = np.atleast_1d(t)
 		proxy_val = self.intp(t - self.lag)
 		proxy_val_grad0 = self.intp(t - self.lag)
 		# annual variation of the proxy lifetime
