@@ -194,6 +194,7 @@ def main():
 		freqs = list(map(float, args.freqs.split(',')))
 	except ValueError:
 		freqs = []
+	args.freqs = freqs
 	# List of initial parameter values
 	initial = None
 	if args.initial is not None:
