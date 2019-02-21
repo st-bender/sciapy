@@ -466,8 +466,10 @@ def trace_gas_model(constant=True, freqs=None, proxy_config=None, **kwargs):
 			conf.update(dict(max_amp=max_amp))
 		if "max_days" not in conf:
 			conf.update(dict(max_days=max_days))
+		kw = kwargs.copy()  # don't mess with the passed arguments
+		kw.update(conf)
 		proxy_models.append(
-			(pn, setup_proxy_model_with_bounds(**conf, **kwargs))
+			(pn, setup_proxy_model_with_bounds(**kw))
 		)
 
 	return TraceGasModelSet(offset_model + harmonic_models + proxy_models)
