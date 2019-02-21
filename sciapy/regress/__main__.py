@@ -268,6 +268,8 @@ def main():
 			if pn in fit_annlifetimes:
 				model.thaw_parameter("{0}:taucos1".format(pn))
 				model.thaw_parameter("{0}:tausin1".format(pn))
+		else:
+			model.set_parameter("{0}:ltscan".format(pn), 0)
 	for freq in freqs:
 		if not args.fit_phase:
 			model.thaw_parameter("f{0:.0f}:cos".format(freq))
