@@ -163,7 +163,10 @@ def mcmc_sample_model(model, y, beta=1.,
 		p0 = np.array([v + 1e-2 * np.random.randn(ndim) for _ in range(nwalkers)])
 
 	# set up the sampling pool
-	pool = Pool(processes=nthreads)
+	if nthreads > 1:
+		pool = Pool(processes=nthreads)
+	else:
+		pool = None
 	sampler = emcee.EnsembleSampler(nwalkers, ndim, mod_func, args=mod_args,
 			pool=pool)
 
