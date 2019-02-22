@@ -64,6 +64,7 @@ if __name__ == "__main__":
 			'xarray',
 			'pysolar',
 			'parse',
+			'autograd',
 			'celerite>=0.3.0',
 			'corner',
 			'george',
