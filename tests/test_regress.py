@@ -61,6 +61,8 @@ def test_modelmodule_method_structure():
 	assert sciapy.regress.HarmonicModelCosineSine.compute_gradient
 	assert sciapy.regress.ProxyModel.get_value
 	assert sciapy.regress.ProxyModel.compute_gradient
+	assert sciapy.regress.setup_proxy_model_with_bounds
+	assert sciapy.regress.trace_gas_model
 	assert sciapy.regress.models_cel.TraceGasModelSet.get_value
 	assert sciapy.regress.models_cel.TraceGasModelSet.compute_gradient
 	assert sciapy.regress.models_cel.HarmonicModelAmpPhase.get_value
@@ -73,6 +75,8 @@ def test_modelmodule_method_structure():
 	assert sciapy.regress.models_cel.HarmonicModelCosineSine.compute_gradient
 	assert sciapy.regress.models_cel.ProxyModel.get_value
 	assert sciapy.regress.models_cel.ProxyModel.compute_gradient
+	assert sciapy.regress.models_cel.setup_proxy_model_with_bounds
+	assert sciapy.regress.models_cel.trace_gas_model
 
 
 def test_main_help():
