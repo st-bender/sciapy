@@ -77,11 +77,3 @@ def test_modelmodule_method_structure():
 	assert sciapy.regress.models_cel.ProxyModel.compute_gradient
 	assert sciapy.regress.models_cel.setup_proxy_model_with_bounds
 	assert sciapy.regress.models_cel.trace_gas_model
-
-
-def test_main_help():
-	from subprocess import Popen
-	p = Popen(["python", "-m", "sciapy.regress", "-h"])
-	p.communicate()
-	p.wait()
-	assert p.returncode == 0
