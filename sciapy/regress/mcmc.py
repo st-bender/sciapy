@@ -154,6 +154,11 @@ def mcmc_sample_model(model, y, beta=1.,
 					popsize=nwalkers // ndim)
 		# The initial population should reflect latin hypercube sampling
 		p0 = de_solver.population
+		# fill up to full size in case the number of walkers is not a
+		# multiple of the number of parameters
+		missing = nwalkers - p0.shape[0]
+		p0 = np.vstack([p0] +
+			[v + 1e-2 * np.random.randn(ndim) for _ in range(missing)])
 	else:
 		p0 = np.array([v + 1e-2 * np.random.randn(ndim) for _ in range(nwalkers)])
 
