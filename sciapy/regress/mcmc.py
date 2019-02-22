@@ -42,7 +42,7 @@ def _lpost(p, model, y=None, beta=1.):
 	model.set_parameter_vector(p)
 	lprior = model.log_prior()
 	if not np.isfinite(lprior):
-		return (-np.inf, np.nan)
+		return (-np.inf, [np.nan])
 	log_likelihood = model.log_likelihood(y, quiet=True)
 	return (beta * (log_likelihood + lprior), [log_likelihood])
 
