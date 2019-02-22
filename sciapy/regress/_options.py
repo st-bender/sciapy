@@ -53,8 +53,8 @@ parser.add_argument("file", default="SCIA_NO.nc",
 parser.add_argument("-m", "--name_suffix", default="",
 		help="The suffix for the figure plot files (default: \"\")")
 parser.add_argument("--proxies", metavar="NAME1:FILE1,NAME2:FILE2,...",
-		default="Sol:~/Work/data/indices/lisird_lya3_1947-2017.dat,"
-		"GM:~/Work/data/indices/AE/AE_Kyoto_1980-2016_daily2_shift12h.dat",
+		default="Sol:data/indices/lisird_lya3_1947-2017.dat,"
+		"GM:data/indices/AE_Kyoto_1980-2016_daily2_shift12h.dat",
 		help="Comma separated list of (solar and geomagnetic or other) "
 		"proxies as 'name:file' (default: %(default)s)")
 parser.add_argument("-T", "--fit_lags", default="", type=str,
