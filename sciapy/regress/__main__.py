@@ -159,7 +159,11 @@ def main():
 		logging.getLogger().setLevel(args.loglevel)
 
 	from numpy.distutils.system_info import get_info
-	for oblas_path in get_info("openblas")["library_dirs"]:
+	try:
+		ob_lib_dirs = get_info("openblas")["library_dirs"]
+	except KeyError:
+		ob_lib_dirs = []
+	for oblas_path in ob_lib_dirs:
 		oblas_name = "{0}/libopenblas.so".format(oblas_path)
 		logging.info("Trying %s", oblas_name)
 		try:
