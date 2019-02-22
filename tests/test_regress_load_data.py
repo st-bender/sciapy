@@ -23,10 +23,10 @@ DZM_FILE = resource_filename(__name__, "sciaNO_20100203_v6.2.1_geogra30.nc")
 
 def test_load_proxydata():
 	import pandas as pd
-	AEfile = resource_filename(__name__,
-			"../data/indices/AE_Kyoto_1980-2016_daily2_shift12h.dat")
-	Lyafile = resource_filename(__name__,
-			"../data/indices/lisird_lya3_1980-2017.dat")
+	AEfile = resource_filename("sciapy",
+			"data/indices/AE_Kyoto_1980-2016_daily2_shift12h.dat")
+	Lyafile = resource_filename("sciapy",
+			"data/indices/lisird_lya3_1980-2017.dat")
 	pAEt, pAEv = sciapy.regress.load_solar_gm_table(AEfile,
 			cols=[0, 1], names=["time", "AE"], tfmt="jyear")
 	pLyat, pLyav = sciapy.regress.load_solar_gm_table(Lyafile,
