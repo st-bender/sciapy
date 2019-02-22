@@ -443,7 +443,7 @@ class scia_density_day(object):
 	aacgmgmlons
 		AACGM geomagentic longitudes
 	"""
-	def __init__(self, name="NO", ref_date="2000-01-01"):
+	def __init__(self, name="NO", ref_date="2000-01-01", author="unknown"):
 		self.date0 = (dt.datetime.strptime(ref_date, "%Y-%m-%d")
 					.replace(tzinfo=dt.timezone.utc))
 		self.alts = None
@@ -451,6 +451,7 @@ class scia_density_day(object):
 		self.version = None
 		self.data_version = None
 		self.name = name
+		self.author = author
 		self.date = []
 		self.time = []
 		self.orbit = []
@@ -599,7 +600,7 @@ class scia_density_day(object):
 		if self.data_version is not None:
 			ncf.L2_data_version = self.data_version
 		ncf.creation_time = dt.datetime.utcnow().strftime("%a %b %d %Y %H:%M:%S +00:00 (UTC)")
-		ncf.author = "Firstname Lastname"
+		ncf.author = self.author
 
 		ncf.createDimension('time', None)
 		ncf.createDimension('altitude', self.alts.size)
@@ -891,6 +892,6 @@ class scia_density_day(object):
 		if self.data_version is not None:
 			xr_ds.attrs["L2_data_version"] = self.data_version
 		xr_ds.attrs["creation_time"] = dt.datetime.utcnow().strftime("%a %b %d %Y %H:%M:%S +00:00 (UTC)")
-		xr_ds.attrs["author"] = "Firstname Lastname"
+		xr_ds.attrs["author"] = self.author
 
 		return xr_ds
