@@ -50,7 +50,7 @@ def _lpost(p, model, y=None, beta=1.):
 def _sample_mcmc(sampler, nsamples, p0, rst0,
 		show_progress, progress_mod, debug=False):
 	smpl = sampler.sample(p0, rstate0=rst0, iterations=nsamples)
-	if have_tqdm:
+	if have_tqdm and show_progress:
 		smpl = tqdm(smpl, total=nsamples, disable=None)
 	for i, result in enumerate(smpl):
 		if show_progress and (i + 1) % progress_mod == 0:
