@@ -183,37 +183,37 @@ class ProxyModel(Model):
 		self.lifetime_metric = lifetime_metric
 		super(ProxyModel, self).__init__(*args, **kwargs)
 
-	def _lt_corr(self, t, taus, tmax=60., tstep=1.):
+	def _lt_corr(self, t, tau, tmax=60.):
 		"""Lifetime corrected values
 
 		Corrects for a finite lifetime by summing over the last `tmax`
 		days with an exponential decay given of lifetime(s) `taus`.
 		"""
-		bs = np.arange(tstep, tmax + tstep, tstep)
+		bs = np.arange(self.dt, tmax + self.dt, self.dt)
 		yp = np.zeros_like(t)
-		tauexp = np.exp(-tstep / taus)
-		taufac = np.ones_like(taus)
+		tauexp = np.exp(-self.dt / tau)
+		taufac = np.ones_like(tau)
 		for b in bs:
 			taufac *= tauexp
 			yp += np.interp(t - self.lag - b / self.days_per_time_unit,
 					self.times, self.values, left=0., right=0.) * taufac
-		return yp * tstep
+		return yp * self.dt
 
-	def _lt_corr_grad(self, t, taus, tmax=60., tstep=1.):
+	def _lt_corr_grad(self, t, tau, tmax=60.):
 		"""Lifetime corrected gradient
 
 		Corrects for a finite lifetime by summing over the last `tmax`
 		days with an exponential decay given of lifetime(s) `taus`.
 		"""
-		bs = np.arange(tstep, tmax + tstep, tstep)
+		bs = np.arange(self.dt, tmax + self.dt, self.dt)
 		ypg = np.zeros_like(t)
-		tauexp = np.exp(-tstep / taus)
-		taufac = np.ones_like(taus)
+		tauexp = np.exp(-self.dt / tau)
+		taufac = np.ones_like(tau)
 		for b in bs:
 			taufac *= tauexp
 			ypg += np.interp(t - self.lag - b / self.days_per_time_unit,
 					self.times, self.values, left=0., right=0.) * taufac * b
-		return ypg * tstep / taus**2
+		return ypg * self.dt / tau**2
 
 	def get_value(self, t):
 		t = np.atleast_1d(t)
@@ -246,7 +246,7 @@ class ProxyModel(Model):
 			_ltscn = 3 * int(np.ceil(self.tau0 +
 						np.sqrt(self.taucos1**2 + self.tausin1**2)))
 		if np.all(tau > 0):
-			proxy_val += self._lt_corr(t, tau, tmax=_ltscn, tstep=self.dt)
+			proxy_val += self._lt_corr(t, tau, tmax=_ltscn)
 		return self.amp * proxy_val
 
 	def compute_gradient(self, t):
@@ -286,8 +286,8 @@ class ProxyModel(Model):
 			_ltscn = 3 * int(np.ceil(self.tau0 +
 						np.sqrt(self.taucos1**2 + self.tausin1**2)))
 		if np.all(tau > 0):
-			proxy_val += self._lt_corr(t, tau, tmax=_ltscn, tstep=self.dt)
-			proxy_val_grad0 += self._lt_corr_grad(t, tau, tmax=_ltscn, tstep=self.dt)
+			proxy_val += self._lt_corr(t, tau, tmax=_ltscn)
+			proxy_val_grad0 += self._lt_corr_grad(t, tau, tmax=_ltscn)
 		return np.array([proxy_val,
 				# set the gradient wrt lag to zero for now
 				np.zeros_like(t),
