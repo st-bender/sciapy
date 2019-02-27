@@ -172,8 +172,9 @@ class ProxyModel(Model):
 		self.mean = 0.
 		if center:
 			self.mean = np.nanmean(proxy_vals)
-		self.intp = interp1d(proxy_times, proxy_vals - self.mean,
-				bounds_error=False)
+		self.times = proxy_times
+		self.dt = 1.
+		self.values = proxy_vals - self.mean
 		self.sza_intp = sza_intp
 		self.fit_phase = fit_phase
 		self.days_per_time_unit = days_per_time_unit
@@ -182,9 +183,42 @@ class ProxyModel(Model):
 		self.lifetime_metric = lifetime_metric
 		super(ProxyModel, self).__init__(*args, **kwargs)
 
+	def _lt_corr(self, t, taus, tmax=60., tstep=1.):
+		"""Lifetime corrected values
+
+		Corrects for a finite lifetime by summing over the last `tmax`
+		days with an exponential decay given of lifetime(s) `taus`.
+		"""
+		bs = np.arange(tstep, tmax + tstep, tstep)
+		yp = np.zeros_like(t)
+		tauexp = np.exp(-tstep / taus)
+		taufac = np.ones_like(taus)
+		for b in bs:
+			taufac *= tauexp
+			yp += np.interp(t - self.lag - b / self.days_per_time_unit,
+					self.times, self.values, left=0., right=0.) * taufac
+		return yp * tstep
+
+	def _lt_corr_grad(self, t, taus, tmax=60., tstep=1.):
+		"""Lifetime corrected gradient
+
+		Corrects for a finite lifetime by summing over the last `tmax`
+		days with an exponential decay given of lifetime(s) `taus`.
+		"""
+		bs = np.arange(tstep, tmax + tstep, tstep)
+		ypg = np.zeros_like(t)
+		tauexp = np.exp(-tstep / taus)
+		taufac = np.ones_like(taus)
+		for b in bs:
+			taufac *= tauexp
+			ypg += np.interp(t - self.lag - b / self.days_per_time_unit,
+					self.times, self.values, left=0., right=0.) * taufac * b
+		return ypg * tstep / taus**2
+
 	def get_value(self, t):
 		t = np.atleast_1d(t)
-		proxy_val = self.intp(t - self.lag)
+		proxy_val = np.interp(t - self.lag,
+				self.times, self.values, left=0., right=0.)
 		if self.ltscan == 0:
 			# no lifetime, nothing else to do
 			return self.amp * proxy_val
@@ -212,18 +246,14 @@ class ProxyModel(Model):
 			_ltscn = 3 * int(np.ceil(self.tau0 +
 						np.sqrt(self.taucos1**2 + self.tausin1**2)))
 		if np.all(tau > 0):
-			bs = np.arange(1, _ltscn + 1, 1.)[None, :]
-			taufacs = np.exp(-bs / tau[:, None])
-			proxy_val += np.sum(
-					self.intp(t[:, None] - self.lag -
-						bs / self.days_per_time_unit) * taufacs,
-					axis=1)
+			proxy_val += self._lt_corr(t, tau, tmax=_ltscn, tstep=self.dt)
 		return self.amp * proxy_val
 
 	def compute_gradient(self, t):
 		t = np.atleast_1d(t)
-		proxy_val = self.intp(t - self.lag)
-		proxy_val_grad0 = self.intp(t - self.lag)
+		proxy_val = np.interp(t - self.lag,
+				self.times, self.values, left=0., right=0.)
+		proxy_val_grad0 = proxy_val.copy()
 		# annual variation of the proxy lifetime
 		if self.sza_intp is not None:
 			# using the solar zenith angle
@@ -256,12 +286,8 @@ class ProxyModel(Model):
 			_ltscn = 3 * int(np.ceil(self.tau0 +
 						np.sqrt(self.taucos1**2 + self.tausin1**2)))
 		if np.all(tau > 0):
-			bs = np.arange(1, _ltscn + 1, 1.)[None, :]
-			taufacs = np.exp(-bs / tau[:, None])
-			proxy_ts = self.intp(t[:, None] - self.lag -
-					bs / self.days_per_time_unit) * taufacs
-			proxy_val += np.sum(proxy_ts, axis=1)
-			proxy_val_grad0 += np.sum(proxy_ts * bs / tau[:, None]**2, axis=1)
+			proxy_val += self._lt_corr(t, tau, tmax=_ltscn, tstep=self.dt)
+			proxy_val_grad0 += self._lt_corr_grad(t, tau, tmax=_ltscn, tstep=self.dt)
 		return np.array([proxy_val,
 				# set the gradient wrt lag to zero for now
 				np.zeros_like(t),
