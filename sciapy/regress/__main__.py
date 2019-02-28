@@ -238,7 +238,7 @@ def main():
 	for pn, pf in proxy_dict.items():
 		pt, pp = load_solar_gm_table(pf, cols=[0, 1], names=["time", pn], tfmt=args.time_format)
 		# use log of proxy values
-		pv = pp[pn].to_numpy()
+		pv = pp[pn]
 		if pn in args.log_proxies.split(','):
 			pv = np.log(pv)
 		# normalize to sun--earth distance squared

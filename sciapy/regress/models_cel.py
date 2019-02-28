@@ -174,7 +174,7 @@ class ProxyModel(Model):
 			self.mean = np.nanmean(proxy_vals)
 		self.times = proxy_times
 		self.dt = 1.
-		self.values = proxy_vals - self.mean
+		self.values = proxy_vals.values - self.mean
 		self.sza_intp = sza_intp
 		self.fit_phase = fit_phase
 		self.days_per_time_unit = days_per_time_unit
