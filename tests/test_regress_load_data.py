@@ -10,33 +10,72 @@
 # See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 """SCIAMACHY regression module data loading tests
 """
-
+from datetime import datetime
 from pkg_resources import resource_filename
 
 import numpy as np
-from pytest import raises
+from pytest import mark, raises
 
 import sciapy.regress
 
 DZM_FILE = resource_filename(__name__, "sciaNO_20100203_v6.2.1_geogra30.nc")
 
+AEdata = [
+		(datetime(2000, 1, 1), "jyear", 1999.9986311, 507.208333),
+		(datetime(2000, 1, 1), "jd", 2451544.5, 507.208333),
+		(datetime(2000, 1, 1), "mjd", 51544.0, 507.208333),
+		(datetime(2007, 7, 1), "jyear", 2007.4948665, 83.208333),
+		(datetime(2007, 7, 1), "jd", 2454282.5, 83.208333),
+		(datetime(2007, 7, 1), "mjd", 54282.0, 83.208333),
+]
+Lyadata = [
+		(datetime(2000, 1, 1), "jyear", 1999.9986311, 4.59),
+		(datetime(2000, 1, 1), "jd", 2451544.5, 4.59),
+		(datetime(2000, 1, 1), "mjd", 51544.0, 4.59),
+		(datetime(2007, 7, 1), "jyear", 2007.4948665, 3.71),
+		(datetime(2007, 7, 1), "jd", 2454282.5, 3.71),
+		(datetime(2007, 7, 1), "mjd", 54282.0, 3.71),
+]
 
-def test_load_proxydata():
+
+def test_load_proxyAEfiles():
 	import pandas as pd
 	AEfile = resource_filename("sciapy",
 			"data/indices/AE_Kyoto_1980-2016_daily2_shift12h.dat")
-	Lyafile = resource_filename("sciapy",
-			"data/indices/lisird_lya3_1980-2017.dat")
 	pAEt, pAEv = sciapy.regress.load_solar_gm_table(AEfile,
 			cols=[0, 1], names=["time", "AE"], tfmt="jyear")
+	pAEt2, pAEv2 = sciapy.regress.load_data.load_dailymeanAE()
+	np.testing.assert_allclose(pAEt, pAEt2)
+	pd.testing.assert_frame_equal(pAEv, pAEv2)
+
+
+def test_load_proxyLyafiles():
+	import pandas as pd
+	Lyafile = resource_filename("sciapy",
+			"data/indices/lisird_lya3_1980-2017.dat")
 	pLyat, pLyav = sciapy.regress.load_solar_gm_table(Lyafile,
 			cols=[0, 1], names=["time", "Lya"], tfmt="jyear")
-	pAEt2, pAEv2 = sciapy.regress.load_data.load_dailymeanAE()
 	pLyat2, pLyav2 = sciapy.regress.load_data.load_dailymeanLya()
-	np.testing.assert_allclose(pAEt, pAEt2)
 	np.testing.assert_allclose(pLyat, pLyat2)
-	pd.testing.assert_frame_equal(pAEv, pAEv2)
 	pd.testing.assert_frame_equal(pLyav, pLyav2)
+
+
+@mark.parametrize("date, tfmt, texp, vexp", AEdata)
+def test_load_proxyAEvalues(date, tfmt, texp, vexp):
+	pAEt, pAEv = sciapy.regress.load_data.load_dailymeanAE(tfmt=tfmt)
+	idx = list(pAEv.index.to_pydatetime()).index(date)
+	np.testing.assert_allclose(pAEt[idx], texp)
+	np.testing.assert_allclose(pAEv["AE"][idx], vexp)
+	np.testing.assert_allclose(pAEv["AE"][date.strftime("%Y-%m-%d")], vexp)
+
+
+@mark.parametrize("date, tfmt, texp, vexp", Lyadata)
+def test_load_proxyLyavalues(date, tfmt, texp, vexp):
+	pLyat, pLyav = sciapy.regress.load_data.load_dailymeanLya(tfmt=tfmt)
+	idx = list(pLyav.index.to_pydatetime()).index(date)
+	np.testing.assert_allclose(pLyat[idx], texp)
+	np.testing.assert_allclose(pLyav["Lya"][idx], vexp)
+	np.testing.assert_allclose(pLyav["Lya"][date.strftime("%Y-%m-%d")], vexp)
 
 
 def test_load_dzm_normal():
