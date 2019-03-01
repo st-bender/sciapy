@@ -349,12 +349,14 @@ class TraceGasModelSet(ModelSet):
 	and `compute_gradient()` methods.
 	"""
 	def get_value(self, t):
+		t = np.atleast_1d(t)
 		v = np.zeros_like(t)
 		for m in self.models.values():
 			v += m.get_value(t)
 		return v
 
 	def compute_gradient(self, t):
+		t = np.atleast_1d(t)
 		grad = []
 		for m in self.models.values():
 			grad.extend(list(m.compute_gradient(t)))
