@@ -15,6 +15,7 @@ most of the cases, if not all.
 """
 from os import path
 from pkg_resources import resource_filename
+from pytest import mark
 from subprocess import Popen
 
 data_file = resource_filename("sciapy",
@@ -29,6 +30,7 @@ def test_main_help():
 	assert p.returncode == 0
 
 
+@mark.long
 def test_main_lin_mean():
 	p = Popen(["python", "-m", "sciapy.regress",
 			data_file,
@@ -50,6 +52,7 @@ def test_main_lin_mean():
 	assert p.returncode == 0
 
 
+@mark.long
 def test_main_lin_gp():
 	p = Popen(["python", "-m", "sciapy.regress",
 			data_file,
@@ -70,6 +73,7 @@ def test_main_lin_gp():
 	assert p.returncode == 0
 
 
+@mark.long
 def test_main_nonlin_gp():
 	p = Popen(["python", "-m", "sciapy.regress",
 			data_file,
