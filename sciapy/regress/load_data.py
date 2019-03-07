@@ -102,11 +102,14 @@ def load_solar_gm_table(filename, cols, names, sep="\t", tfmt="jyear"):
 	----------
 	filename: str
 		The file to read
-	cols: array-like or callable
-		The columns in the file to use, passed to `pandas.read_table`'s
-		`usecols` keyword.
-	names: array-like
-		The column names, passed as `names` to `pandas.read_table()`.
+	cols: sequence
+		The columns in the file to use, passed to `numpy.genfromtxt`'s
+		`usecols` keyword. Should be at least of length 2, indicating
+		time values in the first column, e.g., `cols=[0, 1]`.
+	names: sequence
+		The column names, passed as `names` to `numpy.genfromtxt()`.
+		Should be at least of length 2, naming the proxy values in the
+		second column, e.g., `names=["time", "proxy"]`.
 	sep: str, optional
 		The column separator character, passed as `sep`.
 		Default: `\t`
@@ -131,6 +134,9 @@ def load_solar_gm_table(filename, cols, names, sep="\t", tfmt="jyear"):
 	:class:`astropy.time.Time`
 	.. [#] https://docs.scipy.org/doc/numpy/user/basics.rec.html
 	"""
+	if len(cols) < 2 and len(names) < 2:
+		raise ValueError(
+				"Both `cols` and `names` should be at least of length 2.")
 	tab = np.genfromtxt(filename,
 			delimiter=sep,
 			dtype=None,
