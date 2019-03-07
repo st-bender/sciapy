@@ -16,6 +16,7 @@ daily zonal mean time series (NO for now).
 
 import ctypes
 import logging
+from os import path
 
 import numpy as np
 import scipy.optimize as op
@@ -236,9 +237,10 @@ def main():
 
 	proxy_config = {}
 	for pn, pf in proxy_dict.items():
-		pt, pp = load_solar_gm_table(pf, cols=[0, 1], names=["time", pn], tfmt=args.time_format)
-		# use log of proxy values
+		pt, pp = load_solar_gm_table(path.expanduser(pf),
+				cols=[0, 1], names=["time", pn], tfmt=args.time_format)
 		pv = pp[pn]
+		# use log of proxy values if desired
 		if pn in args.log_proxies.split(','):
 			pv = np.log(pv)
 		# normalize to sun--earth distance squared
