@@ -92,11 +92,11 @@ def load_dailymeanLya(filename="data/indices/lisird_lya3_1980-2017.dat",
 def load_solar_gm_table(filename, cols, names, sep="\t", tfmt="jyear"):
 	"""Load proxy tables from ascii files
 
-	This function wraps :func:`pandas.read_table()` [#]_ with
+	This function wraps :func:`numpy.genfromtxt()` [#]_ with
 	pre-defined settings to match the file format.
 	It explicitly returns the times as UTC decimal years or julian epochs.
 
-	.. [#] https://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_table.html
+	.. [#] https://docs.scipy.org/doc/numpy/reference/generated/numpy.genfromtxt.html
 
 	Parameters
 	----------
@@ -119,23 +119,27 @@ def load_solar_gm_table(filename, cols, names, sep="\t", tfmt="jyear"):
 
 	Returns
 	-------
-	(times, table): tuple
-		The proxy times according to the `tfmt` keyword (UTC),
-		the proxy values as a :class:`pandas.DataFrame` returned by
-		:func:`pandas.read_table()`.
+	times: array_like
+		The proxy times according to the `tfmt` keyword (UTC) as
+		:class:`numpy.ndarray` from the first column of "cols".
+	values: tuple of array_like
+		The proxy values combined into a structured array [#]_
+		according to "names[1:]" and "cols[1:]" passed above.
 
 	See Also
 	--------
-	pandas.read_table
-	:class:`pandas.DataFrame`
 	:class:`astropy.time.Time`
+	.. [#] https://docs.scipy.org/doc/numpy/user/basics.rec.html
 	"""
-	tab = pd.read_table(filename, index_col=0, parse_dates=[0],
-			comment="#",
-			sep=sep, usecols=cols, names=names)
-	times = Time(tab.tz_localize("UTC").index.to_pydatetime())
+	tab = np.genfromtxt(filename,
+			delimiter=sep,
+			dtype=None,
+			names=names,
+			usecols=cols)
+	times = Time(tab[names[0]], scale="utc")
 	ts = getattr(times, tfmt)
-	return ts, tab
+	return ts, tab[names[1:]]
+
 
 def _greedy_select(ds, size, varname="NO_DENS_std", scale=1.):
 	logging.info("Greedy subsampling to size: %s", size)
