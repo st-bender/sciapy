@@ -24,6 +24,8 @@ from astropy.time import Time
 
 __all__ = ["load_solar_gm_table", "load_scia_dzm"]
 
+_NPV_MAJOR, _NPV_MINOR, _NPV_PATCH = np.__version__.split('.')
+
 _seasons = {
 	"summerNH": [
 		slice("2002-03-20", "2002-09-25"),
@@ -137,11 +139,16 @@ def load_solar_gm_table(filename, cols, names, sep="\t", tfmt="jyear"):
 	if len(cols) < 2 and len(names) < 2:
 		raise ValueError(
 				"Both `cols` and `names` should be at least of length 2.")
+	encoding = {}
+	# set the encoding for numpy >= 1.14.0
+	if int(_NPV_MAJOR) >= 1 and int(_NPV_MINOR) >= 14:
+		encoding = dict(encoding=None)
 	tab = np.genfromtxt(filename,
 			delimiter=sep,
 			dtype=None,
 			names=names,
-			usecols=cols)
+			usecols=cols,
+			**encoding)
 	times = Time(tab[names[0]], scale="utc")
 	ts = getattr(times, tfmt)
 	return ts, tab[names[1:]]
