@@ -10,12 +10,18 @@ python:
 env:
   global:
     LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
+addons:
+  apt:
+    packages:
+      - libhdf5-dev
+      - libnetcdf-dev
 before_install:
   - python --version
   - uname -a
   - lsb_release -a
 install:
-  - pip install -U numpy pybind11
+  - pip install numpy>=1.13.0
+  - pip install pybind11
   - pip install -U pytest pytest-cov codecov coveralls
   - pip install tox-travis
   - pip install scrutinizer-ocular
