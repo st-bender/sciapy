@@ -186,7 +186,7 @@ class ProxyModel(Model):
 		# is slightly offset with respect to (modified) julian days.
 		self.t_adj = 0.
 		if self.days_per_time_unit == 1:
-			# discrinate betweet julian days and modified julian days,
+			# discriminate between julian days and modified julian days,
 			# 1.8e6 is year 216 in julian days and year 6787 in
 			# modified julian days. It should be pretty safe to judge on
 			# that for most use cases.
