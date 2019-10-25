@@ -106,5 +106,8 @@ def test_load_dzm_summerSH():
 
 
 def test_load_dzm_summerNH():
-	with raises(IndexError):
-		sciapy.regress.load_scia_dzm(DZM_FILE, 70., 75., season="summerNH")
+	data = sciapy.regress.load_scia_dzm(DZM_FILE, 70., 75., season="summerNH")
+	np.testing.assert_equal(data[0], np.array([]))
+	np.testing.assert_equal(data[1], np.array([]))
+	np.testing.assert_equal(data[2], np.array([]))
+	np.testing.assert_equal(data[3], np.array([]))

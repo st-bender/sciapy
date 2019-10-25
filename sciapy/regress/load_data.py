@@ -297,8 +297,12 @@ def load_scia_dzm(filename, alt, lat, tfmt="jyear",
 	no_sza = NO_tds.mean_SZA
 
 	# Convert to astropy.Time for Julian epoch or decimal year
-	no_t = Time(pd.to_datetime(NO_tds.time.values, utc=True).to_pydatetime())
-	no_ys = getattr(no_t, tfmt)
+	if NO_tds.time.size > 0:
+		no_t = Time(pd.to_datetime(NO_tds.time.values, utc=True).to_pydatetime(),
+					format="datetime", scale="utc")
+		no_ys = getattr(no_t, tfmt)
+	else:
+		no_ys = np.empty_like(NO_tds.time.values, dtype=np.float64)
 
 	if subsample_factor > 1:
 		new_data_size = no_dens.shape[0] // subsample_factor
