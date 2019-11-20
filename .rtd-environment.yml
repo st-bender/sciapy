@@ -11,5 +11,6 @@ dependencies:
     - george
     - numpydoc
     - ipython
+    - pip
     - pip:
         - sphinx-markdown-tables
