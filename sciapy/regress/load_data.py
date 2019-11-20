@@ -128,13 +128,14 @@ def load_solar_gm_table(filename, cols, names, sep="\t", tfmt="jyear"):
 		The proxy times according to the `tfmt` keyword (UTC) as
 		:class:`numpy.ndarray` from the first column of "cols".
 	values: tuple of array_like
-		The proxy values combined into a structured array [#]_
+		The proxy values combined into a structured array
+		(:class:`numpy.recarray`) with fields set
 		according to "names[1:]" and "cols[1:]" passed above.
 
 	See Also
 	--------
 	:class:`astropy.time.Time`
-	.. [#] https://docs.scipy.org/doc/numpy/user/basics.rec.html
+	:class:`numpy.recarray`
 	"""
 	if len(cols) < 2 and len(names) < 2:
 		raise ValueError(
