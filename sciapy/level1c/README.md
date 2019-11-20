@@ -78,7 +78,7 @@ within python the rough steps are:
 >>> scia_limb_scan.write_to_textfile("/path/to/limb_state_filename.dat")
 ```
 For a more complete example which also extracts the solar reference spectrum,
-see the accompanying [scia\_conv\_hdf5\_limb.py](../../scripts/scia_conv_hdf5_limb.py) script.
+see the accompanying [scia\_conv\_hdf5\_limb.py](https://github.com/st-bender/sciapy/blob/master/scripts/scia_conv_hdf5_limb.py) script.
 
 A simple conversion tool is provided with the
-[scia\_binary\_util.py](../../scripts/scia_binary_util.py) script.
+[scia\_binary\_util.py](https://github.com/st-bender/sciapy/blob/master/scripts/scia_binary_util.py) script.

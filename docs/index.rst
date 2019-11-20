@@ -38,7 +38,7 @@ The source code is `developed on Github <https://github.com/st-bender/sciapy>`_.
     :maxdepth: 2
     :caption: Introduction
 
-    readme
+    README
 
 .. toctree::
     :maxdepth: 1
