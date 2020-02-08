@@ -288,9 +288,11 @@ def process_orbit(orbit,
 			sdd.aacgmgmlats, sdd.aacgmgmlons)
 
 	# current day for MSIS input
-	msis_date = (dt.timedelta(np.asscalar(dts_retr_interp0)) +
-					dtrefdate).strftime("%Y-%m-%d").encode()
-	msis_f107 = f107_data[msis_date]
+	msis_dtdate = dt.timedelta(np.asscalar(dts_retr_interp0)) + dtrefdate
+	msis_dtdate1 = msis_dtdate - dt.timedelta(days=1)
+	msis_date = msis_dtdate.strftime("%Y-%m-%d").encode()
+	msis_date1 = msis_dtdate1.strftime("%Y-%m-%d").encode()
+	msis_f107 = f107_data[msis_date1]
 	msis_f107a = f107a_data[msis_date]
 	msis_ap = ap_data[msis_date]
 	logging.debug("MSIS date: %s, f10.7a: %s, f10.7: %s, ap: %s",
