@@ -64,6 +64,7 @@ kp_data = dict(np.genfromtxt(
 phi_fac = 11.91
 lst_fac = -0.62
 
+
 def read_spectra(year, orbit, spec_base=None, skip_upleg=True):
 	"""Read and examine SCIAMACHY orbit spectra
 
@@ -109,7 +110,7 @@ def read_spectra(year, orbit, spec_base=None, skip_upleg=True):
 	spfiles += glob.glob(
 			'{0}/*/SCIA_limb_*_1_0_{1:05d}.dat.l_mpl_binary'
 			.format(spec_path2, orbit))
-	spdict = dict([(fn, (fn.split('/')[7:-1] + fn.split('/')[-1].split('_')[2:4]))
+	spdict = dict([(fn, os.path.basename(fn).split('_')[2:4])
 				for fn in spfiles])
 	logging.debug("spdict: %s", spdict)
 	if len(spfiles) < 2:
@@ -117,7 +118,7 @@ def read_spectra(year, orbit, spec_base=None, skip_upleg=True):
 
 	sorted_spdkeys = sorted(spdict.keys())
 
-	slscans = [sl.scia_limb_scan() for s in spdict]
+	slscans = [sl.scia_limb_scan() for _ in spdict]
 	[s.read_from_file(f) for s, f in zip(slscans, sorted_spdkeys)]
 
 	lsts = [(s.cent_lat_lon[:2],
@@ -144,7 +145,7 @@ def read_spectra(year, orbit, spec_base=None, skip_upleg=True):
 			# Requires an (empirical) separation of +0.5 degree.
 			logging.debug("excluding upleg point at: %s, %s", lat, lon)
 			continue
-		dtdate = pd.to_datetime(spdict[key][2] + spdict[key][3],
+		dtdate = pd.to_datetime(''.join(spdict[key]),
 				format="%Y%m%d%H%M%S", utc=True)
 		time_hour = dtdate.hour + dtdate.minute / 60.0 + dtdate.second / 3600.0
 		logging.debug("mean lst: %s, apparent lst: %s, EoT: %s", mlst, alst, eotcorr)
@@ -217,7 +218,8 @@ def process_orbit(orbit,
 		# return early if reading the spectra failed
 		return fail
 
-	dts = np.array([dtd.days + dtd.seconds / 86400. for dtd in dts - dtrefdate])
+	dts = pd.to_datetime(dts) - dtrefdate
+	dts = np.array([dtd.days + dtd.seconds / 86400. for dtd in dts])
 	logging.debug("lats: %s, lons: %s, times: %s", lats, lons, times)
 
 	sdd = sd.scia_densities_pp(ref_date=ref_date)
