@@ -12,6 +12,5 @@ SCIAMACHY level 2 number density data (only NO for now).
 """
 
 from . import binning
-from . import nrlmsise00
 
-__all__ = ["binning", "nrlmsise00", "msis"]
+__all__ = ["binning"]
