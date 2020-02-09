@@ -23,10 +23,6 @@ if __name__ == "__main__":
 	builtins.__SCIAPY_SETUP__ = True
 	from sciapy import __version__
 
-	# update git submodules
-	if path.exists(".git"):
-		check_call(["git", "submodule", "update", "--init", "--recursive"])
-
 	setup(name='sciapy',
 		version=__version__,
 		description='Python tools for (some) SCIAMACHY data',
