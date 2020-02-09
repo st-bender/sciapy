@@ -18,6 +18,3 @@ def test_module_structure():
 	assert sciapy.level2
 	assert sciapy.level2.binning
 	assert sciapy.level2.binning.bin_lat_timeavg
-	assert sciapy.level2.nrlmsise00
-	assert sciapy.level2.nrlmsise00.gtd7
-	assert sciapy.level2.nrlmsise00.gtd7d
