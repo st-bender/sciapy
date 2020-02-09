@@ -38,7 +38,7 @@ from sciapy.level2 import density_pp as sd
 from sciapy.level2 import scia_akm as sa
 from sciapy.level2.igrf import gmag_igrf
 from sciapy.level2.aacgm2005 import gmag_aacgm2005
-from sciapy.level2.msis import msise
+from nrlmsise00 import msise_flat as msise
 try:
 	from sciapy.level2.noem import noem_cpp
 except ImportError:
@@ -322,16 +322,15 @@ def process_orbit(orbit,
 		logging.debug("ak data: %s", ak)
 		sdd.akdiag = ak.diagonal(axis1=1, axis2=3).diagonal(axis1=0, axis2=1)
 
+	_msis_d_t = msise(
+		msis_dtdate,
+		sdd.alts[None, :], sdd.lats[:, None], sdd.lons[:, None] % 360.,
+		msis_f107a, msis_f107, msis_ap,
+		lst=sdd.lst[:, None],
+	)
+	sdd.dens_tot = np.sum(_msis_d_t[:, :, np.r_[:5, 6:9]], axis=2)
+	sdd.temperature = _msis_d_t[:, :, -1]
 	for i, lat in enumerate(sdd.lats):
-		for j, alt in enumerate(sdd.alts):
-			t, dtot, mtot = msise(msis_date.decode(), alt, lat,
-					sdd.lons[i], sdd.lst[i], msis_f107a, msis_f107, msis_ap)
-			#logging.debug("lat: %s, lon: %s, T [K]: %.6f, vmr [ppb]: %.6e",
-			#		lat, sdd.lons[i], t, (sdd.densities[i, j] / dtot) * 1.e9)
-			#logging.debug("lst: %s, dens: %s, dens_tot: %.6e, dtot: %.6e",
-			#		sdd.lst[i, j], sdd.densities[i, j], sdd.dens_tot[i, j], dtot)
-			sdd.dens_tot[i, j] = dtot
-			sdd.temperature[i, j] = t
 		if noem_cpp is not None:
 			sdd.noem_no[i] = noem_cpp(noem_date.decode(), sdd.alts,
 					[lat], [sdd.lons[i]], noem_f107, noem_kp)[:]

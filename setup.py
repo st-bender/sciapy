@@ -8,15 +8,6 @@ from distutils.core import Extension
 
 here = path.abspath(path.dirname(__file__))
 
-extnrlmsise00 = Extension(
-		name='sciapy.level2.nrlmsise00',
-		sources=[
-			'sciapy/level2/nrlmsise00module.c',
-			'sciapy/level2/nrlmsise00/nrlmsise-00.c',
-			'sciapy/level2/nrlmsise00/nrlmsise-00_data.c'
-		],
-		include_dirs=['sciapy/level2/nrlmsise00'])
-
 # Get the long description from the README file
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 	long_description = f.read()
@@ -68,7 +59,9 @@ if __name__ == "__main__":
 			'celerite>=0.3.0',
 			'corner',
 			'george',
-			'emcee'],
+			'emcee',
+			'nrlmsise00',
+		],
 		license='GPLv2',
 		classifiers=[
 			"Development Status :: 3 - Alpha",
@@ -78,7 +71,6 @@ if __name__ == "__main__":
 			"Programming Language :: Python :: 2",
 			"Programming Language :: Python :: 3",
 		],
-		ext_modules=[extnrlmsise00],
 		entry_points={'console_scripts':
 			['scia_regress = sciapy.regress.__main__:main']
 		},
