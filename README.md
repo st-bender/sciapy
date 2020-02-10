@@ -116,9 +116,6 @@ The other option is to use a local clone:
 ```sh
 $ git clone https://github.com/st-bender/sciapy.git
 $ cd sciapy
-# level 2 needs the nrlmsise-00 submodule
-$ git submodule init
-$ git submodule update
 ```
 and then using `pip` (optionally using `-e`, see
 <https://pip.pypa.io/en/stable/reference/pip_install/#install-editable>):
