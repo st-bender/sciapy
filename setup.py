@@ -65,7 +65,7 @@ if __name__ == "__main__":
 			'h5py',
 			'dask',
 			'toolz',
-			'astropy<4.0',
+			'astropy',
 			'pandas',
 			'xarray',
 			'pysolar',
