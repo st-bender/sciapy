@@ -463,7 +463,7 @@ def sddata_xr_set_attrs(sdday_xr, ref_date="1950-01-01", rename=True):
 			"apriori": "NO_APRIORI", "error_meas": "NO_ERR",
 			"error_tot": "NO_ETOT",
 			"NOEM_density": "NO_NOEM", "akm_diagonal": "NO_AKDIAG",
-			"VMR": "NO_VMR", "temperature": "T_MSIS",
+			"VMR": "NO_VMR",
 			"utc_hour": "UTC", "mean_sza": "mean_SZA",
 			"app_lst": "app_LST", "mean_lst": "mean_LST",
 		})

@@ -805,7 +805,7 @@ class scia_density_day(object):
 				dims=["time", "latitude", "altitude"],
 				attrs=dict(units='K', long_name='temperature (NRLMSIS-00)',
 						model="NRLMSIS-00"),
-				name="T_MSIS")
+				name="temperature")
 
 		xr_lons = xr.DataArray(self.lons, coords=[d, self.lats],
 				dims=["time", "latitude"],
