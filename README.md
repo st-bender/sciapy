@@ -61,20 +61,29 @@ and [`george`](https://george.readthedocs.io).
 ### Prerequisites
 
 Sciapy uses features from a lot of different packages.
-All dependencies should be installed when using
+All dependencies will be automatically installed when using
 `pip install` or `python setup.py`, see below.
 However, to speed up the install or for use
-with a `conda` environment, it may be advantageous to
+within a `conda` environment, it may be advantageous to
 install some of the important packages beforehand:
 
-- `numpy` and `scipy` (at least version 0.17.0) for general numerics,
-- `matplotlib` (at least version 2.2) for plotting,
-- `netCDF4` and `h5py` for their low level data interfaces,
-- `dask`, `toolz`, `pandas`, and `xarray` for the higher level data interfaces,
-- `astropy` and `pysolar` for time and solar zenith angle conversions,
+- `numpy` at least version 1.13.0 for general numerics,
+- `scipy` at least version 0.17.0 for scientific numerics,
+- `matplotlib` at least version 2.2 for plotting,
+- `netCDF4` for the low level netcdf4 interfaces,
+- `h5py` for the low level hdf5 interfaces,
+- `dask`,
+- `toolz`,
+- `pandas` and
+- `xarray` for the higher level data interfaces,
+- `astropy` for (astronomical) time conversions,
+- `pysolar` for solar location calculations,
 - `parse` for ASCII text parsing in `level1c`,
-- `celerite` (at least version 0.3.0) and `george` for Gaussian process modelling,
-- `emcee` for MCMC sampling and `corner` for the sample histogram plots.
+- `pybind11` C++ interface needed by `celerite`
+- `celerite` at least version 0.3.0 and
+- `george` for Gaussian process modelling,
+- `emcee` for MCMC sampling and
+- `corner` for the sample histogram plots.
 
 Out of these packages, `numpy` is probably the most important one
 to be installed first because at least `celerite` needs it for setup.
