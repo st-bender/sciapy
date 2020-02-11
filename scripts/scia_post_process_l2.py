@@ -178,9 +178,12 @@ class _circ_interp(object):
 		return np.arctan2(self.s_intpf(x), self.c_intpf(x))
 
 
-def process_orbit(orbit,
-		ref_date="1950-01-01",
-		dens_path=None, spec_base=None):
+def process_orbit(
+	orbit,
+	ref_date="1950-01-01",
+	dens_path=None,
+	spec_base=None,
+):
 	"""Post process retrieved SCIAMACHY orbit
 
 	Parameters
@@ -224,7 +227,7 @@ def process_orbit(orbit,
 	logging.debug("year: %s", year)
 
 	dts, times, lats, lons, mlsts, alsts, eotcorr = \
-			read_spectra(year, orbit, spec_base)
+		read_spectra(year, orbit, spec_base)
 	if dts is None:
 		# return early if reading the spectra failed
 		return fail
@@ -296,7 +299,7 @@ def process_orbit(orbit,
 		logging.debug("(calculated) retrieval lons: %s, %s",
 				calc_lons, calc_lons_tp)
 	else:
-		#sdd.lons = sdd.lons % 360.
+		# sdd.lons = sdd.lons % 360.
 		logging.debug("(original) retrieval lons: %s", sdd.lons)
 
 	sdd.mst = (sdd.utchour + sdd.lons / 15.) % 24.
@@ -323,8 +326,8 @@ def process_orbit(orbit,
 			msis_date, msis_f107a, msis_f107, msis_ap)
 
 	# previous day for NOEM input
-	noem_date = (dt.timedelta(np.asscalar(dts_retr_interp0) - 1) +
-					dtrefdate).strftime("%Y-%m-%d").encode()
+	noem_dtdate = dt.timedelta(np.asscalar(dts_retr_interp0) - 1) + dtrefdate
+	noem_date = noem_dtdate.strftime("%Y-%m-%d").encode()
 	noem_f107 = f107_adj[noem_date]
 	noem_kp = kp_data[noem_date]
 	logging.debug("NOEM date: %s, f10.7: %s, kp: %s",
@@ -366,6 +369,7 @@ def process_orbit(orbit,
 	sdd.vmr = sdd.densities / sdd.dens_tot * 1.e9  # ppb
 	return dts_retr_interp0, time0, lst0, lon0, sdd
 
+
 def get_orbits_from_date(date, mlt=False, path=None, L2_version="v6.2"):
 	"""Find SCIAMACHY orbits with retrieved data at a date
 
@@ -398,6 +402,7 @@ def get_orbits_from_date(date, mlt=False, path=None, L2_version="v6.2"):
 	if mlt:
 		orbits.append(orbits[-1] + 1)
 	return orbits
+
 
 def combine_orbit_data(orbits,
 		ref_date="1950-01-01",
@@ -448,8 +453,10 @@ def combine_orbit_data(orbits,
 	for orbit in sorted(orbits):
 		dateo, timeo, lsto, lono, sdens = process_orbit(orbit,
 				ref_date=ref_date, dens_path=dens_path, spec_base=spec_base)
-		logging.info("orbit: %s, eq. date: %s, eq. hour: %s, eq. app. lst: %s, eq. lon: %s",
-				orbit, dateo, timeo, lsto, lono)
+		logging.info(
+			"orbit: %s, eq. date: %s, eq. hour: %s, eq. app. lst: %s, eq. lon: %s",
+			orbit, dateo, timeo, lsto, lono
+		)
 		if sdens is not None:
 			sdens.version = file_version
 			sdens.data_version = L2_version
@@ -464,6 +471,7 @@ def combine_orbit_data(orbits,
 	if use_xarray and sddayl:
 		sdday_ds = xr.concat(sddayl, dim="time")
 	return sdday, sdday_ds
+
 
 def sddata_xr_set_attrs(sdday_xr, ref_date="1950-01-01", rename=True):
 	"""Customize xarray Dataset variables and attributes
@@ -513,6 +521,7 @@ def sddata_xr_set_attrs(sdday_xr, ref_date="1950-01-01", rename=True):
 	logging.debug("date %s dataset: %s", dateo, sdday_xr)
 	return sdday_xr
 
+
 def main():
 	logging.basicConfig(level=logging.WARNING,
 			format="[%(levelname)-8s] (%(asctime)s) "
@@ -520,14 +529,17 @@ def main():
 			datefmt="%Y-%m-%d %H:%M:%S %z")
 
 	parser = ap.ArgumentParser()
-	parser.add_argument("file", default="SCIA_NO.nc", help="the filename of the output netcdf file")
+	parser.add_argument("file", default="SCIA_NO.nc",
+			help="the filename of the output netcdf file")
 	parser.add_argument("-M", "--month", metavar="YEAR-MM",
 			help="infer start and end dates for month")
 	parser.add_argument("-D", "--date_range", metavar="START_DATE:END_DATE",
 			help="colon-separated start and end dates")
 	parser.add_argument("-d", "--dates", help="comma-separated list of dates")
-	parser.add_argument("-f", "--orbit_file", help="the file containing the input orbits")
-	parser.add_argument("-p", "--path", default=None, help="path containing the L2 data")
+	parser.add_argument("-f", "--orbit_file",
+			help="the file containing the input orbits")
+	parser.add_argument("-p", "--path", default=None,
+			help="path containing the L2 data")
 	parser.add_argument("-r", "--retrieval_version", default="v6.2",
 			help="SCIAMACHY level 2 data version to process")
 	parser.add_argument("-R", "--file_version", default="2.3",
@@ -537,7 +549,8 @@ def main():
 	parser.add_argument("-m", "--mlt", action="store_true", default=False,
 			help="indicate nominal (False, default) or MLT data (True)")
 	parser.add_argument("-X", "--xarray", action="store_true", default=False,
-			help="use xarray to prepare the dataset (experimental, default %(default)s)")
+			help="use xarray to prepare the dataset"
+			" (experimental, default %(default)s)")
 	loglevels = parser.add_mutually_exclusive_group()
 	loglevels.add_argument("-l", "--loglevel", default="WARNING",
 			choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
