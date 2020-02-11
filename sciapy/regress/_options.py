@@ -50,6 +50,10 @@ parser = argparse.ArgumentParser(description="SCIAMACHY data regression",
 		prog="scia_regress")
 parser.add_argument("file", default="SCIA_NO.nc",
 		help="The filename of the input netcdf file")
+parser.add_argument("-o", "--output_path", default=".",
+		metavar="PATH",
+		help="The directory for the output files (figures and MCMC samples) "
+		"(default: %(default)s)")
 parser.add_argument("-m", "--name_suffix", default="",
 		help="The suffix for the figure plot files (default: \"\")")
 parser.add_argument("--proxies", metavar="NAME1:FILE1,NAME2:FILE2,...",

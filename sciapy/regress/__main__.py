@@ -442,8 +442,11 @@ def main():
 		logging.info("(GP) jitter: %s", gpmodel.kernel.jitter)
 
 	bestfit = gpmodel.get_parameter_vector()
-	filename_base = ("NO_regress_fit_{0}_{1:.0f}_{2:.0f}_{{0}}_{3}"
-					.format(gpmodel_name, lat * 10, alt, ksub))
+	filename_base = path.join(
+		args.output_path,
+		"NO_regress_fit_{0}_{1:.0f}_{2:.0f}_{{0}}_{3}"
+		.format(gpmodel_name, lat * 10, alt, ksub),
+	)
 
 	if args.mcmc:
 		gpmodel.compute(no_ys_train, no_errs_train)
