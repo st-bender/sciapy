@@ -62,14 +62,17 @@ parser.add_argument("--proxies", metavar="NAME1:FILE1,NAME2:FILE2,...",
 		help="Comma separated list of (solar and geomagnetic or other) "
 		"proxies as 'name:file' (default: %(default)s)")
 parser.add_argument("-T", "--fit_lags", default="", type=str,
+		metavar="NAME1,NAME2",
 		help="Fit the proxy lag time "
 		"(comma separated proxy names, e.g. Sol,GM) "
 		"(default: %(default)s)")
 parser.add_argument("-I", "--fit_lifetimes", default="", type=str,
+		metavar="NAME1,NAME2",
 		help="Fit the proxy life time "
 		"(comma separated proxy names, e.g. Sol,GM), "
 		"sets the proxy lag time to zero (default: %(default)s)")
 parser.add_argument("--fit_annlifetimes", default="", type=str,
+		metavar="NAME1,NAME2",
 		help="Fit the proxy annual life time variations "
 		"(comma separated proxy names, e.g. Sol,GM) "
 		"(default: %(default)s)")
@@ -81,25 +84,31 @@ parser.add_argument("--use_sza", action="store_true", default=False,
 		help="Fit the proxy annual life time variations "
 		"using the (cosine and sine of the) of the solar zenith angle "
 		"instead of the time (default: %(default)s)")
-parser.add_argument("-t", "--lag_times", metavar="years",
+parser.add_argument("-t", "--lag_times",
 		default="Sol:0,GM:0", type=str,
+		metavar="NAME1:LAG1,NAME2:LAG2",
 		help="Comma-separated list of name:value pairs of fixed proxy lags "
 		"(in fractional years) (default: %(default)s)")
 parser.add_argument("--center_proxies", default="", type=str,
+		metavar="NAME1,NAME2",
 		help="Comma-separated list of proxies to center "
 		"by subtracting the mean (default: %(default)s)")
 parser.add_argument("--log_proxies", default="", type=str,
+		metavar="NAME1,NAME2",
 		help="Comma-separated list of proxies to take the logarithm of "
 		"for fitting (default: %(default)s)")
 parser.add_argument("--positive_proxies", default="", type=str,
+		metavar="NAME1,NAME2",
 		help="Comma-separated list of proxies with positive cofficients. "
 		"Changes the parameter bounds for these proxies accordingly "
 		"(default: %(default)s)")
 parser.add_argument("--norm_proxies_distSEsq", default="", type=str,
+		metavar="NAME1,NAME2",
 		help="Comma-separated list of proxies to be normalized by the "
 		"Sun-Earth distance squared, for example the Lyman-alpha radiation "
 		"(default: %(default)s)")
 parser.add_argument("--norm_proxies_SZA", default="", type=str,
+		metavar="NAME1,NAME2",
 		help="Comma-separated list of proxies to be normalized by the "
 		"the solar zenith angle, for example to adjust the Lyman-alpha "
 		"radiation for the seasonal effects at different latitudes "
@@ -111,6 +120,7 @@ parser.add_argument("--time_format", default="jyear", type=str,
 parser.add_argument("-k", "--fit_offset", action="store_true", default=False,
 		help="Fit an additional offset via regression (default: %(default)s)")
 parser.add_argument("-F", "--freqs", default="1, 2", type=str,
+		metavar="FREQ1,FREQ2",
 		help="Comma separated list of frequencies (in inverse years) to fit "
 		"(default: %(default)s)")
 parser.add_argument("--lifetime_scan", default=0, type=int,
@@ -144,9 +154,11 @@ parser.add_argument("--season", default=None,
 parser.add_argument("--exclude_spe", action="store_true", default=False,
 		help="Exclude pre-defined SPE events (default: %(default)s)")
 parser.add_argument("--akd_threshold", default=0.002, type=float,
+		metavar="VALUE",
 		help="Exclude data with an averaging kernel diagonal element "
 		"smaller than the given threshold (default: %(default)s)")
 parser.add_argument("--cnt_threshold", default=0, type=int,
+		metavar="VALUE",
 		help="Exclude data with less than the given number of measurement points "
 		"in the averaged bin (default: %(default)s)")
 parser.add_argument("-s", "--scale", metavar="factor",
@@ -188,7 +200,7 @@ parser.add_argument("-O", "--optimize", metavar="m", type=int, default="1",
 parser.add_argument("-N", "--openblas_threads", metavar="N",
 		type=int, default=1,
 		help="Use N OpenBlas threads (default: %(default)s)")
-parser.add_argument("-S", "--random_seed", metavar="NNNN",
+parser.add_argument("-S", "--random_seed", metavar="VALUE",
 		type=int, default=None,
 		help="Use a particular random seed to obtain "
 		"reproducible results (default: %(default)s)")
