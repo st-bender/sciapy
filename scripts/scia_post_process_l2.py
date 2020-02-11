@@ -167,6 +167,17 @@ def read_spectra(year, orbit, spec_base=None, skip_upleg=True):
 			np.asarray(mlsts),
 			np.asarray(alsts), eotcorr)
 
+
+class _circ_interp(object):
+	"""Interpolation on a circle"""
+	def __init__(self, x, y, **kw):
+		self.c_intpf = interp1d(x, np.cos(y), **kw)
+		self.s_intpf = interp1d(x, np.sin(y), **kw)
+
+	def __call__(self, x):
+		return np.arctan2(self.s_intpf(x), self.c_intpf(x))
+
+
 def process_orbit(orbit,
 		ref_date="1950-01-01",
 		dens_path=None, spec_base=None):
@@ -226,31 +237,44 @@ def process_orbit(orbit,
 	sdd.read_from_file(dfiles[0])
 	logging.debug("density lats: %s, lons: %s", sdd.lats, sdd.lons)
 
+	# Re-interpolates the location (longitude) and times from the
+	# limb scan spectra files along the orbit to determine the values
+	# at the Equator and to fill in possibly missing data.
+	#
+	# y values are unit circle angles in radians (0 < φ < 2π or -π < φ < π)
 	# longitudes
-	clons_retr_interpf = interp1d(lats[::-1], np.cos(np.radians(lons[::-1])), fill_value="extrapolate")
-	slons_retr_interpf = interp1d(lats[::-1], np.sin(np.radians(lons[::-1])), fill_value="extrapolate")
+	lons_intpf = _circ_interp(
+		lats[::-1], np.radians(lons[::-1]),
+		fill_value="extrapolate",
+	)
 	# apparent local solar time (EoT corrected)
-	clst_retr_interpf = interp1d(lats[::-1], np.cos(np.pi / 12. * alsts[::-1]), fill_value="extrapolate")
-	slst_retr_interpf = interp1d(lats[::-1], np.sin(np.pi / 12. * alsts[::-1]), fill_value="extrapolate")
+	lst_intpf = _circ_interp(
+		lats[::-1], np.pi / 12. * alsts[::-1],
+		fill_value="extrapolate",
+	)
 	# mean local solar time
-	cmst_retr_interpf = interp1d(lats[::-1], np.cos(np.pi / 12. * mlsts[::-1]), fill_value="extrapolate")
-	smst_retr_interpf = interp1d(lats[::-1], np.sin(np.pi / 12. * mlsts[::-1]), fill_value="extrapolate")
+	mst_intpf = _circ_interp(
+		lats[::-1], np.pi / 12. * mlsts[::-1],
+		fill_value="extrapolate",
+	)
 	# utc time (day)
-	ctime_retr_interpf = interp1d(lats[::-1], np.cos(np.pi / 12. * times[::-1]), fill_value="extrapolate")
-	stime_retr_interpf = interp1d(lats[::-1], np.sin(np.pi / 12. * times[::-1]), fill_value="extrapolate")
+	time_intpf = _circ_interp(
+		lats[::-1], np.pi / 12. * times[::-1],
+		fill_value="extrapolate",
+	)
+	# datetime
 	dts_retr_interpf = interp1d(lats[::-1], dts[::-1], fill_value="extrapolate")
 
 	# equator values
-	lon0 = np.degrees(np.arctan2(slons_retr_interpf(0.), clons_retr_interpf(0.)) % (2. * np.pi))
-	lst0 = (np.arctan2(slst_retr_interpf(0.), clst_retr_interpf(0.)) % (2. * np.pi)) * 12. / np.pi
-	mst0 = (np.arctan2(smst_retr_interpf(0.), cmst_retr_interpf(0.)) % (2. * np.pi)) * 12. / np.pi
-	time0 = (np.arctan2(stime_retr_interpf(0.), ctime_retr_interpf(0.)) % (2. * np.pi)) * 12. / np.pi
+	lon0 = np.degrees(lons_intpf(0.)) % 360.
+	lst0 = (lst_intpf(0.) * 12. / np.pi) % 24.
+	mst0 = (mst_intpf(0.) * 12. / np.pi) % 24.
+	time0 = (time_intpf(0.) * 12. / np.pi) % 24.
 	dts_retr_interp0 = dts_retr_interpf(0.)
 	logging.debug("utc day at equator: %s", dts_retr_interp0)
 	logging.debug("mean LST at equator: %s, apparent LST at equator: %s", mst0, lst0)
 
-	sdd.utchour = (np.arctan2(stime_retr_interpf(sdd.lats),
-						ctime_retr_interpf(sdd.lats)) % (2. * np.pi)) * 12. / np.pi
+	sdd.utchour = (time_intpf(sdd.lats) * 12. / np.pi) % 24.
 	sdd.utcdays = dts_retr_interpf(sdd.lats)
 
 	if sdd.lons is None:
