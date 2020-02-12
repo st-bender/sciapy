@@ -38,7 +38,10 @@ from sciapy.level2 import density_pp as sd
 from sciapy.level2 import scia_akm as sa
 from sciapy.level2.igrf import gmag_igrf
 from sciapy.level2.aacgm2005 import gmag_aacgm2005
-from nrlmsise00 import msise_flat as msise
+try:
+	from nrlmsise00 import msise_flat as msise
+except ImportError:
+	msise = None
 try:
 	from sciapy.level2.noem import noem_cpp
 except ImportError:
@@ -183,6 +186,7 @@ def process_orbit(
 	ref_date="1950-01-01",
 	dens_path=None,
 	spec_base=None,
+	use_msis=True,
 ):
 	"""Post process retrieved SCIAMACHY orbit
 
@@ -335,8 +339,8 @@ def process_orbit(
 
 	if sdd.noem_no is None:
 		sdd.noem_no = np.zeros_like(sdd.densities)
-	if sdd.temperature is None:
-		sdd.temperature = np.zeros_like(sdd.densities)
+	if sdd.temperature is None and msise is None:
+		sdd.temperature = np.full_like(sdd.densities, np.nan)
 	if sdd.sza is None:
 		sdd.sza = np.zeros_like(sdd.lats)
 	if sdd.akdiag is None:
@@ -349,14 +353,17 @@ def process_orbit(
 		logging.debug("ak data: %s", ak)
 		sdd.akdiag = ak.diagonal(axis1=1, axis2=3).diagonal(axis1=0, axis2=1)
 
-	_msis_d_t = msise(
-		msis_dtdate,
-		sdd.alts[None, :], sdd.lats[:, None], sdd.lons[:, None] % 360.,
-		msis_f107a, msis_f107, msis_ap,
-		lst=sdd.lst[:, None],
-	)
-	sdd.dens_tot = np.sum(_msis_d_t[:, :, np.r_[:5, 6:9]], axis=2)
-	sdd.temperature = _msis_d_t[:, :, -1]
+	if msise is not None:
+		if sdd.temperature is None or use_msis:
+			_msis_d_t = msise(
+				msis_dtdate,
+				sdd.alts[None, :], sdd.lats[:, None], sdd.lons[:, None] % 360.,
+				msis_f107a, msis_f107, msis_ap,
+				lst=sdd.lst[:, None],
+			)
+			sdd.temperature = _msis_d_t[:, :, -1]
+		if use_msis:
+			sdd.dens_tot = np.sum(_msis_d_t[:, :, np.r_[:5, 6:9]], axis=2)
 	for i, lat in enumerate(sdd.lats):
 		if noem_cpp is not None:
 			sdd.noem_no[i] = noem_cpp(noem_date.decode(), sdd.alts,

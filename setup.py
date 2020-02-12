@@ -8,6 +8,14 @@ name = "sciapy"
 meta_path = path.join(name, "__init__.py")
 here = path.abspath(path.dirname(__file__))
 
+extras_require = {
+	"msis": ["nrlmsise00"],
+	"tests": ["pytest"],
+}
+extras_require["all"] = sorted(
+	{v for req in extras_require.values() for v in req},
+)
+
 
 # Approach taken from
 # https://packaging.python.org/guides/single-sourcing-package-version/
@@ -75,7 +83,6 @@ if __name__ == "__main__":
 			'corner',
 			'george',
 			'emcee',
-			'nrlmsise00',
 		],
 		license='GPLv2',
 		classifiers=[
