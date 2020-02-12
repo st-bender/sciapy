@@ -1,3 +1,5 @@
+# SCIAMACHY data tools
+
 [![builds](https://travis-ci.org/st-bender/sciapy.svg?branch=master)](https://travis-ci.org/st-bender/sciapy)
 [![docs](https://rtfd.org/projects/sciapy/badge/?version=latest)](https://sciapy.rtfd.io/en/latest/?badge=latest)
 [![coveralls](https://coveralls.io/repos/github/st-bender/sciapy/badge.svg)](https://coveralls.io/github/st-bender/sciapy)
@@ -6,14 +8,12 @@
 [![doi code](https://zenodo.org/badge/DOI/10.5281/zenodo.1401370.svg)](https://doi.org/10.5281/zenodo.1401370)
 [![doi mcmc samples](https://zenodo.org/badge/DOI/10.5281/zenodo.1342701.svg)](https://doi.org/10.5281/zenodo.1342701)
 
-# SCIAMACHY data tools
+## Overview
 
 These SCIAMACHY tools are provided as convenience tools for handling
 SCIAMACHY level 1c limb spectra and retrieved level 2 trace-gas densities.
 
 More extensive documentation is provided on [sciapy.rtfd.io](https://sciapy.rtfd.io).
-
-## Overview
 
 ### Level 1c tools
 
