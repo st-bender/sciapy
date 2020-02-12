@@ -89,5 +89,8 @@ if __name__ == "__main__":
 		entry_points={'console_scripts':
 			['scia_regress = sciapy.regress.__main__:main']
 		},
+		options={
+			"bdist_wheel": {"universal": True},
+		},
 		zip_safe=False,
 	)
