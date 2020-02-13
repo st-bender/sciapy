@@ -551,6 +551,9 @@ def main():
 			help="SCIAMACHY level 2 data version to process")
 	parser.add_argument("-R", "--file_version", default="2.3",
 			help="Postprocessing format version of the output file")
+	parser.add_argument("-A", "--author", default="unknown",
+			help="Author of the post-processed data set "
+			"(default: %(default)s)")
 	parser.add_argument("-p", "--path", default=None,
 			help="path containing the L2 data")
 	parser.add_argument("-s", "--spectra", default=None, metavar="PATH",
@@ -609,8 +612,10 @@ def main():
 			L2_version=args.retrieval_version, file_version=args.file_version,
 			dens_path=args.path, spec_base=args.spectra, use_xarray=args.xarray,
 			save_nc=False)
+	sdlist.author = args.author
 
 	if args.xarray and sdxr_ds is not None:
+		sdxr_ds.attrs["author"] = args.author
 		sd_xr = sddata_xr_set_attrs(sdxr_ds, ref_date=args.base_date)
 		sd_xr2 = sdlist.to_xarray()
 		logging.debug(sd_xr)
