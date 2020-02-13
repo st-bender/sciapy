@@ -625,18 +625,18 @@ class scia_density_day(object):
 		#fdate.long_name = 'date'
 		#fdate.standard_name = 'date'
 		#fdate.units = 'days since 1950-01-01 00:00:00'
-		falts = ncf.createVariable('altitude', 'f4', ('altitude',))
+		falts = ncf.createVariable('altitude', 'f8', ('altitude',))
 		falts.axis = 'Z'
 		falts.long_name = 'altitude'
 		falts.standard_name = 'altitude'
 		falts.units = 'km'
 		falts.positive = 'up'
-		flats = ncf.createVariable('latitude', 'f4', ('latitude',))
+		flats = ncf.createVariable('latitude', 'f8', ('latitude',))
 		flats.axis = 'Y'
 		flats.long_name = 'latitude'
 		flats.standard_name = 'latitude'
 		flats.units = 'degrees_north'
-		flons = ncf.createVariable('longitude', 'f4', ('time', 'latitude',))
+		flons = ncf.createVariable('longitude', 'f8', ('time', 'latitude',))
 		flons.long_name = 'longitude'
 		flons.standard_name = 'longitude'
 		flons.units = 'degrees_east'
@@ -671,13 +671,13 @@ class scia_density_day(object):
 		fvmr = ncf.createVariable('%s_VMR' % self.name, 'f8', ('time', 'latitude', 'altitude'))
 		fvmr.units = 'ppb'
 		fvmr.long_name = '%s volume mixing ratio' % self.name
-		flst = ncf.createVariable('app_LST', 'f4', ('time', 'latitude'))
+		flst = ncf.createVariable('app_LST', 'f8', ('time', 'latitude'))
 		flst.units = 'hours'
 		flst.long_name = 'apparent local solar time'
-		fmst = ncf.createVariable('mean_LST', 'f4', ('time', 'latitude'))
+		fmst = ncf.createVariable('mean_LST', 'f8', ('time', 'latitude'))
 		fmst.units = 'hours'
 		fmst.long_name = 'mean local solar time'
-		fsza = ncf.createVariable('mean_SZA', 'f4', ('time', 'latitude'))
+		fsza = ncf.createVariable('mean_SZA', 'f8', ('time', 'latitude'))
 		fsza.units = 'degrees'
 		fsza.long_name = 'solar zenith anlge at mean altitude'
 		futc = ncf.createVariable('UTC', 'f8', ('time', 'latitude'))
@@ -687,22 +687,22 @@ class scia_density_day(object):
 		futcd.long_name = 'measurement utc day'
 		futcd.units = 'days since {0}'.format(self.date0.isoformat(sep=' '))
 
-		fgmlats = ncf.createVariable('gm_lats', 'f4', ('time', 'latitude',))
+		fgmlats = ncf.createVariable('gm_lats', 'f8', ('time', 'latitude',))
 		fgmlats.long_name = 'geomagnetic_latitude'
 		fgmlats.model = 'IGRF'
 		fgmlats.units = 'degrees_north'
 
-		fgmlons = ncf.createVariable('gm_lons', 'f4', ('time', 'latitude',))
+		fgmlons = ncf.createVariable('gm_lons', 'f8', ('time', 'latitude',))
 		fgmlons.long_name = 'geomagnetic_longitude'
 		fgmlons.model = 'IGRF'
 		fgmlons.units = 'degrees_east'
 
-		faacgmgmlats = ncf.createVariable('aacgm_gm_lats', 'f4', ('time', 'latitude',))
+		faacgmgmlats = ncf.createVariable('aacgm_gm_lats', 'f8', ('time', 'latitude',))
 		faacgmgmlats.long_name = 'geomagnetic_latitude'
 		faacgmgmlats.model = 'AACGM'
 		faacgmgmlats.units = 'degrees_north'
 
-		faacgmgmlons = ncf.createVariable('aacgm_gm_lons', 'f4', ('time', 'latitude',))
+		faacgmgmlons = ncf.createVariable('aacgm_gm_lons', 'f8', ('time', 'latitude',))
 		faacgmgmlons.long_name = 'geomagnetic_longitude'
 		faacgmgmlons.model = 'AACGM'
 		faacgmgmlons.units = 'degrees_east'
