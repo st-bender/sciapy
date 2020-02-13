@@ -34,6 +34,7 @@ def test_main_help():
 def test_main_lin_mean():
 	p = Popen(["python", "-m", "sciapy.regress",
 			data_file,
+			"-o", "/tmp",
 			"-A", "70",
 			"-L", "65",
 			"-k",
@@ -56,6 +57,7 @@ def test_main_lin_mean():
 def test_main_lin_gp():
 	p = Popen(["python", "-m", "sciapy.regress",
 			data_file,
+			"-o", "/tmp",
 			"-A", "70",
 			"-L", "65",
 			"-k",
@@ -77,6 +79,7 @@ def test_main_lin_gp():
 def test_main_nonlin_gp():
 	p = Popen(["python", "-m", "sciapy.regress",
 			data_file,
+			"-o", "/tmp",
 			"-A", "70",
 			"-L", "65",
 			"-k",
