@@ -21,6 +21,7 @@ import os
 import argparse as ap
 import datetime as dt
 import logging
+from pkg_resources import resource_filename
 
 import numpy as np
 import pandas as pd
@@ -47,22 +48,11 @@ try:
 except ImportError:
 	noem_cpp = None
 
-this_dir = os.path.realpath(os.path.dirname(__file__))
-f107_data = dict(np.genfromtxt(
-	os.path.join(this_dir, "../data/indices/f107_noontime_flux_obs.txt"),
-	usecols=[0, 2], dtype=None))
-f107a_data = dict(np.genfromtxt(
-	os.path.join(this_dir, "../data/indices/f107a_noontime_flux_obs.txt"),
-	usecols=[0, 2], dtype=None))
-ap_data = dict(np.genfromtxt(
-	os.path.join(this_dir, "../data/indices/spidr_ap_2000-2012.dat"),
-	usecols=[0, 2], dtype=None))
-f107_adj = dict(np.genfromtxt(
-	os.path.join(this_dir, "../data/indices/spidr_f107_2000-2012.dat"),
-	usecols=[0, 2], dtype=None))
-kp_data = dict(np.genfromtxt(
-	os.path.join(this_dir, "../data/indices/spidr_kp_2000-2012.dat"),
-	usecols=[0, 2], dtype=None))
+F107_FILE = resource_filename("sciapy", "data/indices/f107_noontime_flux_obs.txt")
+F107A_FILE = resource_filename("sciapy", "data/indices/f107a_noontime_flux_obs.txt")
+AP_FILE = resource_filename("sciapy", "data/indices/spidr_ap_2000-2012.dat")
+F107_ADJ_FILE = resource_filename("sciapy", "data/indices/spidr_f107_2000-2012.dat")
+KP_FILE = resource_filename("sciapy", "data/indices/spidr_kp_2000-2012.dat")
 
 phi_fac = 11.91
 lst_fac = -0.62
@@ -213,6 +203,9 @@ def process_orbit(
 		lon0 - longitude of the equator crossing (float)
 		sdd - `scia_density_pp` instance of the post-processed data
 	"""
+	def _read_gm(fname):
+		return dict(np.genfromtxt(fname, usecols=[0, 2], dtype=None))
+
 	fail = (None,) * 5
 	logging.debug("processing orbit: %s", orbit)
 	dtrefdate = pd.to_datetime(ref_date, format="%Y-%m-%d", utc=True)
@@ -319,6 +312,9 @@ def process_orbit(
 			sdd.aacgmgmlats, sdd.aacgmgmlons)
 
 	# current day for MSIS input
+	f107_data = _read_gm(F107_FILE)
+	f107a_data = _read_gm(F107A_FILE)
+	ap_data = _read_gm(AP_FILE)
 	msis_dtdate = dt.timedelta(np.asscalar(dts_retr_interp0)) + dtrefdate
 	msis_dtdate1 = msis_dtdate - dt.timedelta(days=1)
 	msis_date = msis_dtdate.strftime("%Y-%m-%d").encode()
@@ -330,6 +326,8 @@ def process_orbit(
 			msis_date, msis_f107a, msis_f107, msis_ap)
 
 	# previous day for NOEM input
+	f107_adj = _read_gm(F107_ADJ_FILE)
+	kp_data = _read_gm(KP_FILE)
 	noem_dtdate = dt.timedelta(np.asscalar(dts_retr_interp0) - 1) + dtrefdate
 	noem_date = noem_dtdate.strftime("%Y-%m-%d").encode()
 	noem_f107 = f107_adj[noem_date]
