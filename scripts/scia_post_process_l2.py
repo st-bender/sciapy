@@ -547,13 +547,13 @@ def main():
 			"(default: %(default)s).")
 	parser.add_argument("-f", "--orbit_file",
 			help="the file containing the input orbits")
-	parser.add_argument("-p", "--path", default=None,
-			help="path containing the L2 data")
 	parser.add_argument("-r", "--retrieval_version", default="v6.2",
 			help="SCIAMACHY level 2 data version to process")
 	parser.add_argument("-R", "--file_version", default="2.3",
 			help="Postprocessing format version of the output file")
-	parser.add_argument("-s", "--spectra", default=None,
+	parser.add_argument("-p", "--path", default=None,
+			help="path containing the L2 data")
+	parser.add_argument("-s", "--spectra", default=None, metavar="PATH",
 			help="path containing the L1c spectra")
 	parser.add_argument("-m", "--mlt", action="store_true", default=False,
 			help="indicate nominal (False, default) or MLT data (True)")
