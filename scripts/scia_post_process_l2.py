@@ -54,8 +54,8 @@ AP_FILE = resource_filename("sciapy", "data/indices/spidr_ap_2000-2012.dat")
 F107_ADJ_FILE = resource_filename("sciapy", "data/indices/spidr_f107_2000-2012.dat")
 KP_FILE = resource_filename("sciapy", "data/indices/spidr_kp_2000-2012.dat")
 
-phi_fac = 11.91
-lst_fac = -0.62
+PHI_FAC = 11.91
+LST_FAC = -0.62
 
 
 def read_spectra(year, orbit, spec_base=None, skip_upleg=True):
@@ -281,7 +281,7 @@ def process_orbit(
 		# recalculate the longitudes
 		# estimate the equatorial longitude from the
 		# limb scan latitudes and longitudes
-		lon0s_tp = lons - phi_fac * np.tan(np.radians(lats))
+		lon0s_tp = lons - PHI_FAC * np.tan(np.radians(lats))
 		clon0s_tp = np.cos(np.radians(lon0s_tp))
 		slon0s_tp = np.sin(np.radians(lon0s_tp))
 		lon0_tp = np.arctan2(np.sum(slon0s_tp[1:-1]), np.sum(clon0s_tp[1:-1]))
@@ -290,8 +290,8 @@ def process_orbit(
 		logging.info("lon0 tp: %s", lon0_tp)
 		# interpolate to the retrieval latitudes
 		tg_retr_lats = np.tan(np.radians(sdd.lats))
-		calc_lons = (tg_retr_lats * phi_fac + lon0) % 360.
-		calc_lons_tp = (tg_retr_lats * phi_fac + lon0_tp) % 360.
+		calc_lons = (tg_retr_lats * PHI_FAC + lon0) % 360.
+		calc_lons_tp = (tg_retr_lats * PHI_FAC + lon0_tp) % 360.
 		sdd.lons = calc_lons_tp
 		logging.debug("(calculated) retrieval lons: %s, %s",
 				calc_lons, calc_lons_tp)
