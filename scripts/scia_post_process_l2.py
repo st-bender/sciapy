@@ -541,6 +541,10 @@ def main():
 	parser.add_argument("-D", "--date_range", metavar="START_DATE:END_DATE",
 			help="colon-separated start and end dates")
 	parser.add_argument("-d", "--dates", help="comma-separated list of dates")
+	parser.add_argument("-B", "--base_date",
+			metavar="YEAR-MM-DD", default="2000-01-01",
+			help="Reference date to base the time values (days) on "
+			"(default: %(default)s).")
 	parser.add_argument("-f", "--orbit_file",
 			help="the file containing the input orbits")
 	parser.add_argument("-p", "--path", default=None,
@@ -601,13 +605,13 @@ def main():
 		return
 
 	sdlist, sdxr_ds = combine_orbit_data(olist,
-			ref_date="2000-01-01",
+			ref_date=args.base_date,
 			L2_version=args.retrieval_version, file_version=args.file_version,
 			dens_path=args.path, spec_base=args.spectra, use_xarray=args.xarray,
 			save_nc=False)
 
 	if args.xarray and sdxr_ds is not None:
-		sd_xr = sddata_xr_set_attrs(sdxr_ds, ref_date="2000-01-01")
+		sd_xr = sddata_xr_set_attrs(sdxr_ds, ref_date=args.base_date)
 		sd_xr2 = sdlist.to_xarray()
 		logging.debug(sd_xr)
 		logging.debug(sd_xr2)
