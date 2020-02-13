@@ -679,7 +679,7 @@ class scia_density_day(object):
 		fmst.long_name = 'mean local solar time'
 		fsza = ncf.createVariable('mean_SZA', 'f8', ('time', 'latitude'))
 		fsza.units = 'degrees'
-		fsza.long_name = 'solar zenith anlge at mean altitude'
+		fsza.long_name = 'solar zenith angle at mean altitude'
 		futc = ncf.createVariable('UTC', 'f8', ('time', 'latitude'))
 		futc.units = 'hours'
 		futc.long_name = 'measurement utc time'
@@ -803,7 +803,7 @@ class scia_density_day(object):
 
 		xr_temp = xr.DataArray(self.temperature, coords=[d, self.lats, self.alts],
 				dims=["time", "latitude", "altitude"],
-				attrs=dict(units='K', long_name='temperature (NRLMSIS-00)',
+				attrs=dict(units='K', long_name='temperature',
 						model="NRLMSIS-00"),
 				name="temperature")
 
