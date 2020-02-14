@@ -41,3 +41,17 @@ notifications:
   email:
     on_success: never
     on_failure: always
+deploy:
+  - provider: pypi
+    server: https://test.pypi.org/legacy/
+    user: __token__
+    password:
+      secure: jkxwuahmZqMa0JRnKz5mpaD1HJxiEZhRuvSKwWOZU2UHoH+zRmH10c/ZGM80GPSrbS6Mju69oXTBOzb9IRnPDZeOZgrSbnVjVx5eYmmawwz25hcnnW2g4Zy/YZuXaA+uij1MxzkeaCVotLRSVkYLlkZ+zxP+6uD+EIRSkEbwMKBnQzPgQzFPb32EagCC1p/P6arTBDJm+ZKplhX3KOpAnj9VQcWVEMWk5sz8EoUBe5njEbdKgbzW2cAfT9TQsEVXNfALnh529oewKRR/yVrahLcjRSWi00TK+9weJCXSyUHwHklMG3KSj2ineKUjesxY1aaS6EJUBGkH/PGGjMvgweetD3y+wePKoVr/J5DU3mgauvHrmmH56t1BTOqmQmGRo7/w18s8Vue8Y96USaUWBa4m5M3w3JGdCAVrE7XVqS8qcJ/2J7kPEkUF6ed4w6IUPl11DExyBzQWIQK0ApOhw+w2vJMRP8jSQwVkgXxXyePX6Ap6U4lnc985KpKliLXSXTCw8e1dltQAXbaONU9fetNTilBfdmQvhZ2LJ/hSKSDEKvz2MHZQMecy01/doxGH3gEz7WcMZ740bc8FZh4k3h//DNs3GVBaaA9DVKEIMCvF8oaG27PZCG7gFZj/vi8AghraxRy2GROIZpG0o9bs4b6Bf1Z5xH2OOK0UWxIZnWk=
+    skip_existing: true
+    skip_cleanup: true
+    on:
+      repo: st-bender/sciapy
+      branch: master
+      tags: false
+      condition: $TRAVIS_PYTHON_VERSION == 3.7
+      distributions: sdist bdist_wheel
