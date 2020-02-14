@@ -31,9 +31,12 @@ install:
 script:
   - py.test -v --cov sciapy
 after_success:
-  - codecov
-  - coveralls
-  - ocular --data-file ".coverage"
+  - |
+    if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then
+      codecov
+      coveralls
+      ocular --data-file ".coverage"
+    fi
 notifications:
   email:
     on_success: never
