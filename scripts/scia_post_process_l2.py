@@ -86,8 +86,8 @@ def read_spectra(year, orbit, spec_base=None, skip_upleg=True):
 	fail = (None,) * 7
 	if spec_base is None:
 		spec_base = os.curdir
-	spec_path = "{0}/{1}".format(spec_base.rstrip('/'), year)
-	spec_path2 = "{0}/{1}".format(spec_base.rstrip('/'), int(year) + 1)
+	spec_path = os.path.join(spec_base, "{0}".format(year))
+	spec_path2 = os.path.join(spec_base, "{0}".format(int(year) + 1))
 	logging.debug("spec_path: %s", spec_path)
 	logging.debug("spec_path2: %s", spec_path)
 	if not (os.path.isdir(spec_path) or os.path.isdir(spec_path2)):
