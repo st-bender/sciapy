@@ -106,19 +106,6 @@ def read_spectra(year, orbit, spec_base=None, skip_upleg=True):
 	if len(spfiles) < 2:
 		return fail
 
-	sorted_spdkeys = sorted(spfiles)
-
-	slscans = [sl.scia_limb_scan() for _ in spfiles]
-	[s.read_from_file(f) for s, f in zip(slscans, sorted_spdkeys)]
-
-	lsts = [(s.cent_lat_lon[:2],
-			s.local_solar_time(False),
-			s.limb_data.tp_lat,
-			s.date)
-			for s in slscans]
-	lstdict = dict(zip(sorted_spdkeys, lsts))
-	logging.debug("lstdict: %s", lstdict)
-
 	dts = []
 	times = []
 	lats = []
@@ -126,9 +113,20 @@ def read_spectra(year, orbit, spec_base=None, skip_upleg=True):
 	mlsts = []
 	alsts = []
 
-	for key in sorted_spdkeys:
-		(lat, lon), (mlst, alst, eotcorr), tp_lats, date = lstdict[key]
+	sls = sl.scia_limb_scan()
+	for f in sorted(spfiles):
+		sls.read_from_file(f)
+		# copy the values from the l1c file
+		lat, lon = sls.cent_lat_lon[:2]
+		mlst, alst, eotcorr = sls.local_solar_time(False)
+		tp_lats = sls.limb_data.tp_lat
+		date = sls.date
+		# debug output if requested
+		logging.debug("file: %s", f)
 		logging.debug("lat: %s, lon: %s", lat, lon)
+		logging.debug("mlst: %s, alst: %s, eotcorr: %s", mlst, alst, eotcorr)
+		logging.debug("tp_lats: %s", tp_lats)
+		logging.debug("date: %s", date)
 		if skip_upleg and ((tp_lats[1] - tp_lats[-2]) < 0.5):
 			# Exclude non-downleg measurements where the latitude
 			# of the last real tangent point (the last is dark sky)
