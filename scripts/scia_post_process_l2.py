@@ -495,9 +495,10 @@ def sddata_xr_set_attrs(sdday_xr, ref_date="1950-01-01", rename=True):
 			"akm_diagonal": "NO_AKDIAG",
 			"apriori": "NO_APRIORI",
 			"density": "NO_DENS",
-			"density_air": "TOT_DENS",
+			"density_air": "MSIS_Dens",
 			"error_meas": "NO_ERR",
 			"error_tot": "NO_ETOT",
+			"temperature": "MSIS_Temp",
 			"NOEM_density": "NO_NOEM",
 			"VMR": "NO_VMR",
 			# 1d vars and dimensions
