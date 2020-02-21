@@ -660,14 +660,15 @@ class scia_density_day(object):
 		fapri.long_name = '%s apriori density' % self.name
 		ftemp = ncf.createVariable('MSIS_Temp', 'f8', ('time', 'latitude', 'altitude'))
 		ftemp.units = 'K'
-		ftemp.long_name = 'temperature'
+		ftemp.long_name = 'MSIS temperature'
 		ftemp.model = 'NRLMSIS-00'
 		fnoem = ncf.createVariable('%s_NOEM' % self.name, 'f8', ('time', 'latitude', 'altitude'))
 		fnoem.units = 'cm^{-3}'
 		fnoem.long_name = 'NOEM %s number density' % self.name
 		fdens_tot = ncf.createVariable('MSIS_Dens', 'f8', ('time', 'latitude', 'altitude'))
 		fdens_tot.units = 'cm^{-3}'
-		fdens_tot.long_name = 'total number density (NRLMSIS-00)'
+		fdens_tot.long_name = 'MSIS total number density'
+		fdens_tot.model = 'NRLMSIS-00'
 		fvmr = ncf.createVariable('%s_VMR' % self.name, 'f8', ('time', 'latitude', 'altitude'))
 		fvmr.units = 'ppb'
 		fvmr.long_name = '%s volume mixing ratio' % self.name
@@ -798,12 +799,13 @@ class scia_density_day(object):
 
 		xr_dtot = xr.DataArray(self.tot_dens, coords=[d, self.lats, self.alts],
 				dims=["time", "latitude", "altitude"],
-				attrs=dict(units='cm^{-3}', long_name='total number density (NRLMSIS-00)'),
+				attrs=dict(units='cm^{-3}', long_name='MSIS total number density',
+					model='NRLMSIS-00'),
 				name="MSIS_Dens")
 
 		xr_temp = xr.DataArray(self.temperature, coords=[d, self.lats, self.alts],
 				dims=["time", "latitude", "altitude"],
-				attrs=dict(units='K', long_name='temperature',
+				attrs=dict(units='K', long_name='MSIS temperature',
 						model="NRLMSIS-00"),
 				name="MSIS_Temp")
 
