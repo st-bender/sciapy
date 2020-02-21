@@ -31,10 +31,10 @@ def test_main_help():
 
 
 @mark.long
-def test_main_lin_mean():
+def test_main_lin_mean(tmpdir):
 	p = Popen(["python", "-m", "sciapy.regress",
 			data_file,
-			"-o", "/tmp",
+			"-o", tmpdir,
 			"-A", "70",
 			"-L", "65",
 			"-k",
@@ -54,10 +54,10 @@ def test_main_lin_mean():
 
 
 @mark.long
-def test_main_lin_gp():
+def test_main_lin_gp(tmpdir):
 	p = Popen(["python", "-m", "sciapy.regress",
 			data_file,
-			"-o", "/tmp",
+			"-o", tmpdir,
 			"-A", "70",
 			"-L", "65",
 			"-k",
@@ -76,10 +76,10 @@ def test_main_lin_gp():
 
 
 @mark.long
-def test_main_nonlin_gp():
+def test_main_nonlin_gp(tmpdir):
 	p = Popen(["python", "-m", "sciapy.regress",
 			data_file,
-			"-o", "/tmp",
+			"-o", tmpdir,
 			"-A", "70",
 			"-L", "65",
 			"-k",
