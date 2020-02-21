@@ -491,13 +491,20 @@ def sddata_xr_set_attrs(sdday_xr, ref_date="1950-01-01", rename=True):
 	"""
 	if rename:
 		sdday_xr = sdday_xr.rename({
-			"density": "NO_DENS", "density_air": "TOT_DENS",
-			"apriori": "NO_APRIORI", "error_meas": "NO_ERR",
+			# 2d vars
+			"akm_diagonal": "NO_AKDIAG",
+			"apriori": "NO_APRIORI",
+			"density": "NO_DENS",
+			"density_air": "TOT_DENS",
+			"error_meas": "NO_ERR",
 			"error_tot": "NO_ETOT",
-			"NOEM_density": "NO_NOEM", "akm_diagonal": "NO_AKDIAG",
+			"NOEM_density": "NO_NOEM",
 			"VMR": "NO_VMR",
-			"utc_hour": "UTC", "mean_sza": "mean_SZA",
-			"app_lst": "app_LST", "mean_lst": "mean_LST",
+			# 1d vars and dimensions
+			"app_lst": "app_LST",
+			"mean_lst": "mean_LST",
+			"mean_sza": "mean_SZA",
+			"utc_hour": "UTC",
 		})
 	sdday_xr["NO_RSTD"] = 100 * np.abs(sdday_xr.NO_ERR / sdday_xr.NO_DENS)
 	sdday_xr["NO_RSTD"].attrs = dict(units='%',
