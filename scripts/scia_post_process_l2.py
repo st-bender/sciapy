@@ -296,11 +296,13 @@ def process_orbit(
 
 	sdd.mst = (sdd.utchour + sdd.lons / 15.) % 24.
 	sdd.lst = sdd.mst + eotcorr / 60.
+	mean_alt_km = sdd.alts.mean()
+	mean_alt_m = mean_alt_km * 1000.
 
 	dt_date_this = dt.timedelta(np.asscalar(dts_retr_interp0)) + dtrefdate
 	logging.info("date: %s", dt_date_this)
 	# caclulate geomagnetic coordinates
-	sdd.gmlats, sdd.gmlons = gmag_igrf(dt_date_this, sdd.lats, sdd.lons, alt=100.)
+	sdd.gmlats, sdd.gmlons = gmag_igrf(dt_date_this, sdd.lats, sdd.lons, alt=mean_alt_km)
 	logging.debug("geomag. lats: %s, lons: %s", sdd.gmlats, sdd.gmlons)
 	sdd.aacgmgmlats, sdd.aacgmgmlons = gmag_aacgm2005(sdd.lats, sdd.lons)
 	logging.debug("aacgm geomag. lats: %s, lons: %s",
@@ -365,7 +367,7 @@ def process_orbit(
 			sdd.noem_no[i][:] = np.nan
 		sdd.sza[i] = 90. - sun_alt_func(lat, sdd.lons[i],
 				dt.timedelta(np.asscalar(sdd.utcdays[i])) + dtrefdate,
-				elevation=sdd.alts.mean() * 1000.)
+				elevation=mean_alt_m)
 	sdd.vmr = sdd.densities / sdd.dens_tot * 1.e9  # ppb
 	return dts_retr_interp0, time0, lst0, lon0, sdd
 
