@@ -1,0 +1,17 @@
+10
+#Data type          : SCIAMACHY solar mean ref.
+#L1b product        : SCI_NL__1PYDPA20100203_031030_000060632086_00319_41455_0002.N1
+#Orbit nr.          : 41455
+#Ver. Proc/Key/M/I/D: SciaL1c/3.2     03.30  08.31   500  nnnnnnnn
+#Starttime          : 03-FEB-2010 03:10:30.979575
+#L.12 : Number_of_pixels
+#L.13 : Solar ID 
+#L.14 : Orbit 
+#L.15 : Date Time : yyyy mm dd hh mm ss
+#L.16 : Npix lines : wavelength  irradiance
+2
+D0
+41455
+2010  2  3  3 10 30
+ 230.0000   3.57275e+12
+ 250.0000   8.17662e+12
