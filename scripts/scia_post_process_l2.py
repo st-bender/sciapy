@@ -366,7 +366,7 @@ def process_orbit(
 		else:
 			sdd.noem_no[i][:] = np.nan
 		sdd.sza[i] = 90. - sun_alt_func(lat, sdd.lons[i],
-				dt.timedelta(np.asscalar(sdd.utcdays[i])) + dtrefdate,
+				(dt.timedelta(np.asscalar(sdd.utcdays[i])) + dtrefdate).to_pydatetime(),
 				elevation=mean_alt_m)
 	sdd.vmr = sdd.densities / sdd.dens_tot * 1.e9  # ppb
 	return dts_retr_interp0, time0, lst0, lon0, sdd
