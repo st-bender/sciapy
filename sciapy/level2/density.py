@@ -32,7 +32,7 @@ except ImportError:
 		from pupynere import netcdf_file
 		fmtargs = {"version": 1}
 
-__all__ = ["scia_density", "scia_densities"]
+__all__ = ["scia_density", "scia_densities", "_UTC"]
 
 try:
 	_UTC = dt.timezone.utc

@@ -29,7 +29,7 @@ except ImportError:
 		from pupynere import netcdf_file
 		fmtargs = {"version": 1}
 
-from .density import scia_densities
+from .density import scia_densities, _UTC
 
 __all__ = ["scia_densities_pp", "scia_density_day"]
 
@@ -445,7 +445,7 @@ class scia_density_day(object):
 	"""
 	def __init__(self, name="NO", ref_date="2000-01-01", author="unknown"):
 		self.date0 = (dt.datetime.strptime(ref_date, "%Y-%m-%d")
-					.replace(tzinfo=dt.timezone.utc))
+					.replace(tzinfo=_UTC))
 		self.alts = None
 		self.lats = None
 		self.version = None
