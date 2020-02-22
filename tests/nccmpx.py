@@ -19,6 +19,21 @@ import xarray as xr
 __all__ = ["nccmpattrs", "ncallclose", "ncequal", "ncidentical"]
 
 
+def cmpvarattrs(v1, v2):
+	"""Compare variable attribute values"""
+	msg = ""
+	same = True
+	for a in v1.attrs:
+		a1 = getattr(v1, a, None)
+		a2 = getattr(v2, a, None)
+		if a2 is None or a2 != a1:
+			msg = "{0}\nL\t{1}\t{2}\t{3}\nR\t{1}\t{2}\t{4}".format(
+				msg, v1.name, a, a1, a2,
+			)
+			same = False
+	return same, msg
+
+
 def nccmpattrs(file1, file2, ignore=[]):
 	"""Compare variable attributes and global attributes"""
 	msg = ""
@@ -26,11 +41,7 @@ def nccmpattrs(file1, file2, ignore=[]):
 	with xr.open_dataset(file1) as ds1:
 		ds2 = xr.open_dataset(file2)
 		for v in ds1.variables:
-			if ds1[v].attrs != ds2[v].attrs:
-				msg = "{0}\nL\t{1}\t{2}\nR\t{1}\t{3}".format(
-					msg, v, ds1[v].attrs, ds2[v].attrs,
-				)
-				same = False
+			same, msg = cmpvarattrs(ds1[v], ds2[v])
 		for attr in ds1.attrs:
 			lattr = getattr(ds1, attr)
 			rattr = getattr(ds2, attr)
