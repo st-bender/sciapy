@@ -10,7 +10,7 @@ here = path.abspath(path.dirname(__file__))
 
 extras_require = {
 	"msis": ["nrlmsise00"],
-	"tests": ["pytest"],
+	"tests": ["nrlmsise00", "pytest"],
 }
 extras_require["all"] = sorted(
 	{v for req in extras_require.values() for v in req},
@@ -84,6 +84,7 @@ if __name__ == "__main__":
 			'george',
 			'emcee',
 		],
+		extras_require=extras_require,
 		license='GPLv2',
 		classifiers=[
 			"Development Status :: 3 - Alpha",
