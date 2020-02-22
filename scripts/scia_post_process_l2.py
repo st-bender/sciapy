@@ -27,12 +27,10 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from scipy.interpolate import interp1d
-try:
-	import pysolar.solar as sol
-	sun_alt_func = sol.get_altitude
-except ImportError:  # pysolar 0.6 (for python 2)
-	import Pysolar.solar as sol
-	sun_alt_func = sol.GetAltitude
+
+from astropy import units
+from astropy.time import Time
+import astropy.coordinates as coord
 
 import sciapy.level1c as sl
 from sciapy.level2 import density_pp as sd
@@ -56,6 +54,18 @@ KP_FILE = resource_filename("sciapy", "data/indices/spidr_kp_2000-2012.dat")
 
 PHI_FAC = 11.91
 LST_FAC = -0.62
+
+
+def solar_zenith_angle(alt, lat, lon, time):
+	atime = Time(time)
+	loc = coord.EarthLocation.from_geodetic(
+		height=alt * units.km,
+		lat=lat * units.deg,
+		lon=lon * units.deg,
+	)
+	altaz = coord.AltAz(location=loc, obstime=atime)
+	sun = coord.get_sun(atime)
+	return sun.transform_to(altaz).zen.value
 
 
 def read_spectra(year, orbit, spec_base=None, skip_upleg=True):
@@ -365,9 +375,11 @@ def process_orbit(
 					[lat], [sdd.lons[i]], noem_f107, noem_kp)[:]
 		else:
 			sdd.noem_no[i][:] = np.nan
-		sdd.sza[i] = 90. - sun_alt_func(lat, sdd.lons[i],
-				(dt.timedelta(np.asscalar(sdd.utcdays[i])) + dtrefdate).to_pydatetime(),
-				elevation=mean_alt_m)
+	sdd.sza[:] = solar_zenith_angle(
+			mean_alt_km,
+			sdd.lats, sdd.lons,
+			pd.to_timedelta(sdd.utcdays, unit="days") + dtrefdate,
+	)
 	sdd.vmr = sdd.densities / sdd.dens_tot * 1.e9  # ppb
 	return dts_retr_interp0, time0, lst0, lon0, sdd
 
