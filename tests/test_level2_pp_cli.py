@@ -46,8 +46,6 @@ def test_pp_netcdf(tmpdir):
 	assert p.returncode == 0
 	ncallclose(IFILE1, ofile)
 	nccmpattrs(IFILE1, ofile, ignore=["creation_time"])
-	ncequal(IFILE1, ofile)
-	ncidentical(IFILE1, ofile, ignore=["creation_time"])
 
 
 def test_pp_xarray(tmpdir):
@@ -67,5 +65,3 @@ def test_pp_xarray(tmpdir):
 	assert p.returncode == 0
 	ncallclose(IFILE2, ofile)
 	nccmpattrs(IFILE2, ofile, ignore=["creation_time"])
-	ncequal(IFILE2, ofile)
-	ncidentical(IFILE2, ofile, ignore=["creation_time"])
