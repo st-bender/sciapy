@@ -32,6 +32,10 @@ def test_pp_help():
 	assert p.returncode == 0
 
 
+@pytest.mark.xfail(
+	sys.version_info[:2] == (3, 4),
+	reason="netcdf file attributes don't work with Python 3.4 compatible xarray.",
+)
 def test_pp_netcdf(tmpdir):
 	ofile = os.path.join(tmpdir, "test_v2.2_t.nc")
 	p = Popen([
