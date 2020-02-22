@@ -43,8 +43,8 @@ def nccmpattrs(file1, file2, ignore=[]):
 		for v in ds1.variables:
 			same, msg = cmpvarattrs(ds1[v], ds2[v])
 		for attr in ds1.attrs:
-			lattr = getattr(ds1, attr)
-			rattr = getattr(ds2, attr)
+			lattr = getattr(ds1, attr, None)
+			rattr = getattr(ds2, attr, None)
 			if lattr != rattr and attr not in ignore:
 				msg = "{0}\nL\t{1}\t{2}\nR\t{1}\t{3}".format(
 					msg, attr, lattr, rattr,
