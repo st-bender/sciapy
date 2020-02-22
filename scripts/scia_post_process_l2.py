@@ -378,7 +378,7 @@ def process_orbit(
 	sdd.sza[:] = solar_zenith_angle(
 			mean_alt_km,
 			sdd.lats, sdd.lons,
-			pd.to_timedelta(sdd.utcdays, unit="days") + dtrefdate,
+			(pd.to_timedelta(sdd.utcdays, unit="days") + dtrefdate).to_pydatetime(),
 	)
 	sdd.vmr = sdd.densities / sdd.dens_tot * 1.e9  # ppb
 	return dts_retr_interp0, time0, lst0, lon0, sdd
