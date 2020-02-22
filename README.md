@@ -77,7 +77,6 @@ install some of the important packages beforehand:
 - `pandas` and
 - `xarray` for the higher level data interfaces,
 - `astropy` for (astronomical) time conversions,
-- `pysolar` for solar location calculations,
 - `parse` for ASCII text parsing in `level1c`,
 - `pybind11` C++ interface needed by `celerite`
 - `celerite` at least version 0.3.0 and

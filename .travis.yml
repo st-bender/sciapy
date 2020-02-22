@@ -27,10 +27,6 @@ install:
   - pip install tox-travis
   - pip install scrutinizer-ocular
   - pip install "astropy<4.0"
-  - |
-    if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then
-      pip install "pysolar<0.7"
-    fi
   - pip install -e ".[all]"
 script:
   - py.test -v --cov sciapy
