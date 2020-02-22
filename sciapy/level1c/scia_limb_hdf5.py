@@ -315,7 +315,7 @@ def read_hdf5_limb_state_common_data(self, hf, lstate_id, state_in_orbit, cl_id)
 	self.cent_lat_lon = cent_lat_lon
 	# pre-set the limb_data
 	if self._limb_data_dtype is None:
-		self._limb_data_dtype = _limb_data_dtype.copy()
+		self._limb_data_dtype = _limb_data_dtype[:]
 	self.limb_data = np.zeros((self.nalt), dtype=self._limb_data_dtype)
 	self.limb_data["sub_sat_lat"] = subsatlat
 	self.limb_data["sub_sat_lon"] = subsatlon

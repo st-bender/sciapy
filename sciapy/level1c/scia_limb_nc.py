@@ -63,7 +63,7 @@ def read_from_netcdf(self, filename):
 
 	# pre-set the limb_data
 	if self._limb_data_dtype is None:
-		self._limb_data_dtype = _limb_data_dtype.copy()
+		self._limb_data_dtype = _limb_data_dtype[:]
 	self.limb_data = np.zeros((self.nalt), dtype=self._limb_data_dtype)
 
 	self.limb_data["sub_sat_lat"] = ncf.variables['sub_sat_lat'][:]

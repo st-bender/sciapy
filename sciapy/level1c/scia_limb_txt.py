@@ -67,7 +67,7 @@ def read_from_textfile(self, filename):
 	self.date = np.fromstring(f.readline(), dtype=_int_type, sep=' ')
 	# pre-set the limb_data
 	if self._limb_data_dtype is None:
-		self._limb_data_dtype = _limb_data_dtype.copy()
+		self._limb_data_dtype = _limb_data_dtype[:]
 	self.limb_data = np.zeros((self.nalt), dtype=self._limb_data_dtype)
 	if nh > 27:
 		self.limb_data["sub_sat_lat"] = np.fromstring(f.readline(), dtype=_float_type, sep=' ')

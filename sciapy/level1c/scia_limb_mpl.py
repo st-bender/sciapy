@@ -101,7 +101,7 @@ def read_from_mpl_binary(self, filename):
 	self.wls = np.fromstring(f.read(4 * self.npix), dtype=_float_type)
 
 	if self._limb_data_dtype is None:
-		self._limb_data_dtype = _limb_data_dtype.copy()
+		self._limb_data_dtype = _limb_data_dtype[:]
 		if self.textheader_length < 28:
 			self._limb_data_dtype.remove(("sub_sat_lat", _float_type))
 			self._limb_data_dtype.remove(("sub_sat_lon", _float_type))
