@@ -14,8 +14,10 @@ Test functions to assure that the command line interface works in
 most of the cases.
 """
 import os
+import sys
 from subprocess import Popen
 
+import pytest
 from nccmpx import (ncallclose, nccmpattrs, ncequal, ncidentical)
 
 DATADIR = os.path.join(".", "tests", "data")
@@ -48,6 +50,10 @@ def test_pp_netcdf(tmpdir):
 	nccmpattrs(IFILE1, ofile, ignore=["creation_time"])
 
 
+@pytest.mark.xfail(
+	sys.version_info[:2] == (3, 4),
+	reason="netcdf file attributes don't work with Python 3.4 compatible xarray.",
+)
 def test_pp_xarray(tmpdir):
 	ofile = os.path.join(tmpdir, "test_v2.2x_t.nc")
 	p = Popen([
