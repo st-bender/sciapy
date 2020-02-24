@@ -41,7 +41,9 @@ def nccmpattrs(file1, file2, ignore=[]):
 	with xr.open_dataset(file1) as ds1:
 		ds2 = xr.open_dataset(file2)
 		for v in ds1.variables:
-			same, msg = cmpvarattrs(ds1[v], ds2[v])
+			same, vmsg = cmpvarattrs(ds1[v], ds2[v])
+			if not same:
+				msg = "{0}{1}".format(msg, vmsg)
 		for attr in ds1.attrs:
 			lattr = getattr(ds1, attr, None)
 			rattr = getattr(ds2, attr, None)
