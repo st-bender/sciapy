@@ -278,7 +278,7 @@ class scia_densities(object):
 		else:
 			f = open(filename, 'w')
 
-		header = "%5s %13s %12s %13s %14s  %12s %14s   %12s  %12s %12s %12s %12s" % ("GP_ID",
+		header = "%5s %13s %12s %13s %13s %12s %13s %13s  %13s %12s %12s %12s" % ("GP_ID",
 				"Max_Hoehe[km]", "Hoehe[km]", "Min_Hoehe[km]",
 				"Max_Breite[°]", "Breite[°]", "Min_Breite[°]",
 				"Laenge[°]",
