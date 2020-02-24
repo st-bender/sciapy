@@ -36,12 +36,14 @@ def test_pp_help():
 	sys.version_info[:2] == (3, 4),
 	reason="netcdf file attributes don't work with Python 3.4 compatible xarray.",
 )
-def test_pp_netcdf(tmpdir):
-	ofile = os.path.join(tmpdir, "test_v2.2_t.nc")
+@pytest.mark.parametrize("revision", ["2.2"])
+def test_pp_netcdf(revision, tmpdir):
+	ofile = os.path.join(tmpdir, "test_v{0}_t.nc".format(revision))
 	p = Popen([
 		"scia_post_process_l2.py",
 		"-A", "The Dude",
 		"-M", "2010-02",
+		"-R", revision,
 		"-p", os.path.join(DATADIR, "l2"),
 		"-s", os.path.join(DATADIR, "l1c"),
 		"--mlt",
@@ -58,12 +60,14 @@ def test_pp_netcdf(tmpdir):
 	sys.version_info[:2] == (3, 4),
 	reason="netcdf file attributes don't work with Python 3.4 compatible xarray.",
 )
-def test_pp_xarray(tmpdir):
-	ofile = os.path.join(tmpdir, "test_v2.2x_t.nc")
+@pytest.mark.parametrize("revision", ["2.2"])
+def test_pp_xarray(revision, tmpdir):
+	ofile = os.path.join(tmpdir, "test_v{0}x_t.nc".format(revision))
 	p = Popen([
 		"scia_post_process_l2.py",
 		"-A", "The Dude",
 		"-M", "2010-02",
+		"-R", revision,
 		"-p", os.path.join(DATADIR, "l2"),
 		"-s", os.path.join(DATADIR, "l1c"),
 		"--mlt",
