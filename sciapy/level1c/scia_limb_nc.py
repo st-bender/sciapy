@@ -95,6 +95,10 @@ def read_from_netcdf(self, filename):
 			usemask=False, asrecarray=True, flatten=True)
 	self._limb_data_dtype = self.limb_data.dtype
 
+	for _k in ncf.ncattrs():
+		if _k.startswith("metadata"):
+			_meta_key = _k.split("::")[1]
+			self.metadata[_meta_key] = getattr(ncf, _k)
 	ncf.close()
 
 def write_to_netcdf(self, filename):
@@ -184,4 +188,6 @@ def write_to_netcdf(self, filename):
 	rads[:] = np.asarray(self.limb_data["rad"]).reshape(self.nalt, self.npix)
 	errs[:] = np.asarray(self.limb_data["err"]).reshape(self.nalt, self.npix)
 
+	for _k, _v in self.metadata.items():
+		setattr(ncf, "metadata::" + _k, _v)
 	ncf.close()
