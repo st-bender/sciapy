@@ -658,6 +658,11 @@ def sddata_xr_set_attrs(
 	if rename:
 		# version specific renaming
 		sdday_xr = sdday_xr.rename(VAR_RENAME[file_version])
+	if int(file_version.split(".")[0]) < 3:
+		# invert latitudes for backwards-compatitbility
+		sdday_xr = sdday_xr.sortby("latitude", ascending=False)
+	else:
+		sdday_xr = sdday_xr.sortby("latitude", ascending=True)
 
 	dateo = pd.to_datetime(
 			xr.conventions.decode_cf_variable("date", sdday_xr.time).data[0],
