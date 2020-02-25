@@ -311,7 +311,6 @@ class scia_densities(object):
 		"""Write NO densities to netcdf files
 
 		This function has no stream, i.e. file object, support.
-		Uses single precision floats (32 bit) to save space.
 
 		Parameters
 		----------
@@ -353,15 +352,15 @@ class scia_densities(object):
 		ncf.createDimension('latitude', self.nlat)
 		ncf.createDimension('time', None)
 
-		forbit = ncf.createVariable('orbit', np.dtype('int32').char, ('time',))
-		ftime = ncf.createVariable('time', np.dtype('int32').char, ('time',))
+		forbit = ncf.createVariable('orbit', np.dtype('int64').char, ('time',))
+		ftime = ncf.createVariable('time', np.dtype('int64').char, ('time',))
 
-		falts_min = ncf.createVariable('alt_min', np.dtype('float32').char, ('altitude',))
-		falts = ncf.createVariable('altitude', np.dtype('float32').char, ('altitude',))
-		falts_max = ncf.createVariable('alt_max', np.dtype('float32').char, ('altitude',))
-		flats_min = ncf.createVariable('lat_min', np.dtype('float32').char, ('latitude',))
-		flats = ncf.createVariable('latitude', np.dtype('float32').char, ('latitude',))
-		flats_max = ncf.createVariable('lat_max', np.dtype('float32').char, ('latitude',))
+		falts_min = ncf.createVariable('alt_min', np.dtype('float64').char, ('altitude',))
+		falts = ncf.createVariable('altitude', np.dtype('float64').char, ('altitude',))
+		falts_max = ncf.createVariable('alt_max', np.dtype('float64').char, ('altitude',))
+		flats_min = ncf.createVariable('lat_min', np.dtype('float64').char, ('latitude',))
+		flats = ncf.createVariable('latitude', np.dtype('float64').char, ('latitude',))
+		flats_max = ncf.createVariable('lat_max', np.dtype('float64').char, ('latitude',))
 
 		falts_min.units = 'km'
 		falts_min.positive = 'up'
@@ -378,16 +377,16 @@ class scia_densities(object):
 		ftime.units = 'days since {0}'.format(self.date0.isoformat(sep=' '))
 		ftime.standard_name = 'time'
 
-		fdens = ncf.createVariable('density', np.dtype('float32').char, ('time', 'latitude', 'altitude'))
+		fdens = ncf.createVariable('density', np.dtype('float64').char, ('time', 'latitude', 'altitude'))
 		fdens.units = 'cm^{-3}'
 		fdens.standard_name = 'number_concentration_of_nitrogen_monoxide_molecules_in_air'
-		fdens_err_meas = ncf.createVariable('error_meas', np.dtype('float32').char, ('time', 'latitude', 'altitude'))
+		fdens_err_meas = ncf.createVariable('error_meas', np.dtype('float64').char, ('time', 'latitude', 'altitude'))
 		fdens_err_meas.units = 'cm^{-3}'
 		fdens_err_meas.long_name = 'NO number density measurement error'
-		fdens_err_tot = ncf.createVariable('error_tot', np.dtype('float32').char, ('time', 'latitude', 'altitude'))
+		fdens_err_tot = ncf.createVariable('error_tot', np.dtype('float64').char, ('time', 'latitude', 'altitude'))
 		fdens_err_tot.units = 'cm^{-3}'
 		fdens_err_tot.long_name = 'NO number density total error'
-		fdens_tot = ncf.createVariable('density_air', np.dtype('float32').char, ('time', 'latitude', 'altitude'))
+		fdens_tot = ncf.createVariable('density_air', np.dtype('float64').char, ('time', 'latitude', 'altitude'))
 		fdens_tot.units = 'cm^{-3}'
 		fdens_tot.long_name = 'approximate overall number concentration of air molecules (NRLMSIS-00)'
 
@@ -410,20 +409,20 @@ class scia_densities(object):
 		# longitudes if they are available
 		if self.nlon > 0:
 			lons_out = np.asarray(self.lons).reshape(self.nlon)
-			flons = ncf.createVariable('longitude', np.dtype('float32').char, ('time', 'latitude',))
+			flons = ncf.createVariable('longitude', np.dtype('float64').char, ('time', 'latitude',))
 			flons.units = 'degrees_east'
 			flons[0, :] = lons_out
 
 		if self.apriori is not None:
 			fapriori = ncf.createVariable('apriori',
-					np.dtype('float32').char, ('time', 'latitude', 'altitude'))
+					np.dtype('float64').char, ('time', 'latitude', 'altitude'))
 			fapriori.units = 'cm^{-3}'
 			fapriori.long_name = 'apriori NO number density'
 			fapriori[0, :] = self.apriori
 
 		if self.akdiag is not None:
 			fakdiag = ncf.createVariable('akm_diagonal',
-					np.dtype('float32').char, ('time', 'latitude', 'altitude'))
+					np.dtype('float64').char, ('time', 'latitude', 'altitude'))
 			fakdiag.units = '1'
 			fakdiag.long_name = 'averaging kernel matrix diagonal element'
 			fakdiag[0, :] = self.akdiag

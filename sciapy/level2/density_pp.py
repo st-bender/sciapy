@@ -188,7 +188,6 @@ class scia_densities_pp(scia_densities):
 		"""Write variables to netcdf files
 
 		This function has no stream, i.e. file object, support.
-		Uses single precision floats (32 bit) to save space.
 
 		Parameters
 		----------
@@ -200,7 +199,7 @@ class scia_densities_pp(scia_densities):
 
 		if self.temperature is not None:
 			ftemp = ncf.createVariable('temperature',
-					np.dtype('float32').char, ('time', 'latitude', 'altitude'))
+					np.dtype('float64').char, ('time', 'latitude', 'altitude'))
 			ftemp.units = 'K'
 			ftemp.long_name = 'temperature'
 			ftemp.model = 'NRLMSIS-00'
@@ -208,56 +207,56 @@ class scia_densities_pp(scia_densities):
 
 		if self.noem_no is not None:
 			fnoem_no = ncf.createVariable('NOEM_density',
-					np.dtype('float32').char, ('time', 'latitude', 'altitude'))
+					np.dtype('float64').char, ('time', 'latitude', 'altitude'))
 			fnoem_no.units = 'cm^{-3}'
 			fnoem_no.long_name = 'NOEM NO number density'
 			fnoem_no[0, :] = self.noem_no
 
 		if self.vmr is not None:
 			fvmr = ncf.createVariable('VMR',
-					np.dtype('float32').char, ('time', 'latitude', 'altitude'))
+					np.dtype('float64').char, ('time', 'latitude', 'altitude'))
 			fvmr.units = 'ppb'
 			fvmr.long_name = 'volume mixing ratio'
 			fvmr[0, :] = self.vmr
 
 		if self.lst is not None:
 			flst = ncf.createVariable('app_lst',
-					np.dtype('float32').char, ('time', 'latitude',))
+					np.dtype('float64').char, ('time', 'latitude',))
 			flst.units = 'hours'
 			flst.long_name = 'apparent local solar time'
 			flst[0, :] = self.lst
 
 		if self.mst is not None:
 			fmst = ncf.createVariable('mean_lst',
-					np.dtype('float32').char, ('time', 'latitude',))
+					np.dtype('float64').char, ('time', 'latitude',))
 			fmst.units = 'hours'
 			fmst.long_name = 'mean local solar time'
 			fmst[0, :] = self.mst
 
 		if self.sza is not None:
 			fsza = ncf.createVariable('mean_sza',
-					np.dtype('float32').char, ('time', 'latitude',))
+					np.dtype('float64').char, ('time', 'latitude',))
 			fsza.units = 'degrees'
 			fsza.long_name = 'mean solar zenith angle'
 			fsza[0, :] = self.sza
 
 		if self.utchour is not None:
 			futc = ncf.createVariable('utc_hour',
-					np.dtype('float32').char, ('time', 'latitude',))
+					np.dtype('float64').char, ('time', 'latitude',))
 			futc.units = 'hours'
 			futc.long_name = 'measurement utc time'
 			futc[0, :] = self.utchour
 
 		if self.utcdays is not None:
 			futcd = ncf.createVariable('utc_days',
-					np.dtype('float32').char, ('time', 'latitude',))
+					np.dtype('float64').char, ('time', 'latitude',))
 			futcd.long_name = 'measurement day'
 			futcd.units = 'days since {0}'.format(self.date0.isoformat(sep=' '))
 			futcd[0, :] = self.utcdays
 
 		if self.gmlats is not None:
 			fgmlats = ncf.createVariable('gm_lats',
-					np.dtype('float32').char, ('time', 'latitude',))
+					np.dtype('float64').char, ('time', 'latitude',))
 			fgmlats.long_name = 'geomagnetic_latitude'
 			fgmlats.model = 'IGRF'
 			fgmlats.units = 'degrees_north'
@@ -265,7 +264,7 @@ class scia_densities_pp(scia_densities):
 
 		if self.gmlons is not None:
 			fgmlons = ncf.createVariable('gm_lons',
-					np.dtype('float32').char, ('time', 'latitude',))
+					np.dtype('float64').char, ('time', 'latitude',))
 			fgmlons.long_name = 'geomagnetic_longitude'
 			fgmlons.model = 'IGRF'
 			fgmlons.units = 'degrees_east'
@@ -273,7 +272,7 @@ class scia_densities_pp(scia_densities):
 
 		if self.aacgmgmlats is not None:
 			faacgmgmlats = ncf.createVariable('aacgm_gm_lats',
-					np.dtype('float32').char, ('time', 'latitude',))
+					np.dtype('float64').char, ('time', 'latitude',))
 			faacgmgmlats.long_name = 'geomagnetic_latitude'
 			faacgmgmlats.model = 'AACGM'
 			faacgmgmlats.units = 'degrees_north'
@@ -281,7 +280,7 @@ class scia_densities_pp(scia_densities):
 
 		if self.aacgmgmlons is not None:
 			faacgmgmlons = ncf.createVariable('aacgm_gm_lons',
-					np.dtype('float32').char, ('time', 'latitude',))
+					np.dtype('float64').char, ('time', 'latitude',))
 			faacgmgmlons.long_name = 'geomagnetic_longitude'
 			faacgmgmlons.model = 'AACGM'
 			faacgmgmlons.units = 'degrees_east'
@@ -379,7 +378,7 @@ class scia_densities_pp(scia_densities):
 			self.write_to_netcdf(tf.name)
 			with xr.open_dataset(tf.name, decode_cf=False) as sdorb:
 				sdorb = sdorb.drop(["alt_min", "alt_max", "lat_min", "lat_max"])
-				sdorb["time"] = np.array([dateo], dtype=np.float32)
+				sdorb["time"] = np.array([dateo], dtype=np.float64)
 				sdorb["orbit"] = orbit
 				sdorb.load()
 		return sdorb
@@ -583,8 +582,6 @@ class scia_density_day(object):
 	def write_to_netcdf(self, filename):
 		"""Write variables to netcdf files
 
-		Uses single precision floats (32 bit) to save space.
-
 		Parameters
 		----------
 		filename: str
@@ -619,7 +616,7 @@ class scia_density_day(object):
 		ftime.standard_name = 'time'
 		ftime.units = 'days since {0}'.format(self.date0.isoformat(sep=' '))
 		#ftime.units = 'days since {0}'.format(self.date0.strftime('%Y-%m-%d %H:%M:%S%z (%Z)'))
-		#fdate = ncf.createVariable('date', np.dtype('float32').char, ('time',))
+		#fdate = ncf.createVariable('date', np.dtype('float64').char, ('time',))
 		#fdate.axis = 'T'
 		#fdate.calendar = 'standard'
 		#fdate.long_name = 'date'
