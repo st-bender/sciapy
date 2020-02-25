@@ -487,7 +487,59 @@ def combine_orbit_data(orbits,
 	return sdday, sdday_ds
 
 
-def sddata_xr_set_attrs(sdday_xr, ref_date="1950-01-01", rename=True):
+VAR_ATTRS = {
+	"2.1": {
+		"MSIS_Dens": dict(
+			units='cm^{-3}',
+			long_name='total number density (NRLMSIS-00)',
+		),
+		"MSIS_Temp": dict(
+			units='K',
+			long_name='temperature',
+			model="NRLMSIS-00",
+		),
+	},
+	"2.2": {
+	},
+	"2.3": {
+		"aacgm_gm_lats": dict(
+			long_name='geomagnetic_latitude',
+			model='AACGM2005 at 80 km',
+			units='degrees_north',
+		),
+		"aacgm_gm_lons": dict(
+			long_name='geomagnetic_longitude',
+			model='AACGM2005 at 80 km',
+			units='degrees_east',
+		),
+		"orbit": dict(
+			axis='T', calendar='standard',
+			long_name='SCIAMACHY/Envisat orbit number',
+			standard_name="orbit",
+			units='1',
+		),
+	},
+}
+VAR_RENAME = {
+	"2.1": {
+		# Rename to v2.1 variable names
+		"MSIS_Dens": "TOT_DENS",
+		"MSIS_Temp": "temperature",
+	},
+	"2.2": {
+	},
+	"2.3": {
+	},
+}
+FLOAT_VARS = [
+	"altitude", "latitude", "longitude",
+	"app_LST", "mean_LST", "mean_SZA",
+	"aacgm_gm_lats", "aacgm_gm_lons",
+	"gm_lats", "gm_lons",
+]
+
+
+def sddata_xr_set_attrs(sdday_xr, ref_date="2000-01-01", rename=True, revision="2.2"):
 	"""Customize xarray Dataset variables and attributes
 
 	Changes the variable names to match those exported from the
@@ -537,6 +589,77 @@ def sddata_xr_set_attrs(sdday_xr, ref_date="1950-01-01", rename=True):
 		standard_name='latitude', units='degrees_north')
 	sdday_xr["longitude"].attrs = dict(long_name='longitude',
 		standard_name='longitude', units='degrees_east')
+	# Default attributes
+	species = "NO"
+	# fix variable attributes
+	sdday_xr["{0}_DENS".format(species)].attrs = {
+			"units": "cm^{-3}",
+			"long_name": "{0} number density".format(species)}
+	sdday_xr["{0}_ERR".format(species)].attrs = {
+			"units": "cm^{-3}",
+			"long_name": "{0} density measurement error".format(species)}
+	sdday_xr["{0}_ETOT".format(species)].attrs = {
+			"units": "cm^{-3}",
+			"long_name": "{0} density total error".format(species)}
+	sdday_xr["{0}_RSTD".format(species)].attrs = dict(
+			units='%',
+			long_name='{0} relative standard deviation'.format(species))
+	sdday_xr["{0}_AKDIAG".format(species)].attrs = dict(
+			units='1',
+			long_name='{0} averaging kernel diagonal element'.format(species))
+	sdday_xr["{0}_APRIORI".format(species)].attrs = dict(
+			units='cm^{-3}', long_name='{0} apriori density'.format(species))
+	sdday_xr["{0}_NOEM".format(species)].attrs = dict(
+			units='cm^{-3}', long_name='NOEM {0} number density'.format(species))
+	sdday_xr["{0}_VMR".format(species)].attrs = dict(
+			units='ppb', long_name='{0} volume mixing ratio'.format(species))
+	sdday_xr["MSIS_Dens"].attrs = dict(units='cm^{-3}',
+			long_name='MSIS total number density',
+			model="NRLMSIS-00")
+	sdday_xr["MSIS_Temp"].attrs = dict(units='K',
+			long_name='MSIS temperature',
+			model="NRLMSIS-00")
+	sdday_xr["longitude"].attrs = dict(long_name='longitude',
+			standard_name='longitude', units='degrees_east')
+	sdday_xr["app_LST"].attrs = dict(units='hours',
+			long_name='apparent local solar time')
+	sdday_xr["mean_LST"].attrs = dict(units='hours',
+			long_name='mean local solar time')
+	sdday_xr["mean_SZA"].attrs = dict(units='degrees',
+			long_name='solar zenith angle at mean altitude')
+	sdday_xr["UTC"].attrs = dict(units='hours',
+			long_name='measurement utc time')
+	sdday_xr["utc_days"].attrs = dict(
+			units='days since {0}'.format(
+				pd.to_datetime(ref_date).isoformat(sep=" ")),
+			long_name='measurement utc day')
+	sdday_xr["gm_lats"].attrs = dict(long_name='geomagnetic_latitude',
+			model='IGRF', units='degrees_north')
+	sdday_xr["gm_lons"].attrs = dict(long_name='geomagnetic_longitude',
+			model='IGRF', units='degrees_east')
+	sdday_xr["aacgm_gm_lats"].attrs = dict(long_name='geomagnetic_latitude',
+			# model='AACGM2005 80 km',  # v2.3
+			model='AACGM',  # v2.1, v2.2
+			units='degrees_north')
+	sdday_xr["aacgm_gm_lons"].attrs = dict(long_name='geomagnetic_longitude',
+			# model='AACGM2005 80 km',  # v2.3
+			model='AACGM',  # v2.1, v2.2
+			units='degrees_east')
+	sdday_xr["orbit"].attrs = dict(
+			axis='T', calendar='standard',
+			# long_name='SCIAMACHY/Envisat orbit number',  # v2.3
+			long_name='orbit',  # v2.1, v2.2
+			standard_name="orbit",
+			# units='1',  # v2.3
+			units='orbit number',  # v2.1, v2.2
+	)
+	# Overwrite version-specific variable attributes
+	for _v, _a in VAR_ATTRS[revision].items():
+		sdday_xr[_v].attrs = _a
+	if rename:
+		# version specific renaming
+		sdday_xr = sdday_xr.rename(VAR_RENAME[revision])
+
 	dateo = (pd.to_datetime(
 			xr.conventions.decode_cf_variable("date", sdday_xr.time).data[0])
 				.strftime("%Y-%m-%d"))
@@ -633,8 +756,16 @@ def main():
 
 	if args.xarray and sdxr_ds is not None:
 		sdxr_ds.attrs["author"] = args.author
-		sd_xr = sddata_xr_set_attrs(sdxr_ds, ref_date=args.base_date)
+		sd_xr = sddata_xr_set_attrs(
+			sdxr_ds, ref_date=args.base_date,
+			rename=True, revision=args.file_version,
+		)
 		sd_xr2 = sdlist.to_xarray()
+		# Overwrite version-specific variable attributes
+		for _v, _a in VAR_ATTRS[args.file_version].items():
+			sd_xr2[_v].attrs = _a
+		# version specific renaming
+		sd_xr2 = sd_xr2.rename(VAR_RENAME[args.file_version])
 		logging.debug(sd_xr)
 		logging.debug(sd_xr2)
 		logging.debug("equal datasets: %s", sd_xr.equals(sd_xr2))
