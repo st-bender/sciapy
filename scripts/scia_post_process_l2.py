@@ -234,7 +234,7 @@ def process_orbit(
 		# return early if reading the spectra failed
 		return fail
 
-	dts = pd.to_datetime(dts) - dtrefdate
+	dts = pd.to_datetime(dts, utc=True) - dtrefdate
 	dts = np.array([dtd.days + dtd.seconds / 86400. for dtd in dts])
 	logging.debug("lats: %s, lons: %s, times: %s", lats, lons, times)
 
@@ -585,7 +585,7 @@ def sddata_xr_set_attrs(
 	sdday_xr["time"].attrs = dict(axis='T', standard_name='time',
 		calendar='standard', long_name='equatorial crossing time',
 		units="days since {0}".format(
-			pd.to_datetime(ref_date).isoformat(sep=" ")))
+			pd.to_datetime(ref_date, utc=True).isoformat(sep=" ")))
 	sdday_xr["orbit"].attrs = dict(axis='T', calendar='standard',
 		long_name='SCIAMACHY/Envisat orbit number', units='1')
 	sdday_xr["altitude"].attrs = dict(axis='Z', positive='up',
@@ -634,7 +634,7 @@ def sddata_xr_set_attrs(
 			long_name='measurement utc time')
 	sdday_xr["utc_days"].attrs = dict(
 			units='days since {0}'.format(
-				pd.to_datetime(ref_date).isoformat(sep=" ")),
+				pd.to_datetime(ref_date, utc=True).isoformat(sep=" ")),
 			long_name='measurement utc day')
 	sdday_xr["gm_lats"].attrs = dict(long_name='geomagnetic_latitude',
 			model='IGRF', units='degrees_north')
@@ -663,9 +663,10 @@ def sddata_xr_set_attrs(
 		# version specific renaming
 		sdday_xr = sdday_xr.rename(VAR_RENAME[file_version])
 
-	dateo = (pd.to_datetime(
-			xr.conventions.decode_cf_variable("date", sdday_xr.time).data[0])
-				.strftime("%Y-%m-%d"))
+	dateo = pd.to_datetime(
+			xr.conventions.decode_cf_variable("date", sdday_xr.time).data[0],
+			utc=True,
+	).strftime("%Y-%m-%d")
 	logging.debug("date %s dataset: %s", dateo, sdday_xr)
 	return sdday_xr
 
@@ -727,12 +728,12 @@ def main():
 
 	pddrange = []
 	if args.month is not None:
-		d0 = pd.to_datetime(args.month + "-01")
+		d0 = pd.to_datetime(args.month + "-01", utc=True)
 		pddrange += pd.date_range(d0, d0 + pd.tseries.offsets.MonthEnd())
 	if args.date_range is not None:
 		pddrange += pd.date_range(*args.date_range.split(':'))
 	if args.dates is not None:
-		pddrange += pd.to_datetime(args.dates.split(','))
+		pddrange += pd.to_datetime(args.dates.split(','), utc=True)
 	logging.debug("pddrange: %s", pddrange)
 
 	olist = []
