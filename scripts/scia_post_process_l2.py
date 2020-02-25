@@ -178,7 +178,7 @@ class _circ_interp(object):
 
 def process_orbit(
 	orbit,
-	ref_date="1950-01-01",
+	ref_date="2000-01-01",
 	dens_path=None,
 	spec_base=None,
 	use_msis=True,
@@ -419,8 +419,8 @@ def get_orbits_from_date(date, mlt=False, path=None, L2_version="v6.2"):
 
 
 def combine_orbit_data(orbits,
-		ref_date="1950-01-01",
-		L2_version="v6.2", file_version="2.3",
+		ref_date="2000-01-01",
+		L2_version="v6.2", file_version="2.2",
 		dens_path=None, spec_base=None,
 		use_xarray=False, save_nc=False):
 	"""Combine post-processed SCIAMACHY retrieved orbit data
