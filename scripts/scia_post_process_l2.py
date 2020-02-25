@@ -191,7 +191,7 @@ def process_orbit(
 		SCIAMACHY/Envisat orbit number of the results to process.
 	ref_date: str, optional
 		Base date to calculate the relative days from,
-		of the format "%Y-%m-%d". Default: 1950-01-01
+		of the format "%Y-%m-%d". Default: 2000-01-01
 	dens_path: str, optional
 		The path to the level 2 data. Uses the current
 		dir if not set or set to `None` (default).
@@ -430,7 +430,7 @@ def combine_orbit_data(orbits,
 		List of SCIAMACHY/Envisat orbit numbers to process.
 	ref_date: str, optional
 		Base date to calculate the relative days from,
-		of the format "%Y-%m-%d". Default: 1950-01-01
+		of the format "%Y-%m-%d". Default: 2000-01-01
 	L2_version: str, optional
 		SCIAMACHY level 2 data version to process
 	file_version: str, optional
@@ -552,13 +552,22 @@ def sddata_xr_set_attrs(
 
 	Parameters
 	----------
-	sdday_xr: xarray.Dataset instance
+	sdday_xr: `xarray.Dataset` instance
+		The combined dataset.
+	file_version: string "major.minor", optional
+		The netcdf file datase version, determines some variable
+		names and attributes.
 	ref_date: str, optional
 		Base date to calculate the relative days from,
-		of the format "%Y-%m-%d". Default: 1950-01-01
+		of the format "%Y-%m-%d". Default: 2000-01-01
 	rename: bool, optional
 		Rename the dataset variables to match the
 		`scia_density_day` exported ones.
+		Default: True
+	species: str, optional
+		The name of the level 2 species, used to prefix the
+		dataset variables to be named <species>_<variable>.
+		Default: "NO".
 	"""
 	if rename:
 		sdday_xr = sdday_xr.rename({
@@ -694,7 +703,7 @@ def main():
 			help="the file containing the input orbits")
 	parser.add_argument("-r", "--retrieval_version", default="v6.2",
 			help="SCIAMACHY level 2 data version to process")
-	parser.add_argument("-R", "--file_version", default="2.3",
+	parser.add_argument("-R", "--file_version", default="2.2",
 			help="Postprocessing format version of the output file")
 	parser.add_argument("-A", "--author", default="unknown",
 			help="Author of the post-processed data set "
