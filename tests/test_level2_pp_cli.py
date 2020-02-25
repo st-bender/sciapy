@@ -21,8 +21,8 @@ import pytest
 from nccmpx import (ncallclose, nccmpattrs, ncequal, ncidentical)
 
 DATADIR = os.path.join(".", "tests", "data")
-IFILE1 = os.path.join(DATADIR, "test_v2.2.nc")
-IFILE2 = os.path.join(DATADIR, "test_v2.2x.nc")
+IFILE1 = os.path.join(DATADIR, "test_v{0}.nc")
+IFILE2 = os.path.join(DATADIR, "test_v{0}x.nc")
 
 
 def test_pp_help():
@@ -36,8 +36,9 @@ def test_pp_help():
 	sys.version_info[:2] == (3, 4),
 	reason="netcdf file attributes don't work with Python 3.4 compatible xarray.",
 )
-@pytest.mark.parametrize("revision", ["2.2"])
+@pytest.mark.parametrize("revision", ["2.1", "2.2"])
 def test_pp_netcdf(revision, tmpdir):
+	ifile = IFILE1.format(revision)
 	ofile = os.path.join(tmpdir, "test_v{0}_t.nc".format(revision))
 	p = Popen([
 		"scia_post_process_l2.py",
@@ -52,16 +53,17 @@ def test_pp_netcdf(revision, tmpdir):
 	p.communicate()
 	p.wait()
 	assert p.returncode == 0
-	ncallclose(IFILE1, ofile)
-	nccmpattrs(IFILE1, ofile, ignore=["creation_time"])
+	ncallclose(ifile, ofile)
+	nccmpattrs(ifile, ofile, ignore=["creation_time"])
 
 
 @pytest.mark.xfail(
 	sys.version_info[:2] == (3, 4),
 	reason="netcdf file attributes don't work with Python 3.4 compatible xarray.",
 )
-@pytest.mark.parametrize("revision", ["2.2"])
+@pytest.mark.parametrize("revision", ["2.1", "2.2"])
 def test_pp_xarray(revision, tmpdir):
+	ifile = IFILE2.format(revision)
 	ofile = os.path.join(tmpdir, "test_v{0}x_t.nc".format(revision))
 	p = Popen([
 		"scia_post_process_l2.py",
@@ -77,5 +79,5 @@ def test_pp_xarray(revision, tmpdir):
 	p.communicate()
 	p.wait()
 	assert p.returncode == 0
-	ncallclose(IFILE2, ofile)
-	nccmpattrs(IFILE2, ofile, ignore=["creation_time"])
+	ncallclose(ifile, ofile)
+	nccmpattrs(ifile, ofile, ignore=["creation_time"])
