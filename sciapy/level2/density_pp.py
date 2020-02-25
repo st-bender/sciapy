@@ -587,6 +587,33 @@ class scia_density_day(object):
 		filename: str
 			The name of the file to write the data to.
 		"""
+		_var_dicts = {
+			"2.1": {
+				"dens_tot": {
+					"name": "TOT_DENS",
+					"long_name": "total number density (NRLMSIS-00)",
+					"model": None,
+				},
+				"temperature": {
+					"name": "temperature",
+					"long_name": "temperature",
+					"model": "NRLMSIS-00",
+				},
+			},
+			"2.2": {
+				"dens_tot": {
+					"name": "MSIS_Dens",
+					"long_name": "MSIS total number density",
+					"model": "NRLMSIS-00",
+				},
+				"temperature": {
+					"name": "MSIS_Temp",
+					"long_name": "MSIS temperature",
+					"model": "NRLMSIS-00",
+				},
+			},
+		}
+
 		ncf = netcdf_file(filename, 'w', **fmtargs)
 		o = np.asarray(self.orbit)
 		d = np.asarray(self.date)
@@ -655,17 +682,20 @@ class scia_density_day(object):
 		fapri = ncf.createVariable('%s_APRIORI' % self.name, 'f8', ('time', 'latitude', 'altitude'))
 		fapri.units = 'cm^{-3}'
 		fapri.long_name = '%s apriori density' % self.name
-		ftemp = ncf.createVariable('MSIS_Temp', 'f8', ('time', 'latitude', 'altitude'))
-		ftemp.units = 'K'
-		ftemp.long_name = 'MSIS temperature'
+		ftemp = ncf.createVariable(_var_dicts[self.version]["temperature"]["name"],
+				'f8', ('time', 'latitude', 'altitude'))
+		ftemp.long_name = _var_dicts[self.version]["temperature"]["long_name"]
 		ftemp.model = 'NRLMSIS-00'
+		ftemp.units = 'K'
+		fdens_tot = ncf.createVariable(_var_dicts[self.version]["dens_tot"]["name"],
+				'f8', ('time', 'latitude', 'altitude'))
+		fdens_tot.long_name = _var_dicts[self.version]["dens_tot"]["long_name"]
+		fdens_tot.units = 'cm^{-3}'
+		if _var_dicts[self.version]["dens_tot"]["model"] is not None:
+			fdens_tot.model = _var_dicts[self.version]["dens_tot"]["model"]
 		fnoem = ncf.createVariable('%s_NOEM' % self.name, 'f8', ('time', 'latitude', 'altitude'))
 		fnoem.units = 'cm^{-3}'
 		fnoem.long_name = 'NOEM %s number density' % self.name
-		fdens_tot = ncf.createVariable('MSIS_Dens', 'f8', ('time', 'latitude', 'altitude'))
-		fdens_tot.units = 'cm^{-3}'
-		fdens_tot.long_name = 'MSIS total number density'
-		fdens_tot.model = 'NRLMSIS-00'
 		fvmr = ncf.createVariable('%s_VMR' % self.name, 'f8', ('time', 'latitude', 'altitude'))
 		fvmr.units = 'ppb'
 		fvmr.long_name = '%s volume mixing ratio' % self.name
