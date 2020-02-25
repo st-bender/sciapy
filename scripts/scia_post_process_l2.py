@@ -544,6 +544,7 @@ def sddata_xr_set_attrs(
 	file_version="2.2",
 	ref_date="2000-01-01",
 	rename=True,
+	species="NO",
 ):
 	"""Customize xarray Dataset variables and attributes
 
@@ -563,24 +564,23 @@ def sddata_xr_set_attrs(
 	if rename:
 		sdday_xr = sdday_xr.rename({
 			# 2d vars
-			"akm_diagonal": "NO_AKDIAG",
-			"apriori": "NO_APRIORI",
-			"density": "NO_DENS",
+			"akm_diagonal": "{0}_AKDIAG".format(species),
+			"apriori": "{0}_APRIORI".format(species),
+			"density": "{0}_DENS".format(species),
 			"density_air": "MSIS_Dens",
-			"error_meas": "NO_ERR",
-			"error_tot": "NO_ETOT",
+			"error_meas": "{0}_ERR".format(species),
+			"error_tot": "{0}_ETOT".format(species),
 			"temperature": "MSIS_Temp",
-			"NOEM_density": "NO_NOEM",
-			"VMR": "NO_VMR",
+			"NOEM_density": "{0}_NOEM".format(species),
+			"VMR": "{0}_VMR".format(species),
 			# 1d vars and dimensions
 			"app_lst": "app_LST",
 			"mean_lst": "mean_LST",
 			"mean_sza": "mean_SZA",
 			"utc_hour": "UTC",
 		})
-	sdday_xr["NO_RSTD"] = 100 * np.abs(sdday_xr.NO_ERR / sdday_xr.NO_DENS)
-	sdday_xr["NO_RSTD"].attrs = dict(units='%',
-		long_name='NO relative standard deviation')
+	sdday_xr["{0}_RSTD".format(species)] = 100.0 * np.abs(
+			sdday_xr["{0}_ERR".format(species)] / sdday_xr["{0}_DENS".format(species)])
 	# fix coordinate attributes
 	sdday_xr["time"].attrs = dict(axis='T', standard_name='time',
 		calendar='standard', long_name='equatorial crossing time',
@@ -594,9 +594,7 @@ def sddata_xr_set_attrs(
 		standard_name='latitude', units='degrees_north')
 	sdday_xr["longitude"].attrs = dict(long_name='longitude',
 		standard_name='longitude', units='degrees_east')
-	# Default attributes
-	species = "NO"
-	# fix variable attributes
+	# Default variable attributes
 	sdday_xr["{0}_DENS".format(species)].attrs = {
 			"units": "cm^{-3}",
 			"long_name": "{0} number density".format(species)}
