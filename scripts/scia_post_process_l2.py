@@ -539,7 +539,12 @@ FLOAT_VARS = [
 ]
 
 
-def sddata_xr_set_attrs(sdday_xr, ref_date="2000-01-01", rename=True, revision="2.2"):
+def sddata_xr_set_attrs(
+	sdday_xr,
+	file_version="2.2",
+	ref_date="2000-01-01",
+	rename=True,
+):
 	"""Customize xarray Dataset variables and attributes
 
 	Changes the variable names to match those exported from the
@@ -654,11 +659,11 @@ def sddata_xr_set_attrs(sdday_xr, ref_date="2000-01-01", rename=True, revision="
 			units='orbit number',  # v2.1, v2.2
 	)
 	# Overwrite version-specific variable attributes
-	for _v, _a in VAR_ATTRS[revision].items():
+	for _v, _a in VAR_ATTRS[file_version].items():
 		sdday_xr[_v].attrs = _a
 	if rename:
 		# version specific renaming
-		sdday_xr = sdday_xr.rename(VAR_RENAME[revision])
+		sdday_xr = sdday_xr.rename(VAR_RENAME[file_version])
 
 	dateo = (pd.to_datetime(
 			xr.conventions.decode_cf_variable("date", sdday_xr.time).data[0])
@@ -758,7 +763,7 @@ def main():
 		sdxr_ds.attrs["author"] = args.author
 		sd_xr = sddata_xr_set_attrs(
 			sdxr_ds, ref_date=args.base_date,
-			rename=True, revision=args.file_version,
+			rename=True, file_version=args.file_version,
 		)
 		sd_xr2 = sdlist.to_xarray()
 		# Overwrite version-specific variable attributes
