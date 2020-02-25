@@ -307,7 +307,6 @@ def process_orbit(
 	sdd.mst = (sdd.utchour + sdd.lons / 15.) % 24.
 	sdd.lst = sdd.mst + eotcorr / 60.
 	mean_alt_km = sdd.alts.mean()
-	mean_alt_m = mean_alt_km * 1000.
 
 	dt_date_this = dt.timedelta(np.asscalar(dts_retr_interp0)) + dtrefdate
 	logging.info("date: %s", dt_date_this)
@@ -579,6 +578,7 @@ def sddata_xr_set_attrs(
 			"mean_sza": "mean_SZA",
 			"utc_hour": "UTC",
 		})
+	# relative standard deviation
 	sdday_xr["{0}_RSTD".format(species)] = 100.0 * np.abs(
 			sdday_xr["{0}_ERR".format(species)] / sdday_xr["{0}_DENS".format(species)])
 	# fix coordinate attributes
@@ -586,14 +586,10 @@ def sddata_xr_set_attrs(
 		calendar='standard', long_name='equatorial crossing time',
 		units="days since {0}".format(
 			pd.to_datetime(ref_date, utc=True).isoformat(sep=" ")))
-	sdday_xr["orbit"].attrs = dict(axis='T', calendar='standard',
-		long_name='SCIAMACHY/Envisat orbit number', units='1')
 	sdday_xr["altitude"].attrs = dict(axis='Z', positive='up',
 		long_name='altitude', standard_name='altitude', units='km')
 	sdday_xr["latitude"].attrs = dict(axis='Y', long_name='latitude',
 		standard_name='latitude', units='degrees_north')
-	sdday_xr["longitude"].attrs = dict(long_name='longitude',
-		standard_name='longitude', units='degrees_east')
 	# Default variable attributes
 	sdday_xr["{0}_DENS".format(species)].attrs = {
 			"units": "cm^{-3}",
