@@ -461,6 +461,7 @@ class scia_density_day(object):
 		self.no_akd = None
 		self.no_apri = None
 		self.no_noem = None
+		self.temperature = None
 		self.tot_dens = None
 		self.no_vmr = None
 		self.lons = None
@@ -520,6 +521,13 @@ class scia_density_day(object):
 		scia_dens: :class:`scia_densities_pp` instance
 			The post-processed orbit data set
 		"""
+		def _vstack_or_new(a, b):
+			# Check if we 'stack' for the first time (a is None),
+			# in that case we assign first.
+			if a is None:
+				return b[None]
+			return np.ma.vstack((a, b[None]))
+
 		self.version = scia_dens.version
 		self.data_version = scia_dens.data_version
 		self.date.append(date)
@@ -529,55 +537,30 @@ class scia_density_day(object):
 		_errs = scia_dens.dens_err_meas
 		_etot = scia_dens.dens_err_tot
 		_r_std = np.abs(_errs / _dens) * 100.0
-		# This is cumbersome and error-prone but check
-		# if we 'append' for the first time.
-		# In that case `vstack` doesn't work so we set
-		# the members first.
-		if self.no_dens is None:
+		if self.alts is None:
 			# we need altitudes and latitudes only once
 			self.alts = scia_dens.alts
 			self.lats = scia_dens.lats
-			self.no_dens = _dens[np.newaxis]
-			self.no_errs = _errs[np.newaxis]
-			self.no_etot = _etot[np.newaxis]
-			self.no_rstd = _r_std[np.newaxis]
-			self.no_akd = scia_dens.akdiag[np.newaxis]
-			self.no_apri = scia_dens.apriori[np.newaxis]
-			self.temperature = scia_dens.temperature[np.newaxis]
-			self.no_noem = scia_dens.noem_no[np.newaxis]
-			self.tot_dens = scia_dens.dens_tot[np.newaxis]
-			self.no_vmr = scia_dens.vmr[np.newaxis]
-			self.lons = scia_dens.lons[np.newaxis]
-			self.lst = scia_dens.lst[np.newaxis]
-			self.mst = scia_dens.mst[np.newaxis]
-			self.sza = scia_dens.sza[np.newaxis]
-			self.utchour = scia_dens.utchour[np.newaxis]
-			self.utcdays = scia_dens.utcdays[np.newaxis]
-			self.gmlats = scia_dens.gmlats[np.newaxis]
-			self.gmlons = scia_dens.gmlons[np.newaxis]
-			self.aacgmgmlats = scia_dens.aacgmgmlats[np.newaxis]
-			self.aacgmgmlons = scia_dens.aacgmgmlons[np.newaxis]
-		else:
-			self.no_dens = np.ma.vstack((self.no_dens, _dens[np.newaxis]))
-			self.no_errs = np.ma.vstack((self.no_errs, _errs[np.newaxis]))
-			self.no_etot = np.ma.vstack((self.no_etot, _etot[np.newaxis]))
-			self.no_rstd = np.ma.vstack((self.no_rstd, _r_std[np.newaxis]))
-			self.no_akd = np.ma.vstack((self.no_akd, scia_dens.akdiag[np.newaxis]))
-			self.no_apri = np.ma.vstack((self.no_apri, scia_dens.apriori[np.newaxis]))
-			self.temperature = np.ma.vstack((self.temperature, scia_dens.temperature[np.newaxis]))
-			self.no_noem = np.ma.vstack((self.no_noem, scia_dens.noem_no[np.newaxis]))
-			self.tot_dens = np.ma.vstack((self.tot_dens, scia_dens.dens_tot[np.newaxis]))
-			self.no_vmr = np.ma.vstack((self.no_vmr, scia_dens.vmr[np.newaxis]))
-			self.lons = np.ma.vstack((self.lons, scia_dens.lons[np.newaxis]))
-			self.lst = np.ma.vstack((self.lst, scia_dens.lst[np.newaxis]))
-			self.mst = np.ma.vstack((self.mst, scia_dens.mst[np.newaxis]))
-			self.sza = np.ma.vstack((self.sza, scia_dens.sza[np.newaxis]))
-			self.utchour = np.ma.vstack((self.utchour, scia_dens.utchour[np.newaxis]))
-			self.utcdays = np.ma.vstack((self.utcdays, scia_dens.utcdays[np.newaxis]))
-			self.gmlats = np.ma.vstack((self.gmlats, scia_dens.gmlats[np.newaxis]))
-			self.gmlons = np.ma.vstack((self.gmlons, scia_dens.gmlons[np.newaxis]))
-			self.aacgmgmlats = np.ma.vstack((self.aacgmgmlats, scia_dens.aacgmgmlats[np.newaxis]))
-			self.aacgmgmlons = np.ma.vstack((self.aacgmgmlons, scia_dens.aacgmgmlons[np.newaxis]))
+		self.no_dens = _vstack_or_new(self.no_dens, _dens)
+		self.no_errs = _vstack_or_new(self.no_errs, _errs)
+		self.no_etot = _vstack_or_new(self.no_etot, _etot)
+		self.no_rstd = _vstack_or_new(self.no_rstd, _r_std)
+		self.no_akd = _vstack_or_new(self.no_akd, scia_dens.akdiag)
+		self.no_apri = _vstack_or_new(self.no_apri, scia_dens.apriori)
+		self.temperature = _vstack_or_new(self.temperature, scia_dens.temperature)
+		self.no_noem = _vstack_or_new(self.no_noem, scia_dens.noem_no)
+		self.tot_dens = _vstack_or_new(self.tot_dens, scia_dens.dens_tot)
+		self.no_vmr = _vstack_or_new(self.no_vmr, scia_dens.vmr)
+		self.lons = _vstack_or_new(self.lons, scia_dens.lons)
+		self.lst = _vstack_or_new(self.lst, scia_dens.lst)
+		self.mst = _vstack_or_new(self.mst, scia_dens.mst)
+		self.sza = _vstack_or_new(self.sza, scia_dens.sza)
+		self.utchour = _vstack_or_new(self.utchour, scia_dens.utchour)
+		self.utcdays = _vstack_or_new(self.utcdays, scia_dens.utcdays)
+		self.gmlats = _vstack_or_new(self.gmlats, scia_dens.gmlats)
+		self.gmlons = _vstack_or_new(self.gmlons, scia_dens.gmlons)
+		self.aacgmgmlats = _vstack_or_new(self.aacgmgmlats, scia_dens.aacgmgmlats)
+		self.aacgmgmlons = _vstack_or_new(self.aacgmgmlons, scia_dens.aacgmgmlons)
 
 	def write_to_netcdf(self, filename):
 		"""Write variables to netcdf files
