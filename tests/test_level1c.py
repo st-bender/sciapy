@@ -28,13 +28,27 @@ def test_limbmodule_method_structure():
 	assert sciapy.level1c.scia_limb.scia_limb_point.from_limb_scan
 	assert sciapy.level1c.scia_limb_point.from_limb_scan
 	assert sciapy.level1c.scia_limb.scia_limb_scan.assemble_textheader
+	assert sciapy.level1c.scia_limb.scia_limb_scan.local_solar_time
 	assert sciapy.level1c.scia_limb.scia_limb_scan.parse_textheader
 	assert sciapy.level1c.scia_limb.scia_limb_scan.read_from_file
-	assert sciapy.level1c.scia_limb.scia_limb_scan.local_solar_time
+	assert sciapy.level1c.scia_limb.scia_limb_scan.read_from_hdf5
+	assert sciapy.level1c.scia_limb.scia_limb_scan.read_from_mpl_binary
+	assert sciapy.level1c.scia_limb.scia_limb_scan.read_from_netcdf
+	assert sciapy.level1c.scia_limb.scia_limb_scan.read_from_textfile
+	assert sciapy.level1c.scia_limb.scia_limb_scan.write_to_mpl_binary
+	assert sciapy.level1c.scia_limb.scia_limb_scan.write_to_netcdf
+	assert sciapy.level1c.scia_limb.scia_limb_scan.write_to_textfile
 	assert sciapy.level1c.scia_limb_scan.assemble_textheader
+	assert sciapy.level1c.scia_limb_scan.local_solar_time
 	assert sciapy.level1c.scia_limb_scan.parse_textheader
 	assert sciapy.level1c.scia_limb_scan.read_from_file
-	assert sciapy.level1c.scia_limb_scan.local_solar_time
+	assert sciapy.level1c.scia_limb_scan.read_from_hdf5
+	assert sciapy.level1c.scia_limb_scan.read_from_mpl_binary
+	assert sciapy.level1c.scia_limb_scan.read_from_netcdf
+	assert sciapy.level1c.scia_limb_scan.read_from_textfile
+	assert sciapy.level1c.scia_limb_scan.write_to_mpl_binary
+	assert sciapy.level1c.scia_limb_scan.write_to_netcdf
+	assert sciapy.level1c.scia_limb_scan.write_to_textfile
 
 
 def test_solarmodule_method_structure():
