@@ -38,8 +38,8 @@ def nccmpattrs(file1, file2, ignore=[]):
 	"""Compare variable attributes and global attributes"""
 	msg = ""
 	same = True
-	with xr.open_dataset(file1) as ds1:
-		ds2 = xr.open_dataset(file2)
+	with xr.open_dataset(file1, decode_cf=False) as ds1:
+		ds2 = xr.open_dataset(file2, decode_cf=False)
 		for v in ds1.variables:
 			same, vmsg = cmpvarattrs(ds1[v], ds2[v])
 			if not same:
@@ -56,20 +56,20 @@ def nccmpattrs(file1, file2, ignore=[]):
 
 
 def ncallclose(file1, file2):
-	with xr.open_dataset(file1) as ds1:
-		ds2 = xr.open_dataset(file2)
+	with xr.open_dataset(file1, decode_cf=False) as ds1:
+		ds2 = xr.open_dataset(file2, decode_cf=False)
 		xr.testing.assert_allclose(ds1, ds2)
 
 
 def ncequal(file1, file2):
-	with xr.open_dataset(file1) as ds1:
-		ds2 = xr.open_dataset(file2)
+	with xr.open_dataset(file1, decode_cf=False) as ds1:
+		ds2 = xr.open_dataset(file2, decode_cf=False)
 		xr.testing.assert_equal(ds1, ds2)
 
 
 def ncidentical(file1, file2, ignore=[]):
-	with xr.open_dataset(file1) as ds1:
-		ds2 = xr.open_dataset(file2)
+	with xr.open_dataset(file1, decode_cf=False) as ds1:
+		ds2 = xr.open_dataset(file2, decode_cf=False)
 		for ign in ignore:
 			del ds1.attrs[ign]
 			del ds2.attrs[ign]
