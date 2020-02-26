@@ -179,6 +179,8 @@ class scia_limb_scan(object):
 		lat_corner3, lon_corner3).
 	orbit_phase : float
 		The orbital phase of the limb scan.
+	wls: (N,) array_like
+		The spectral wavelengths.
 	limb_data : numpy.recarray
 		The limb data containing the following records:
 
@@ -214,8 +216,6 @@ class scia_limb_scan(object):
 			The satellite altitudes (M = nalt).
 		earth_rad: (M,) array_like
 			The earth radii at the tangent ground points (M = nalt).
-		wls: (N,) array_like
-			The spectral wavelengths.
 		rad: (M, N) array_like
 			The radiances at the tangent points, M = nalt, N = len(wls).
 		err: (M, N) array_like
@@ -244,7 +244,6 @@ class scia_limb_scan(object):
 		self.orbit_phase = 0.
 
 		self.limb_data = None
-		self.meta_data = {}
 
 		self.wls = []
 
