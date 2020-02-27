@@ -68,6 +68,16 @@ IFILE = os.path.join(
 	DATADIR, "2010", "20100203",
 	"SCIA_limb_20100203_015238_1_0_41454.dat.l_mpl_binary",
 )
+IFILE_SOLAR = os.path.join(
+	DATADIR, "2010", "20100203",
+	"SCIA_solar_20100203_013027_D0_41454.dat",
+)
+
+
+def _assert_class_equal(l, r):
+	for _k, _l in l.__dict__.items():
+		_r = r.__dict__[_k]
+		assert np.all(_l == _r), (_k, _l, _r)
 
 
 def test_level1c_round_trip_mpl(tmpdir):
@@ -104,3 +114,35 @@ def test_level1c_round_trip_txt(tmpdir):
 	l1c_t.read_from_textfile(oftxt)
 	for _k, _v in l1c_o.__dict__.items():
 		assert np.all(_v == l1c_t.__dict__[_k]), "ascii round trip failed"
+
+
+def test_solar_round_trip_nc(tmpdir):
+	# obase = os.path.join(tmpdir, "test_l1c_sol_t")
+	obase = os.path.join(DATADIR, "test_l1c_sol_t")
+	ofnc = obase + ".nc"
+	l1c_o = sciapy.level1c.scia_solar()
+	l1c_o.read_from_file(IFILE_SOLAR)
+	# test original read
+	np.testing.assert_allclose(l1c_o.wls, [230.0, 250.0])
+	np.testing.assert_allclose(l1c_o.rads, [3.57275e+12, 8.17662e+12])
+	# test round trip
+	l1c_o.write_to_netcdf(ofnc)
+	l1c_t = sciapy.level1c.scia_solar()
+	l1c_t.read_from_netcdf(ofnc)
+	_assert_class_equal(l1c_o, l1c_t)
+
+
+def test_solar_round_trip_txt(tmpdir):
+	# obase = os.path.join(tmpdir, "test_l1c_sol_t")
+	obase = os.path.join(DATADIR, "test_l1c_sol_t")
+	oftxt = obase + ".dat"
+	l1c_o = sciapy.level1c.scia_solar()
+	l1c_o.read_from_file(IFILE_SOLAR)
+	# test original read
+	np.testing.assert_allclose(l1c_o.wls, [230.0, 250.0])
+	np.testing.assert_allclose(l1c_o.rads, [3.57275e+12, 8.17662e+12])
+	# test round trip
+	l1c_o.write_to_textfile(oftxt)
+	l1c_t = sciapy.level1c.scia_solar()
+	l1c_t.read_from_textfile(oftxt)
+	_assert_class_equal(l1c_o, l1c_t)
