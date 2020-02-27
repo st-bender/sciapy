@@ -139,8 +139,7 @@ class scia_solar(object):
 		if nh > 6:
 			self.solar_id = f.readline().rstrip()
 			self.orbit = int(f.readline())
-			#self.time = f.readline().rstrip().split()
-			self.time = datetime.datetime(*map(int, f.readline().split()))
+			self.time = datetime.datetime.strptime(f.readline() + "+0000", "%Y %m %d %H %M %S %z")
 			self.wls, self.rads = np.genfromtxt(filename, skip_header=nh + 5, unpack=True)
 			self.errs = None
 		else:
@@ -254,8 +253,7 @@ class scia_solar(object):
 		ncf.textheader = self.textheader
 		ncf.solar_id = self.solar_id
 		ncf.orbit = self.orbit
-		#ncf.time = self.time.strftime('%Y-%m-%d %H:%M:%S%z (%Z)')
-		ncf.time = self.time.strftime('%Y-%m-%d %H:%M:%S%z')
+		ncf.time = self.time.strftime('%Y-%m-%d %H:%M:%S+0000')
 
 		ncf.createDimension('wavelength', self.npix)
 		wavs = ncf.createVariable('wavelength', np.dtype('float32').char, ('wavelength',))
@@ -295,7 +293,6 @@ class scia_solar(object):
 		if self.textheader_length > 6:
 			print(self.solar_id, file=f)
 			print(self.orbit, file=f)
-			#print(self.time, file=f)
 			print("%4d %2d %2d %2d %2d %2d" % (self.time.year, self.time.month,
 					self.time.day, self.time.hour, self.time.minute, self.time.second),
 				file=f)
