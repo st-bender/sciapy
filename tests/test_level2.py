@@ -113,14 +113,18 @@ def _assert_class_equal(l, r):
 		assert np.all(_l == _r), (_k, _l, _r)
 
 
-def test_level2_round_trip_nc(tmpdir):
+@pytest.mark.parametrize(
+	"dirname, version",
+	[["level2_v1.2.3", "1.2.3"], ["foo", None]],
+)
+def test_level2_round_trip_nc(tmpdir, dirname, version):
 	from sciapy.level2.density import scia_densities
-	odir = os.path.join(tmpdir, "level2_v1.2.3")
+	odir = os.path.join(tmpdir, dirname)
 	if not os.path.exists(odir):
 		os.makedirs(odir)
 	obase = os.path.join(odir, os.path.basename(IFILE))
 	ofnc = obase + ".nc"
-	l2_o = scia_densities(data_ver="1.2.3")
+	l2_o = scia_densities(data_ver=version)
 	l2_o.read_from_file(IFILE)
 	l2_o.write_to_netcdf(ofnc)
 	l2_t = scia_densities()
@@ -128,14 +132,18 @@ def test_level2_round_trip_nc(tmpdir):
 	_assert_class_equal(l2_o, l2_t)
 
 
-def test_level2_round_trip_txt(tmpdir):
+@pytest.mark.parametrize(
+	"dirname, version",
+	[["level2_v1.2.3", "1.2.3"], ["foo", None]],
+)
+def test_level2_round_trip_txt(tmpdir, dirname, version):
 	from sciapy.level2.density import scia_densities
-	odir = os.path.join(tmpdir, "level2_v1.2.3")
+	odir = os.path.join(tmpdir, dirname)
 	if not os.path.exists(odir):
 		os.makedirs(odir)
 	obase = os.path.join(odir, os.path.basename(IFILE))
 	oftxt = obase + ".txt"
-	l2_o = scia_densities(data_ver="1.2.3")
+	l2_o = scia_densities(data_ver=version)
 	l2_o.read_from_file(IFILE)
 	l2_o.write_to_textfile(oftxt)
 	l2_t = scia_densities()
