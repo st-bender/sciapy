@@ -163,7 +163,8 @@ class scia_densities(object):
 	The variables are empty when initialized, use one of the
 	read_from_...() methods to fill with actual data.
 	"""
-	def __init__(self, ref_date="2000-01-01", ver=None, data_ver=None):
+	def __init__(self, author="unknown", ref_date="2000-01-01", ver=None, data_ver=None):
+		self.author = author
 		self.version = ver
 		self.data_version = data_ver
 		self.date0 = dt.datetime.strptime(ref_date, "%Y-%m-%d").replace(tzinfo=_UTC)
@@ -332,7 +333,7 @@ class scia_densities(object):
 			ncf.L2_data_version = self.data_version
 		#ncf.creation_time = dt.datetime.utcnow().replace(tzinfo=_UTC).strftime("%a %b %d %Y %H:%M:%S %z (%Z)")
 		ncf.creation_time = dt.datetime.utcnow().strftime("%a %b %d %Y %H:%M:%S +00:00 (UTC)")
-		ncf.author = "Firstname Lastname"
+		ncf.author = self.author
 
 		# create netcdf file
 		ncf.createDimension('altitude', self.nalt)
@@ -441,6 +442,19 @@ class scia_densities(object):
 		`pupynere.netcdf_file` instance depending on availability.
 		"""
 		ncf = netcdf_file(filename, 'r')
+
+		try:
+			self.author = ncf.author
+		except AttributeError:
+			pass
+		try:
+			self.version = ncf.version
+		except AttributeError:
+			pass
+		try:
+			self.data_version = ncf.L2_data_version
+		except AttributeError:
+			pass
 
 		self.nalt = len(ncf.dimensions['altitude'])
 		self.nlat = len(ncf.dimensions['latitude'])
