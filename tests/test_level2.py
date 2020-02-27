@@ -116,7 +116,8 @@ def _assert_class_equal(l, r):
 def test_level2_round_trip_nc(tmpdir):
 	from sciapy.level2.density import scia_densities
 	odir = os.path.join(tmpdir, "level2_v1.2.3")
-	os.makedirs(odir, exist_ok=True)
+	if not os.path.exists(odir):
+		os.makedirs(odir)
 	obase = os.path.join(odir, os.path.basename(IFILE))
 	ofnc = obase + ".nc"
 	l2_o = scia_densities(data_ver="1.2.3")
@@ -130,7 +131,8 @@ def test_level2_round_trip_nc(tmpdir):
 def test_level2_round_trip_txt(tmpdir):
 	from sciapy.level2.density import scia_densities
 	odir = os.path.join(tmpdir, "level2_v1.2.3")
-	os.makedirs(odir, exist_ok=True)
+	if not os.path.exists(odir):
+		os.makedirs(odir)
 	obase = os.path.join(odir, os.path.basename(IFILE))
 	oftxt = obase + ".txt"
 	l2_o = scia_densities(data_ver="1.2.3")
