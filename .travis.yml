@@ -32,7 +32,8 @@ script:
   - py.test -v --cov sciapy
 after_success:
   - |
-    if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then
+    if [[ $TRAVIS_PYTHON_VERSION == 3.7 || $TRAVIS_PYTHON_VERSION == 2.7 ]]
+    then
       codecov
       coveralls
       ocular --data-file ".coverage"
