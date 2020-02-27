@@ -88,8 +88,7 @@ def test_level1c_round_trip_mpl(tmpdir):
 	l1c_o.write_to_mpl_binary(ofmpl)
 	l1c_t = sciapy.level1c.scia_limb_scan()
 	l1c_t.read_from_mpl_binary(ofmpl)
-	for _k, _v in l1c_o.__dict__.items():
-		assert np.all(_v == l1c_t.__dict__[_k]), "mpl round trip failed"
+	_assert_class_equal(l1c_o, l1c_t)
 
 
 def test_level1c_round_trip_nc(tmpdir):
@@ -100,8 +99,7 @@ def test_level1c_round_trip_nc(tmpdir):
 	l1c_o.write_to_netcdf(ofnc)
 	l1c_t = sciapy.level1c.scia_limb_scan()
 	l1c_t.read_from_netcdf(ofnc)
-	for _k, _v in l1c_o.__dict__.items():
-		assert np.all(_v == l1c_t.__dict__[_k]), "netcdf round trip failed"
+	_assert_class_equal(l1c_o, l1c_t)
 
 
 def test_level1c_round_trip_txt(tmpdir):
@@ -112,8 +110,7 @@ def test_level1c_round_trip_txt(tmpdir):
 	l1c_o.write_to_textfile(oftxt)
 	l1c_t = sciapy.level1c.scia_limb_scan()
 	l1c_t.read_from_textfile(oftxt)
-	for _k, _v in l1c_o.__dict__.items():
-		assert np.all(_v == l1c_t.__dict__[_k]), "ascii round trip failed"
+	_assert_class_equal(l1c_o, l1c_t)
 
 
 def test_solar_round_trip_nc(tmpdir):
