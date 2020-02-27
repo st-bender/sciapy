@@ -12,5 +12,6 @@ SCIAMACHY level 2 number density data (only NO for now).
 """
 
 from . import binning
+from . import density
 
-__all__ = ["binning"]
+__all__ = ["binning", "density"]

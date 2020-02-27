@@ -32,7 +32,7 @@ except ImportError:
 		from pupynere import netcdf_file
 		fmtargs = {"version": 1}
 
-__all__ = ["scia_density", "scia_densities", "_UTC"]
+__all__ = ["scia_densities", "_UTC"]
 
 try:
 	_UTC = dt.timezone.utc
@@ -78,25 +78,6 @@ def _unique_values(vals):
 	ldum = []
 	[ldum.append(i) for i in vals if not ldum.count(i)]
 	return np.asarray(ldum).flatten()
-
-
-class scia_density(object):
-	"""SCIAMACHY single scan retrieved number densities"""
-	def __init__(self):
-		self.gp_id = 0
-		self.alt_min = 0.
-		self.alt = 0.
-		self.alt_max = 0.
-		self.lat_min = 0.
-		self.lat = 0.
-		self.lat_max = 0.
-		self.lon = 0.
-		self.density = 0.
-		self.dens_err_meas = 0.
-		self.dens_err_tot = 0.
-		self.dens_tot = 0.
-		self.akdiag = 0.
-		self.apriori = 0.
 
 
 class scia_densities(object):

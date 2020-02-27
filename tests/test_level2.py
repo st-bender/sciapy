@@ -21,6 +21,8 @@ def test_module_structure():
 	assert sciapy.level2
 	assert sciapy.level2.binning
 	assert sciapy.level2.binning.bin_lat_timeavg
+	assert sciapy.level2.density
+	assert sciapy.level2.density.scia_densities
 
 
 @pytest.fixture(scope="module")
