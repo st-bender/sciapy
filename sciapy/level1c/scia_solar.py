@@ -256,16 +256,18 @@ class scia_solar(object):
 		ncf.time = self.time.strftime('%Y-%m-%d %H:%M:%S+0000')
 
 		ncf.createDimension('wavelength', self.npix)
-		wavs = ncf.createVariable('wavelength', np.dtype('float32').char, ('wavelength',))
+		wavs = ncf.createVariable('wavelength', np.dtype('float64').char, ('wavelength',))
 		wavs.units = 'nm'
 		wavs[:] = self.wls
 
-		rads = ncf.createVariable('radiance', np.dtype('float32').char, ('wavelength',))
-		errs = ncf.createVariable('radiance errors', np.dtype('float32').char, ('wavelength',))
+		rads = ncf.createVariable('radiance', np.dtype('float64').char, ('wavelength',))
 		rads.units = 'ph / s / cm^2 / nm'
-		errs.units = 'ph / s / cm^2 / nm'
 		rads[:] = self.rads
-		errs[:] = self.errs
+
+		if self.errs is not None:
+			errs = ncf.createVariable('radiance errors', np.dtype('float64').char, ('wavelength',))
+			errs.units = 'ph / s / cm^2 / nm'
+			errs[:] = self.errs
 
 		ncf.close()
 
