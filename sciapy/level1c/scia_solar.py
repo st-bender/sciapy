@@ -79,7 +79,7 @@ class scia_solar(object):
 		self.time = None
 		self.wls = np.array([])
 		self.rads = np.array([])
-		self.errs = np.array([])
+		self.errs = None
 
 	def read_from_netcdf(self, filename):
 		"""SCIAMACHY level 1c solar reference netcdf import
@@ -103,7 +103,10 @@ class scia_solar(object):
 		self.npix = len(ncf.dimensions['wavelength'])
 		self.wls = ncf.variables['wavelength'][:].copy()
 		self.rads = ncf.variables['radiance'][:].copy()
-		self.errs = ncf.variables['radiance errors'][:].copy()
+		try:
+			self.errs = ncf.variables['radiance errors'][:].copy()
+		except KeyError:
+			self.errs = None
 		ncf.close()
 
 	def read_from_textfile(self, filename):
@@ -302,6 +305,17 @@ class scia_solar(object):
 			#output.append(self.rads[i])
 			#output.append(self.errs[i])
 			#print('\t'.join(map(str, output)), file=f)
-			print("{0:9.4f}  {1:12.5e}  {2:12.5e}".format(
-					self.wls[i], self.rads[i], self.errs[i]),
-				file=f)
+			if self.errs is not None:
+				print(
+					"{0:9.4f}  {1:12.5e}  {2:12.5e}".format(
+						self.wls[i], self.rads[i], self.errs[i],
+					),
+					file=f,
+				)
+			else:
+				print(
+					"{0:9.4f}  {1:12.5e}".format(
+						self.wls[i], self.rads[i],
+					),
+					file=f,
+				)
