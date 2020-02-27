@@ -10,6 +10,8 @@
 # See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 """SCIAMACHY level 2 tests
 """
+import os
+
 import numpy as np
 import pytest
 import xarray as xr
@@ -96,3 +98,44 @@ def test_binning_nw(ds):
 	np.testing.assert_allclose(dst_nw.longitude.values, lons_avg)
 	assert dst_nw.data.attrs["units"] == "fir mfur μftn$^{-2}$ fth"
 	assert dst_nw.longitude.attrs["units"] == "degrees_east"
+
+
+DATADIR = os.path.join(".", "tests", "data", "l2")
+IFILE = os.path.join(
+	DATADIR,
+	"000NO_orbit_41454_20100203_Dichten.txt",
+)
+
+
+def _assert_class_equal(l, r):
+	for _k, _l in l.__dict__.items():
+		_r = r.__dict__[_k]
+		assert np.all(_l == _r), (_k, _l, _r)
+
+
+def test_level2_round_trip_nc(tmpdir):
+	from sciapy.level2.density import scia_densities
+	odir = os.path.join(tmpdir, "level2_v1.2.3")
+	os.makedirs(odir, exist_ok=True)
+	obase = os.path.join(odir, os.path.basename(IFILE))
+	ofnc = obase + ".nc"
+	l2_o = scia_densities(data_ver="1.2.3")
+	l2_o.read_from_file(IFILE)
+	l2_o.write_to_netcdf(ofnc)
+	l2_t = scia_densities()
+	l2_t.read_from_netcdf(ofnc)
+	_assert_class_equal(l2_o, l2_t)
+
+
+def test_level2_round_trip_txt(tmpdir):
+	from sciapy.level2.density import scia_densities
+	odir = os.path.join(tmpdir, "level2_v1.2.3")
+	os.makedirs(odir, exist_ok=True)
+	obase = os.path.join(odir, os.path.basename(IFILE))
+	oftxt = obase + ".txt"
+	l2_o = scia_densities(data_ver="1.2.3")
+	l2_o.read_from_file(IFILE)
+	l2_o.write_to_textfile(oftxt)
+	l2_t = scia_densities()
+	l2_t.read_from_textfile(oftxt)
+	_assert_class_equal(l2_o, l2_t)
