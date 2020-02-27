@@ -442,8 +442,8 @@ class scia_densities(object):
 		"""
 		ncf = netcdf_file(filename, 'r')
 
-		self.nalt = ncf.dimensions['altitude']
-		self.nlat = ncf.dimensions['latitude']
+		self.nalt = len(ncf.dimensions['altitude'])
+		self.nlat = len(ncf.dimensions['latitude'])
 
 		self.alts_min = ncf.variables['alt_min'][:]
 		self.alts = ncf.variables['altitude'][:]
@@ -452,8 +452,8 @@ class scia_densities(object):
 		self.lats = ncf.variables['latitude'][:]
 		self.lats_max = ncf.variables['lat_max'][:]
 
-		self.date = ncf.variable['time'][:]
-		self.orbit = ncf.variable['orbit'][:]
+		self.date = ncf.variables['time'][:]
+		self.orbit = ncf.variables['orbit'][:]
 
 		self.densities = ncf.variables['density'][:]
 		self.dens_err_meas = ncf.variables['error_meas'][:]
@@ -462,8 +462,8 @@ class scia_densities(object):
 
 		# longitudes if they are available
 		try:
-			self.nlon = ncf.dimensions['longitude']
 			self.lons = ncf.variables['longitude'][:]
+			self.nlon = self.lons.shape[1]
 		except:
 			pass
 
