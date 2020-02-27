@@ -99,7 +99,7 @@ class scia_solar(object):
 		if self.textheader_length > 6:
 			self.solar_id = ncf.solar_id
 			self.orbit = ncf.orbit
-			self.time = datetime.datetime.strptime(ncf.time, '%Y-%m-%d %H:%M:%S%z')
+			self.time = datetime.datetime.strptime(ncf.time, '%Y-%m-%d %H:%M:%S %Z')
 		self.npix = len(ncf.dimensions['wavelength'])
 		self.wls = ncf.variables['wavelength'][:].copy()
 		self.rads = ncf.variables['radiance'][:].copy()
@@ -139,7 +139,10 @@ class scia_solar(object):
 		if nh > 6:
 			self.solar_id = f.readline().rstrip()
 			self.orbit = int(f.readline())
-			self.time = datetime.datetime.strptime(f.readline() + "+0000", "%Y %m %d %H %M %S %z")
+			self.time = datetime.datetime.strptime(
+				f.readline().strip('\n') + " UTC",
+				"%Y %m %d %H %M %S %Z",
+			)
 			self.wls, self.rads = np.genfromtxt(filename, skip_header=nh + 5, unpack=True)
 			self.errs = None
 		else:
@@ -253,7 +256,7 @@ class scia_solar(object):
 		ncf.textheader = self.textheader
 		ncf.solar_id = self.solar_id
 		ncf.orbit = self.orbit
-		ncf.time = self.time.strftime('%Y-%m-%d %H:%M:%S+0000')
+		ncf.time = self.time.strftime('%Y-%m-%d %H:%M:%S UTC')
 
 		ncf.createDimension('wavelength', self.npix)
 		wavs = ncf.createVariable('wavelength', np.dtype('float64').char, ('wavelength',))
