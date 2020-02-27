@@ -25,7 +25,7 @@ def _write_padded_string(fp, s, padding):
 	fp.write(b'\x00' * count)
 
 def _read_single_float(fp):
-	ret = np.fromstring(fp.read(4), dtype=_float_type)[0]
+	ret = np.frombuffer(fp.read(4), dtype=_float_type)[0]
 	return ret
 
 def _write_int_to_binary(fp, a):
@@ -88,17 +88,17 @@ def read_from_mpl_binary(self, filename):
 	self.parse_textheader()
 
 	# global data
-	self.nalt = np.fromstring(f.read(4), dtype=_int_type)[0]
-	self.npix = np.fromstring(f.read(4), dtype=_int_type)[0]
-	self.orbit_state = np.fromstring(f.read(4 * 5), dtype=_int_type)
+	self.nalt = np.frombuffer(f.read(4), dtype=_int_type)[0]
+	self.npix = np.frombuffer(f.read(4), dtype=_int_type)[0]
+	self.orbit_state = np.frombuffer(f.read(4 * 5), dtype=_int_type)
 	(self.orbit, self.state_in_orbit, self.state_id,
 		self.profiles_per_state, self.profile_in_state) = self.orbit_state
-	self.date = np.fromstring(f.read(4 * 6), dtype=_int_type)
-	self.cent_lat_lon = np.fromstring(f.read(4 * 10), dtype=_float_type)
+	self.date = np.frombuffer(f.read(4 * 6), dtype=_int_type)
+	self.cent_lat_lon = np.frombuffer(f.read(4 * 10), dtype=_float_type)
 	if self.textheader_length > 29:
-		self.orbit_phase = np.fromstring(f.read(4), dtype=_float_type)[0]
+		self.orbit_phase = np.frombuffer(f.read(4), dtype=_float_type)[0]
 
-	self.wls = np.fromstring(f.read(4 * self.npix), dtype=_float_type)
+	self.wls = np.frombuffer(f.read(4 * self.npix), dtype=_float_type)
 
 	if self._limb_data_dtype is None:
 		self._limb_data_dtype = _limb_data_dtype[:]
