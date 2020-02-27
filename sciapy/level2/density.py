@@ -17,6 +17,7 @@ files and netcdf files for further processing.
 from __future__ import absolute_import, division, print_function
 
 import os
+import re
 import sys
 import datetime as dt
 
@@ -201,7 +202,12 @@ class scia_densities(object):
 						.replace(tzinfo=_UTC) - self.date0).days
 			if self.data_version is None:
 				# try some heuristics to find the level 2 data version
-				self.data_version = os.path.dirname(filename).split('v')[-1]
+				_dir = os.path.dirname(filename)
+				_m = re.search(".*[_-]v([0-9]+[.].*)", _dir)
+				if _m:
+					self.data_version = _m.group(1)
+				else:
+					self.data_version = "unknown"
 		line = f.readline()
 		data = line.split()
 		mydtype = _meas_dtypes[len(data) - 13]
