@@ -114,8 +114,7 @@ def test_level1c_round_trip_txt(tmpdir):
 
 
 def test_solar_round_trip_nc(tmpdir):
-	# obase = os.path.join(tmpdir, "test_l1c_sol_t")
-	obase = os.path.join(DATADIR, "test_l1c_sol_t")
+	obase = os.path.join(tmpdir, "test_l1c_sol_t")
 	ofnc = obase + ".nc"
 	l1c_o = sciapy.level1c.scia_solar()
 	l1c_o.read_from_file(IFILE_SOLAR)
@@ -130,8 +129,7 @@ def test_solar_round_trip_nc(tmpdir):
 
 
 def test_solar_round_trip_txt(tmpdir):
-	# obase = os.path.join(tmpdir, "test_l1c_sol_t")
-	obase = os.path.join(DATADIR, "test_l1c_sol_t")
+	obase = os.path.join(tmpdir, "test_l1c_sol_t")
 	oftxt = obase + ".dat"
 	l1c_o = sciapy.level1c.scia_solar()
 	l1c_o.read_from_file(IFILE_SOLAR)
