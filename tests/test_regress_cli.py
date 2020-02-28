@@ -14,13 +14,13 @@ Test functions to assure that the command line interface works in
 most of the cases, if not all.
 """
 from os import path
-from pkg_resources import resource_filename
 from pytest import mark
 from subprocess import Popen
 
-data_file = resource_filename("sciapy",
-		path.join("data", "nitric_oxide",
-			"scia_mlt_dzmNO_part_2008-2012_v6.2_2.1_akm0.002_geomag10_nw.nc"))
+DATA_FILE = path.join(
+	".", "tests", "data",
+	"scia_mlt_dzmNO_part_2008-2012_v6.2_2.1_akm0.002_geomag10_nw.nc"
+)
 
 
 def test_main_help():
@@ -33,7 +33,7 @@ def test_main_help():
 @mark.long
 def test_main_lin_mean(tmpdir):
 	p = Popen(["python", "-m", "sciapy.regress",
-			data_file,
+			DATA_FILE,
 			"-o", tmpdir,
 			"-A", "70",
 			"-L", "65",
@@ -56,7 +56,7 @@ def test_main_lin_mean(tmpdir):
 @mark.long
 def test_main_lin_gp(tmpdir):
 	p = Popen(["python", "-m", "sciapy.regress",
-			data_file,
+			DATA_FILE,
 			"-o", tmpdir,
 			"-A", "70",
 			"-L", "65",
@@ -78,7 +78,7 @@ def test_main_lin_gp(tmpdir):
 @mark.long
 def test_main_nonlin_gp(tmpdir):
 	p = Popen(["python", "-m", "sciapy.regress",
-			data_file,
+			DATA_FILE,
 			"-o", tmpdir,
 			"-A", "70",
 			"-L", "65",
