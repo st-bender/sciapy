@@ -92,6 +92,7 @@ def test_main_nonlin_gp(tmpdir):
 			"--cnt_threshold=3",
 			"--akd_threshold=0.01",
 			"-K", "Mat32",
+			"-g",
 			"-O1",
 			"-w", "4",
 			"-b", "10",
