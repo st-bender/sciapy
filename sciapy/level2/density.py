@@ -209,8 +209,7 @@ class scia_densities(object):
 					self.data_version = _m.group(1)
 				else:
 					self.data_version = "unknown"
-		line = f.readline()
-		data = line.split()
+		data = f.readline().split()
 		mydtype = _meas_dtypes[len(data) - 13]
 		marr = np.genfromtxt(f, dtype=mydtype)
 		f.close()
