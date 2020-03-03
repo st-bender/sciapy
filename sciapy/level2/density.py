@@ -512,7 +512,7 @@ class scia_densities(object):
 		try:
 			# try netcdf first
 			self.read_from_netcdf(filename)
-		except OSError:
+		except (IOError, OSError):
 			# fall back to text file as a last resort
 			self.read_from_textfile(filename)
 
