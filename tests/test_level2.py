@@ -153,7 +153,7 @@ def test_level2_round_trip_txt(tmpdir, dirname, version):
 
 @pytest.mark.parametrize(
 	"version",
-	["0.8", "0.9"],
+	["0.1", "0.8", "0.9"],
 )
 def test_oldver_round_trip_txt(tmpdir, version):
 	from sciapy.level2.density import scia_densities
@@ -172,7 +172,7 @@ def test_oldver_round_trip_txt(tmpdir, version):
 
 @pytest.mark.parametrize(
 	"version",
-	["0.8", "0.9"],
+	["0.1", "0.8", "0.9"],
 )
 def test_oldver_round_trip_nc(tmpdir, version):
 	from sciapy.level2.density import scia_densities

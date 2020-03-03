@@ -268,28 +268,34 @@ class scia_densities(object):
 		else:
 			f = open(filename, 'w')
 
-		header = "%5s %13s %12s %13s %13s %12s %13s %13s  %13s %12s %12s %12s" % ("GP_ID",
+		header = "%5s %13s %12s %13s %13s %12s %13s  %13s %12s %12s %12s" % ("GP_ID",
 				"Max_Hoehe[km]", "Hoehe[km]", "Min_Hoehe[km]",
 				"Max_Breite[°]", "Breite[°]", "Min_Breite[°]",
-				"Laenge[°]",
 				"Dichte[cm^-3]", "Fehler Mess[cm^-3]",
 				"Fehler tot[cm^-3]", "Gesamtdichte[cm^-3]")
+		if self.nlon > 0:
+			header = header[:87] + " %13s" % ("Laenge[°]",) + header[87:]
 		if self.apriori is not None:
 			header = header + " %12s" % ("apriori[cm^-3]",)
 		if self.akdiag is not None:
 			header = header + " %12s" % ("AKdiag",)
 		print(header, file=f)
 
-		oformat = "%5i  %+1.5E %+1.5E  %+1.5E  %+1.5E %+1.5E  %+1.5E  %+1.5E   %+1.5E       %+1.5E      %+1.5E        %+1.5E"
+		oformat = "%5i  %+1.5E %+1.5E  %+1.5E  %+1.5E %+1.5E  %+1.5E   %+1.5E       %+1.5E      %+1.5E        %+1.5E"
+		if self.nlon > 0:
+			oformat = oformat[:49] + "  %+1.5E" + oformat[49:]
 		oformata = "  %+1.5E"
 
 		for i, a in enumerate(self.alts):
 			for j, b in enumerate(self.lats):
-				print(oformat % (i * self.nlat + j,
+				line_list = [i * self.nlat + j,
 					self.alts_max[i], a, self.alts_min[i],
-					self.lats_max[j], b, self.lats_min[j], self.lons[j],
+					self.lats_max[j], b, self.lats_min[j],
 					self.densities[j, i], self.dens_err_meas[j, i],
-					self.dens_err_tot[j, i], self.dens_tot[j, i]),
+					self.dens_err_tot[j, i], self.dens_tot[j, i]]
+				if self.nlon > 0:
+					line_list.insert(7, self.lons[j])
+				print(oformat % tuple(line_list),
 					end="", file=f)
 				if self.apriori is not None:
 					print(" " + oformata % self.apriori[j, i], end="", file=f)
