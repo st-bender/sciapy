@@ -486,19 +486,19 @@ class scia_densities(object):
 		try:
 			self.lons = ncf.variables['longitude'][:]
 			self.nlon = self.lons.shape[1]
-		except:
+		except KeyError:
 			pass
 
 		# apriori
 		try:
 			self.apriori = ncf.variables['apriori'][:]
-		except:
+		except KeyError:
 			pass
 
 		# akm diagonal elements
 		try:
 			self.akdiag = ncf.variables['akm_diagonal'][:]
-		except:
+		except KeyError:
 			pass
 
 		if close:
