@@ -75,12 +75,6 @@ _meas_dtypes = [[('gp_id', int),
 		('apriori', float), ('akdiag', float)]]
 
 
-def _unique_values(vals):
-	ldum = []
-	[ldum.append(i) for i in vals if not ldum.count(i)]
-	return np.asarray(ldum).flatten()
-
-
 class scia_densities(object):
 	"""SCIAMACHY orbital retrieved number densities
 
@@ -216,19 +210,19 @@ class scia_densities(object):
 		f.close()
 
 		# unique altitudes
-		self.alts_min = _unique_values(marr['alt_min'])
-		self.alts = _unique_values(marr['alt'])
-		self.alts_max = _unique_values(marr['alt_max'])
+		self.alts_min = np.unique(marr['alt_min'])
+		self.alts = np.unique(marr['alt'])
+		self.alts_max = np.unique(marr['alt_max'])
 
 		# unique latitudes
-		self.lats_min = _unique_values(marr['lat_min'])
-		self.lats = _unique_values(marr['lat'])
-		self.lats_max = _unique_values(marr['lat_max'])
+		self.lats_min = np.unique(marr['lat_min'])
+		self.lats = np.unique(marr['lat'])
+		self.lats_max = np.unique(marr['lat_max'])
 
 		# unique longitudes if available
 		try:
-			self.lons = _unique_values(marr['longitude'])
-		except:
+			self.lons = np.unique(marr['longitude'])
+		except ValueError:
 			pass
 
 		self.nalt = len(self.alts)
