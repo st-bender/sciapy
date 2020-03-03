@@ -149,3 +149,41 @@ def test_level2_round_trip_txt(tmpdir, dirname, version):
 	l2_t = scia_densities()
 	l2_t.read_from_textfile(oftxt)
 	_assert_class_equal(l2_o, l2_t)
+
+
+@pytest.mark.parametrize(
+	"version",
+	["0.8", "0.9"],
+)
+def test_oldver_round_trip_txt(tmpdir, version):
+	from sciapy.level2.density import scia_densities
+	odir = os.path.join(tmpdir, "level2_v{0}".format(version))
+	if not os.path.exists(odir):
+		os.makedirs(odir)
+	obase = os.path.join(odir, os.path.basename(IFILE))
+	oftxt = obase + ".txt"
+	l2_o = scia_densities(data_ver=version)
+	l2_o.read_from_file(IFILE[:-4] + "_v{0}.txt".format(version))
+	l2_o.write_to_textfile(oftxt)
+	l2_t = scia_densities()
+	l2_t.read_from_textfile(oftxt)
+	_assert_class_equal(l2_o, l2_t)
+
+
+@pytest.mark.parametrize(
+	"version",
+	["0.8", "0.9"],
+)
+def test_oldver_round_trip_nc(tmpdir, version):
+	from sciapy.level2.density import scia_densities
+	odir = os.path.join(tmpdir, "level2_v{0}".format(version))
+	if not os.path.exists(odir):
+		os.makedirs(odir)
+	obase = os.path.join(odir, os.path.basename(IFILE))
+	ofnc = obase + ".nc"
+	l2_o = scia_densities(data_ver=version)
+	l2_o.read_from_file(IFILE[:-4] + "_v{0}.txt".format(version))
+	l2_o.write_to_netcdf(ofnc)
+	l2_t = scia_densities()
+	l2_t.read_from_netcdf(ofnc)
+	_assert_class_equal(l2_o, l2_t)
