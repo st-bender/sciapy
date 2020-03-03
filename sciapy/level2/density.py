@@ -192,6 +192,9 @@ class scia_densities(object):
 			The filename or stream to read the data from. For example
 			to read from stdin in python 3, pass `sys.stdin.buffer`.
 		"""
+		def _unsrt_unique(a):
+			return a[np.sort(np.unique(a, return_index=True)[1])]
+
 		if hasattr(filename, 'seek'):
 			f = filename
 		else:
@@ -215,18 +218,18 @@ class scia_densities(object):
 		f.close()
 
 		# unique altitudes
-		self.alts_min = np.unique(marr['alt_min'])
-		self.alts = np.unique(marr['alt'])
-		self.alts_max = np.unique(marr['alt_max'])
+		self.alts_min = _unsrt_unique(marr['alt_min'])
+		self.alts = _unsrt_unique(marr['alt'])
+		self.alts_max = _unsrt_unique(marr['alt_max'])
 
 		# unique latitudes
-		self.lats_min = np.unique(marr['lat_min'])
-		self.lats = np.unique(marr['lat'])
-		self.lats_max = np.unique(marr['lat_max'])
+		self.lats_min = _unsrt_unique(marr['lat_min'])
+		self.lats = _unsrt_unique(marr['lat'])
+		self.lats_max = _unsrt_unique(marr['lat_max'])
 
 		# unique longitudes if available
 		try:
-			self.lons = np.unique(marr['longitude'])
+			self.lons = _unsrt_unique(marr['longitude'])
 		except ValueError:
 			pass
 
