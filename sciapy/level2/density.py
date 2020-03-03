@@ -48,17 +48,21 @@ except AttributeError:
 			return dt.timedelta(0)
 	_UTC = UTC()
 
-_meas_dtypes = [[('gp_id', int),
+_meas_dtypes = [
+	# initial output << v1.0
+	[('gp_id', int),
 		('alt_max', float), ('alt', float), ('alt_min', float),
 		('lat_max', float), ('lat', float), ('lat_min', float),
 		('density', float), ('dens_err_meas', float),
 		('dens_err_tot', float), ('dens_tot', float)],
+	# < 1.0 (NO_emiss-178-g729efb0)
 	[('gp_id', int),
 		('alt_max', float), ('alt', float), ('alt_min', float),
 		('lat_max', float), ('lat', float), ('lat_min', float),
 		('longitude', float),
 		('density', float), ('dens_err_meas', float),
 		('dens_err_tot', float), ('dens_tot', float)],
+	# < 1.5 (NO_emiss-183-gcaa9349)
 	[('gp_id', int),
 		('alt_max', float), ('alt', float), ('alt_min', float),
 		('lat_max', float), ('lat', float), ('lat_min', float),
@@ -66,13 +70,15 @@ _meas_dtypes = [[('gp_id', int),
 		('density', float), ('dens_err_meas', float),
 		('dens_err_tot', float), ('dens_tot', float),
 		('apriori', float)],
+	# >= 1.5 (NO-v1.5)
 	[('gp_id', int),
 		('alt_max', float), ('alt', float), ('alt_min', float),
 		('lat_max', float), ('lat', float), ('lat_min', float),
 		('longitude', float),
 		('density', float), ('dens_err_meas', float),
 		('dens_err_tot', float), ('dens_tot', float),
-		('apriori', float), ('akdiag', float)]]
+		('apriori', float), ('akdiag', float)],
+]
 
 
 class scia_densities(object):
