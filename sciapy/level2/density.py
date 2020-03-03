@@ -230,12 +230,12 @@ class scia_densities(object):
 		# unique longitudes if available
 		try:
 			self.lons = _unsrt_unique(marr['longitude'])
+			self.nlon = len(self.lons)
 		except ValueError:
 			pass
 
 		self.nalt = len(self.alts)
 		self.nlat = len(self.lats)
-		self.nlon = len(self.lons)
 
 		# reorder by latitude first, then altitude
 		self.densities = marr['density'].flatten().reshape(self.nalt, self.nlat).transpose()
