@@ -243,12 +243,12 @@ class scia_densities(object):
 		# apriori if available
 		try:
 			self.apriori = marr['apriori'].flatten().reshape(self.nalt, self.nlat).transpose()
-		except:
+		except ValueError:
 			pass
 		# akdiag if available
 		try:
 			self.akdiag = marr['akdiag'].flatten().reshape(self.nalt, self.nlat).transpose()
-		except:
+		except ValueError:
 			pass
 
 	def write_to_textfile(self, filename):
@@ -512,7 +512,7 @@ class scia_densities(object):
 		try:
 			# try netcdf first
 			self.read_from_netcdf(filename)
-		except:
+		except OSError:
 			# fall back to text file as a last resort
 			self.read_from_textfile(filename)
 
