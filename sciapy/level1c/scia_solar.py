@@ -100,9 +100,9 @@ class scia_solar(object):
 			self.solar_id = ncf.solar_id
 			self.orbit = ncf.orbit
 			self.time = datetime.datetime.strptime(ncf.time, '%Y-%m-%d %H:%M:%S %Z')
-		self.npix = len(ncf.dimensions['wavelength'])
 		self.wls = ncf.variables['wavelength'][:].copy()
 		self.rads = ncf.variables['radiance'][:].copy()
+		self.npix = self.wls.size
 		try:
 			self.errs = ncf.variables['radiance errors'][:].copy()
 		except KeyError:

@@ -59,32 +59,32 @@ def read_from_netcdf(self, filename):
 		self.nalt = ncf.dimensions['limb']
 		self.npix = ncf.dimensions['wavelength']
 
-	self.wls = ncf.variables['wavelength'][:]
+	self.wls = ncf.variables['wavelength'][:].copy()
 
 	# pre-set the limb_data
 	if self._limb_data_dtype is None:
 		self._limb_data_dtype = _limb_data_dtype[:]
 	self.limb_data = np.zeros((self.nalt), dtype=self._limb_data_dtype)
 
-	self.limb_data["sub_sat_lat"] = ncf.variables['sub_sat_lat'][:]
-	self.limb_data["sub_sat_lon"] = ncf.variables['sub_sat_lon'][:]
-	self.limb_data["tp_lat"] = ncf.variables['TP latitude'][:]
-	self.limb_data["tp_lon"] = ncf.variables['TP longitude'][:]
-	self.limb_data["tp_alt"] = ncf.variables['TP altitude'][:]
-	self.limb_data["tp_sza"] = ncf.variables['TP SZA'][:]
-	self.limb_data["tp_saa"] = ncf.variables['TP SAA'][:]
-	self.limb_data["tp_los"] = ncf.variables['TP LOS Zenith'][:]
-	self.limb_data["toa_sza"] = ncf.variables['TOA SZA'][:]
-	self.limb_data["toa_saa"] = ncf.variables['TOA SAA'][:]
-	self.limb_data["toa_los"] = ncf.variables['TOA LOS Zenith'][:]
-	self.limb_data["sat_sza"] = ncf.variables['SAT SZA'][:]
-	self.limb_data["sat_saa"] = ncf.variables['SAT SAA'][:]
-	self.limb_data["sat_los"] = ncf.variables['SAT LOS Zenith'][:]
-	self.limb_data["sat_alt"] = ncf.variables['SAT altitude'][:]
-	self.limb_data["earth_rad"] = ncf.variables['earthradius'][:]
+	self.limb_data["sub_sat_lat"] = ncf.variables['sub_sat_lat'][:].copy()
+	self.limb_data["sub_sat_lon"] = ncf.variables['sub_sat_lon'][:].copy()
+	self.limb_data["tp_lat"] = ncf.variables['TP latitude'][:].copy()
+	self.limb_data["tp_lon"] = ncf.variables['TP longitude'][:].copy()
+	self.limb_data["tp_alt"] = ncf.variables['TP altitude'][:].copy()
+	self.limb_data["tp_sza"] = ncf.variables['TP SZA'][:].copy()
+	self.limb_data["tp_saa"] = ncf.variables['TP SAA'][:].copy()
+	self.limb_data["tp_los"] = ncf.variables['TP LOS Zenith'][:].copy()
+	self.limb_data["toa_sza"] = ncf.variables['TOA SZA'][:].copy()
+	self.limb_data["toa_saa"] = ncf.variables['TOA SAA'][:].copy()
+	self.limb_data["toa_los"] = ncf.variables['TOA LOS Zenith'][:].copy()
+	self.limb_data["sat_sza"] = ncf.variables['SAT SZA'][:].copy()
+	self.limb_data["sat_saa"] = ncf.variables['SAT SAA'][:].copy()
+	self.limb_data["sat_los"] = ncf.variables['SAT LOS Zenith'][:].copy()
+	self.limb_data["sat_alt"] = ncf.variables['SAT altitude'][:].copy()
+	self.limb_data["earth_rad"] = ncf.variables['earthradius'][:].copy()
 
-	tmp_rad_arr = list(ncf.variables['radiance'][:])
-	tmp_err_arr = list(ncf.variables['radiance errors'][:])
+	tmp_rad_arr = list(ncf.variables['radiance'][:].copy())
+	tmp_err_arr = list(ncf.variables['radiance errors'][:].copy())
 
 	# save to limb_data recarray
 	rads = np.rec.fromarrays([tmp_rad_arr],
@@ -95,7 +95,13 @@ def read_from_netcdf(self, filename):
 			usemask=False, asrecarray=True, flatten=True)
 	self._limb_data_dtype = self.limb_data.dtype
 
-	for _k in ncf.ncattrs():
+	if hasattr(ncf, "_attributes"):
+		# scipy.io.netcdf / pupynere
+		ncattrs = ncf._attributes.keys()
+	else:
+		# netcdf4
+		ncattrs = ncf.ncattrs()
+	for _k in ncattrs:
 		if _k.startswith("metadata"):
 			_meta_key = _k.split("::")[1]
 			self.metadata[_meta_key] = getattr(ncf, _k)
@@ -179,10 +185,16 @@ def write_to_netcdf(self, filename):
 	eradii_alts.units = 'km'
 	eradii_alts[:] = np.asarray(self.limb_data["earth_rad"])
 
-	rads = ncf.createVariable('radiance', np.dtype('float32').char,
-			('limb', 'wavelength'), zlib=True, complevel=1)
-	errs = ncf.createVariable('radiance errors', np.dtype('float32').char,
-			('limb', 'wavelength'), zlib=True, complevel=1)
+	try:
+		rads = ncf.createVariable('radiance', np.dtype('float32').char,
+				('limb', 'wavelength'), zlib=True, complevel=1)
+		errs = ncf.createVariable('radiance errors', np.dtype('float32').char,
+				('limb', 'wavelength'), zlib=True, complevel=1)
+	except TypeError:
+		rads = ncf.createVariable('radiance', np.dtype('float32').char,
+				('limb', 'wavelength'))
+		errs = ncf.createVariable('radiance errors', np.dtype('float32').char,
+				('limb', 'wavelength'))
 	rads.units = 'ph / s / cm^2 / nm'
 	errs.units = 'ph / s / cm^2 / nm'
 	rads[:] = np.asarray(self.limb_data["rad"]).reshape(self.nalt, self.npix)
