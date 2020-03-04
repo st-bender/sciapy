@@ -344,12 +344,12 @@ class scia_densities(object):
 		ncf.author = self.author
 
 		# create netcdf file
+		ncf.createDimension('time', None)
 		ncf.createDimension('altitude', self.nalt)
 		ncf.createDimension('latitude', self.nlat)
-		ncf.createDimension('time', None)
 
-		forbit = ncf.createVariable('orbit', np.dtype('int64').char, ('time',))
-		ftime = ncf.createVariable('time', np.dtype('int64').char, ('time',))
+		forbit = ncf.createVariable('orbit', np.dtype('int32').char, ('time',))
+		ftime = ncf.createVariable('time', np.dtype('int32').char, ('time',))
 
 		falts_min = ncf.createVariable('alt_min', np.dtype('float64').char, ('altitude',))
 		falts = ncf.createVariable('altitude', np.dtype('float64').char, ('altitude',))
@@ -386,8 +386,8 @@ class scia_densities(object):
 		fdens_tot.units = 'cm^{-3}'
 		fdens_tot.long_name = 'approximate overall number concentration of air molecules (NRLMSIS-00)'
 
-		ftime[:] = self.date
-		forbit[:] = self.orbit
+		ftime[:] = [self.date]
+		forbit[:] = [self.orbit]
 
 		falts_min[:] = alts_min_out
 		falts[:] = alts_out
@@ -464,40 +464,40 @@ class scia_densities(object):
 		except AttributeError:
 			pass
 
-		self.nalt = len(ncf.dimensions['altitude'])
-		self.nlat = len(ncf.dimensions['latitude'])
+		self.alts_min = ncf.variables['alt_min'][:].copy()
+		self.alts = ncf.variables['altitude'][:].copy()
+		self.alts_max = ncf.variables['alt_max'][:].copy()
+		self.lats_min = ncf.variables['lat_min'][:].copy()
+		self.lats = ncf.variables['latitude'][:].copy()
+		self.lats_max = ncf.variables['lat_max'][:].copy()
 
-		self.alts_min = ncf.variables['alt_min'][:]
-		self.alts = ncf.variables['altitude'][:]
-		self.alts_max = ncf.variables['alt_max'][:]
-		self.lats_min = ncf.variables['lat_min'][:]
-		self.lats = ncf.variables['latitude'][:]
-		self.lats_max = ncf.variables['lat_max'][:]
+		self.nalt = len(self.alts)
+		self.nlat = len(self.lats)
 
-		self.date = ncf.variables['time'][:]
-		self.orbit = ncf.variables['orbit'][:]
+		self.date = ncf.variables['time'][:].copy()
+		self.orbit = ncf.variables['orbit'][:].copy()
 
-		self.densities = ncf.variables['density'][:]
-		self.dens_err_meas = ncf.variables['error_meas'][:]
-		self.dens_err_tot = ncf.variables['error_tot'][:]
-		self.dens_tot = ncf.variables['density_air'][:]
+		self.densities = ncf.variables['density'][:].copy()
+		self.dens_err_meas = ncf.variables['error_meas'][:].copy()
+		self.dens_err_tot = ncf.variables['error_tot'][:].copy()
+		self.dens_tot = ncf.variables['density_air'][:].copy()
 
 		# longitudes if they are available
 		try:
-			self.lons = ncf.variables['longitude'][:]
+			self.lons = ncf.variables['longitude'][:].copy()
 			self.nlon = self.lons.shape[1]
 		except KeyError:
 			pass
 
 		# apriori
 		try:
-			self.apriori = ncf.variables['apriori'][:]
+			self.apriori = ncf.variables['apriori'][:].copy()
 		except KeyError:
 			pass
 
 		# akm diagonal elements
 		try:
-			self.akdiag = ncf.variables['akm_diagonal'][:]
+			self.akdiag = ncf.variables['akm_diagonal'][:].copy()
 		except KeyError:
 			pass
 
@@ -521,7 +521,7 @@ class scia_densities(object):
 		try:
 			# try netcdf first
 			self.read_from_netcdf(filename)
-		except (IOError, OSError):
+		except (IOError, OSError, TypeError):
 			# fall back to text file as a last resort
 			self.read_from_textfile(filename)
 
