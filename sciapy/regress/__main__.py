@@ -82,7 +82,10 @@ def save_samples_netcdf(filename, model, alt, lat, samples,
 	if compressed:
 		_encoding = {var: {"zlib": True, "complevel": 1}
 					for var in smpl_ds.data_vars}
-	smpl_ds.to_netcdf(filename, encoding=_encoding)
+	try:
+		smpl_ds.to_netcdf(filename, encoding=_encoding)
+	except ValueError:
+		smpl_ds.to_netcdf(filename)
 	smpl_ds.close()
 
 
