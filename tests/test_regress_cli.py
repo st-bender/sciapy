@@ -16,10 +16,15 @@ most of the cases, if not all.
 from os import path
 from pytest import mark
 from subprocess import Popen
+try:
+	import netCDF4
+	NC_EXT = ".nc"
+except ImportError:
+	NC_EXT = ".nc3"
 
 DATA_FILE = path.join(
 	".", "tests", "data",
-	"scia_mlt_dzmNO_part_2008-2012_v6.2_2.1_akm0.002_geomag10_nw.nc"
+	"scia_mlt_dzmNO_part_2008-2012_v6.2_2.1_akm0.002_geomag10_nw" + NC_EXT
 )
 
 

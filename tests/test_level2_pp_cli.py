@@ -19,10 +19,15 @@ from subprocess import Popen
 
 import pytest
 from nccmpx import (ncallclose, nccmpattrs, ncequal, ncidentical)
+try:
+	import netCDF4
+	NC_EXT = ".nc"
+except ImportError:
+	NC_EXT = ".nc3"
 
 DATADIR = os.path.join(".", "tests", "data")
-IFILE1 = os.path.join(DATADIR, "test_v{0}.nc")
-IFILE2 = os.path.join(DATADIR, "test_v{0}x.nc")
+IFILE1 = os.path.join(DATADIR, "test_v{0}" + NC_EXT)
+IFILE2 = os.path.join(DATADIR, "test_v{0}x" + NC_EXT)
 
 
 def test_pp_help():

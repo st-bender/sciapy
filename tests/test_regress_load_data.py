@@ -16,10 +16,15 @@ from pkg_resources import resource_filename
 from astropy.time import Time
 import numpy as np
 from pytest import mark, raises
+try:
+	import netCDF4
+	NC_EXT = ".nc"
+except ImportError:
+	NC_EXT = ".nc3"
 
 import sciapy.regress
 
-DZM_FILE = resource_filename(__name__, "sciaNO_20100203_v6.2.1_geogra30.nc")
+DZM_FILE = resource_filename(__name__, "sciaNO_20100203_v6.2.1_geogra30" + NC_EXT)
 
 AEdata = [
 		("2000-01-01", "jyear", 1999.9986311, 507.208333),
