@@ -449,18 +449,22 @@ class scia_densities(object):
 		`scipy.io.netcdf.netcdf_file` or
 		`pupynere.netcdf_file` instance depending on availability.
 		"""
+		def _try_decode(s):
+			if hasattr(s, "decode"):
+				return s.decode()
+			return s
 		ncf = netcdf_file(filename, 'r')
 
 		try:
-			self.author = ncf.author
+			self.author = _try_decode(ncf.author)
 		except AttributeError:
 			pass
 		try:
-			self.version = ncf.version
+			self.version = _try_decode(ncf.version)
 		except AttributeError:
 			pass
 		try:
-			self.data_version = ncf.L2_data_version
+			self.data_version = _try_decode(ncf.L2_data_version)
 		except AttributeError:
 			pass
 
