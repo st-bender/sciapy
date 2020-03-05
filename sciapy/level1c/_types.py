@@ -22,3 +22,9 @@ _limb_data_dtype = [
 	("sat_alt", _float_type),
 	("earth_rad", _float_type),
 ]
+
+
+def _try_decode(s):
+	if hasattr(s, "decode"):
+		return s.decode()
+	return s

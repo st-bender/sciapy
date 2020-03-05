@@ -25,7 +25,7 @@ except ImportError:
 		from pupynere import netcdf_file
 		_fmtargs = {"version": 1}
 
-from ._types import _limb_data_dtype
+from ._types import _limb_data_dtype, _try_decode
 
 def read_from_netcdf(self, filename):
 	"""SCIAMACHY level 1c limb scan netcdf import
@@ -40,10 +40,11 @@ def read_from_netcdf(self, filename):
 	nothing
 	"""
 	import numpy.lib.recfunctions as rfn
+
 	ncf = netcdf_file(filename, 'r')
 
 	self.textheader_length = ncf.textheader_length
-	self.textheader = ncf.textheader
+	self.textheader = _try_decode(ncf.textheader)
 
 	self.orbit_state = ncf.orbit_state
 	(self.orbit, self.state_in_orbit, self.state_id,
@@ -104,7 +105,8 @@ def read_from_netcdf(self, filename):
 	for _k in ncattrs:
 		if _k.startswith("metadata"):
 			_meta_key = _k.split("::")[1]
-			self.metadata[_meta_key] = getattr(ncf, _k)
+			_att = getattr(ncf, _k)
+			self.metadata[_meta_key] = _try_decode(_att)
 	ncf.close()
 
 def write_to_netcdf(self, filename):

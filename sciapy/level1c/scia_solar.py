@@ -35,6 +35,8 @@ except ImportError:
 		from pupynere import netcdf_file
 		_fmtargs = {"version": 1}
 
+from ._types import _try_decode
+
 logging.basicConfig(level=logging.INFO,
 		format="[%(levelname)-8s] (%(asctime)s) "
 		"%(filename)s:%(lineno)d %(message)s",
@@ -95,11 +97,12 @@ class scia_solar(object):
 		"""
 		ncf = netcdf_file(filename, 'r')
 		self.textheader_length = ncf.textheader_length
-		self.textheader = ncf.textheader
+		self.textheader = _try_decode(ncf.textheader)
 		if self.textheader_length > 6:
-			self.solar_id = ncf.solar_id
+			self.solar_id = _try_decode(ncf.solar_id)
 			self.orbit = ncf.orbit
-			self.time = datetime.datetime.strptime(ncf.time, '%Y-%m-%d %H:%M:%S %Z')
+			_time = _try_decode(ncf.time)
+			self.time = datetime.datetime.strptime(_time, '%Y-%m-%d %H:%M:%S %Z')
 		self.wls = ncf.variables['wavelength'][:].copy()
 		self.rads = ncf.variables['radiance'][:].copy()
 		self.npix = self.wls.size
