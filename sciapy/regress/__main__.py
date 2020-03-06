@@ -403,14 +403,26 @@ def main():
 			logging.debug("optimization result: %s", resop_bh)
 			resop_gp = resop_bh.lowest_optimization_result
 		elif args.optimize == 4:
-			resop_gp, cov_gp = op.curve_fit(
+			resop, cov_gp = op.curve_fit(
 				gpmodel_mean,
 				no_ys_train, no_dens_train, gpmodel.get_parameter_vector(),
 				bounds=tuple(np.array(bounds).T),
 				# method='lm',
 				# absolute_sigma=True,
 				sigma=no_errs_train)
-			print(resop_gp, np.sqrt(np.diag(cov_gp)))
+			resop_gp = op.OptimizeResult(dict(
+				x=resop,
+				success=True,
+				message="Curve fit successful.",
+			))
+			logging.debug("curve fit %s, std %s:", resop, np.sqrt(np.diag(cov_gp)))
+		else:
+			logging.warn("unsupported optimization method: %s", args.optimize)
+			resop_gp = op.OptimizeResult(dict(
+				x=gpmodel.get_parameter_vector(),
+				success=False,
+				message="unsupported optimization method: {0}".format(args.optimize),
+			))
 		logging.info("%s", resop_gp.message)
 		logging.debug("optimization result: %s", resop_gp)
 		logging.info("gpmodel dict: %s", gpmodel.get_parameter_dict())
