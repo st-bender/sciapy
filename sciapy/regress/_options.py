@@ -191,11 +191,13 @@ parser.add_argument("--scheduler_file", metavar="file",
 		default=None,
 		help="Connect to dask scheduler at using the scheduler file "
 		"(default: %(default)s)")
-parser.add_argument("-O", "--optimize", metavar="m", type=int, default="1",
-		help="Optimize the parameters before MCMC run with method no. m: "
+parser.add_argument("-O", "--optimize", type=int, default="1",
+		choices=range(5),
+		help="Optimize the parameters before MCMC run with method no.: "
 		"0: no optimization, 1: Powell, "
 		"2: differential evolution with latin hypercube initialization, "
-		"3: basin hopping "
+		"3: basin hopping (experimental), and "
+		"4: least squares curve fitting (experimental) "
 		"(default: %(default)s)")
 parser.add_argument("-N", "--openblas_threads", metavar="N",
 		type=int, default=1,
