@@ -59,7 +59,8 @@ def test_main_lin_mean(tmpdir):
 
 
 @mark.long
-def test_main_lin_gp(tmpdir):
+@mark.parametrize("optimize", range(5))
+def test_main_lin_gp(tmpdir, optimize):
 	p = Popen(["python", "-m", "sciapy.regress",
 			DATA_FILE,
 			"-o", tmpdir,
@@ -67,10 +68,10 @@ def test_main_lin_gp(tmpdir):
 			"-L", "65",
 			"-k",
 			"-K", "Mat32",
-			"-O1",
+			"-O", str(optimize),
 			"-w", "4",
-			"-b", "10",
-			"-p", "20",
+			"-b", "5",
+			"-p", "10",
 			"--no-plot_samples",
 			"--random_seed=1234",
 			"-q",
