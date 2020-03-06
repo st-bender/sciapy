@@ -380,13 +380,13 @@ def main():
 				# method="tnc", options=dict(disp=True, maxiter=500, xtol=1e-12))
 				# method="nelder-mead", options=dict(disp=True, maxfev=100000, fatol=1.49012e-8, xatol=1.49012e-8))
 				# method="Powell", options=dict(ftol=1.49012e-08, xtol=1.49012e-08))
-		if args.optimize == 2:
+		elif args.optimize == 2:
 			resop_gp = op.differential_evolution(
 				nlpost,
 				bounds=bounds,
 				args=(no_dens_train, gpmodel),
 				popsize=2 * args.walkers, tol=0.01)
-		if args.optimize == 3:
+		elif args.optimize == 3:
 			resop_bh = op.basinhopping(
 				nlpost,
 				gpmodel.get_parameter_vector(),
@@ -402,7 +402,7 @@ def main():
 					# method="Powell", options=dict(ftol=1.49012e-08, xtol=1.49012e-08)))
 			logging.debug("optimization result: %s", resop_bh)
 			resop_gp = resop_bh.lowest_optimization_result
-		if args.optimize == 4:
+		elif args.optimize == 4:
 			resop_gp, cov_gp = op.curve_fit(
 				gpmodel_mean,
 				no_ys_train, no_dens_train, gpmodel.get_parameter_vector(),
