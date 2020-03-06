@@ -55,18 +55,18 @@ celerite_terms = {
 						# The `celerite` version of the Matern-3/2
 						# kernel has problems with very large `log_rho`
 						# values. -7.4 is empirical.
-						"log_rho": [-7.4, 30]}),
+						"log_rho": [-7.4, 16]}),
 	"SHO0": terms.SHOTerm(log_S0=-6, log_Q=1.0 / np.sqrt(2.), log_omega0=0.,
 				bounds={"log_S0": [-30, 30],
 						"log_Q": [-30, 30],
 						"log_omega0": [-30, 30]}),
-	"SHO1": terms.SHOTerm(log_S0=-6, log_Q=1.0 / 2., log_omega0=0.,
+	"SHO1": terms.SHOTerm(log_S0=-6, log_Q=-2., log_omega0=0.,
 				bounds={"log_S0": [-10, 10],
 						"log_omega0": [-10, 10]}),
-	"SHO2": terms.SHOTerm(log_S0=-6, log_Q=-2.24, log_omega0=-0.6,
-				bounds={"log_S0": [-30, 30],
-						"log_Q": [-30, 30],
-						"log_omega0": [-30, 30]}),
+	"SHO2": terms.SHOTerm(log_S0=-6, log_Q=0.5, log_omega0=0.,
+				bounds={"log_S0": [-10, 10],
+						"log_Q": [-10, 10],
+						"log_omega0": [-10, 10]}),
 	# see Foreman-Mackey et al. 2017, AJ 154, 6, pp. 220
 	# doi: 10.3847/1538-3881/aa9332
 	# Eq. (53)
