@@ -11,7 +11,7 @@
 """SCIAMACHY regression models (celerite version)
 
 Model classes for SCIAMACHY data regression fits using the
-:mod:`celerite` [#]_ modeling protocol.
+:mod:`celerite` [#]_ modelling protocol.
 
 .. [#] https://celerite.readthedocs.io
 """
@@ -467,7 +467,7 @@ def trace_gas_model(constant=True, freqs=None, proxy_config=None, **kwargs):
 
 	Returns
 	-------
-	model : :class:`TraceGasModelSet` (extended :class:`celerite.ModelSet`)
+	model : :class:`TraceGasModelSet` (extends :class:`celerite.ModelSet`)
 	"""
 	fit_phase = kwargs.get("fit_phase", False)
 	scale = kwargs.get("scale", 1e-6)
