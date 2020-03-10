@@ -16,6 +16,7 @@ addons:
     packages:
       - libhdf5-dev
       - libnetcdf-dev
+      - netcdf-bin
 before_install:
   - python --version
   - uname -a
