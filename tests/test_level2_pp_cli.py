@@ -22,12 +22,34 @@ from nccmpx import (ncallclose, nccmpattrs, ncequal, ncidentical)
 try:
 	import netCDF4
 	NC_EXT = ".nc"
+	NC_FMT = "-4"
+	CDL_EXT = ".cdl"
 except ImportError:
 	NC_EXT = ".nc3"
+	NC_FMT = "-3"
+	CDL_EXT = ".cdl3"
 
 DATADIR = os.path.join(".", "tests", "data")
 IFILE1 = os.path.join(DATADIR, "test_v{0}" + NC_EXT)
 IFILE2 = os.path.join(DATADIR, "test_v{0}x" + NC_EXT)
+
+
+def _gentestfile(tfile, tmpdir):
+	tpath = os.path.join(
+		tmpdir,
+		os.path.basename(tfile)
+	)
+	p = Popen([
+		"ncgen",
+		NC_FMT,
+		"-o",
+		tpath,
+		tfile[:-len(NC_EXT)] + CDL_EXT,
+	])
+	p.communicate()
+	p.wait()
+	assert p.returncode == 0
+	return tpath
 
 
 def test_pp_help():
@@ -43,7 +65,7 @@ def test_pp_help():
 )
 @pytest.mark.parametrize("revision", ["2.1", "2.2"])
 def test_pp_netcdf(revision, tmpdir):
-	ifile = IFILE1.format(revision)
+	ifile = _gentestfile(IFILE1.format(revision), tmpdir)
 	ofile = os.path.join(tmpdir, "test_v{0}_t.nc".format(revision))
 	p = Popen([
 		"scia_post_process_l2.py",
@@ -68,7 +90,7 @@ def test_pp_netcdf(revision, tmpdir):
 )
 @pytest.mark.parametrize("revision", ["2.1", "2.2"])
 def test_pp_xarray(revision, tmpdir):
-	ifile = IFILE2.format(revision)
+	ifile = _gentestfile(IFILE2.format(revision), tmpdir)
 	ofile = os.path.join(tmpdir, "test_v{0}x_t.nc".format(revision))
 	p = Popen([
 		"scia_post_process_l2.py",
