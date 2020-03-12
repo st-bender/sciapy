@@ -96,10 +96,11 @@ variables:
 		utc_days:units = "days since 2000-01-01 00:00:00+00:00" ;
 
 // global attributes:
-		:L2_data_version = "v6.2" ;
-		:creation_time = "Sat Feb 22 2020 18:33:02 +00:00 (UTC)" ;
-		:author = "The Dude" ;
 		:version = "2.2" ;
+		:L2_data_version = "v6.2" ;
+		:software = "sciapy 0.0.7.dev" ;
+		:creation_time = "Thu Mar 12 2020 19:47:40 +00:00 (UTC)" ;
+		:author = "The Dude" ;
 data:
 
  MSIS_Dens =

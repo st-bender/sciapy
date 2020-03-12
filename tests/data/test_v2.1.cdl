@@ -97,7 +97,8 @@ variables:
 // global attributes:
 		:version = "2.1" ;
 		:L2_data_version = "v6.2" ;
-		:creation_time = "Tue Feb 25 2020 12:59:27 +00:00 (UTC)" ;
+		:software = "sciapy 0.0.7.dev" ;
+		:creation_time = "Thu Mar 12 2020 19:47:31 +00:00 (UTC)" ;
 		:author = "The Dude" ;
 data:
 
