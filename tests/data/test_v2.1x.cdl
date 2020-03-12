@@ -94,7 +94,7 @@ variables:
 		mean_SZA:_FillValue = NaN ;
 		mean_SZA:units = "degrees" ;
 		mean_SZA:long_name = "solar zenith angle at mean altitude" ;
-	int64 orbit(time) ;
+	int orbit(time) ;
 		orbit:axis = "T" ;
 		orbit:calendar = "standard" ;
 		orbit:long_name = "orbit" ;
