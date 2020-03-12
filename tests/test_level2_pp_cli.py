@@ -21,14 +21,12 @@ import pytest
 from nccmpx import (ncallclose, nccmpattrs, ncequal, ncidentical)
 try:
 	import netCDF4
-	NC_EXT = ".nc"
 	NC_FMT = "-4"
-	CDL_EXT = ".cdl"
 except ImportError:
-	NC_EXT = ".nc3"
 	NC_FMT = "-3"
-	CDL_EXT = ".cdl3"
 
+CDL_EXT = ".cdl"
+NC_EXT = ".nc"
 DATADIR = os.path.join(".", "tests", "data")
 IFILE1 = os.path.join(DATADIR, "test_v{0}" + NC_EXT)
 IFILE2 = os.path.join(DATADIR, "test_v{0}x" + NC_EXT)
