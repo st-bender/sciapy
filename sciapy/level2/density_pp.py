@@ -30,6 +30,7 @@ except ImportError:
 		fmtargs = {"version": 1}
 
 from .density import scia_densities, _UTC
+from .. import __version__
 
 __all__ = ["scia_densities_pp", "scia_density_day"]
 
@@ -606,6 +607,7 @@ class scia_density_day(object):
 			ncf.version = self.version
 		if self.data_version is not None:
 			ncf.L2_data_version = self.data_version
+		ncf.software = "sciapy {0}".format(__version__)
 		ncf.creation_time = dt.datetime.utcnow().strftime("%a %b %d %Y %H:%M:%S +00:00 (UTC)")
 		ncf.author = self.author
 
@@ -903,6 +905,7 @@ class scia_density_day(object):
 			xr_ds.attrs["version"] = self.version
 		if self.data_version is not None:
 			xr_ds.attrs["L2_data_version"] = self.data_version
+		xr_ds.attrs["software"] = "sciapy {0}".format(__version__)
 		xr_ds.attrs["creation_time"] = dt.datetime.utcnow().strftime("%a %b %d %Y %H:%M:%S +00:00 (UTC)")
 		xr_ds.attrs["author"] = self.author
 

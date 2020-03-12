@@ -37,6 +37,7 @@ from sciapy.level2 import density_pp as sd
 from sciapy.level2 import scia_akm as sa
 from sciapy.level2.igrf import gmag_igrf
 from sciapy.level2.aacgm2005 import gmag_aacgm2005
+from sciapy import __version__
 try:
 	from nrlmsise00 import msise_flat as msise
 except ImportError:
@@ -672,6 +673,8 @@ def sddata_xr_set_attrs(
 		sdday_xr = sdday_xr.sortby("latitude", ascending=False)
 	else:
 		sdday_xr = sdday_xr.sortby("latitude", ascending=True)
+
+	sdday_xr.attrs["software"] = "sciapy {0}".format(__version__)
 
 	dateo = pd.to_datetime(
 			xr.conventions.decode_cf_variable("date", sdday_xr.time).data[0],
