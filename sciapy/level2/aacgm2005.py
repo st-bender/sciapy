@@ -50,7 +50,7 @@ def gmag_aacgm2005(lat, lon, aacgm_name="AACGM2005_80km_grid.nc"):
 	aacgm_file = resource_filename(__name__, aacgm_name)
 	logging.debug("aacgm_file: %s", aacgm_file)
 	# Fix longitudes to +- 180
-	lon = np.asarray(lon) % -180.
+	lon = (np.asarray(lon) + 180.) % 360. - 180.
 	aacgm_ds = xr.open_dataset(aacgm_file)
 	lats = aacgm_ds["Latitude"]
 	lons = aacgm_ds["Longitude"]
