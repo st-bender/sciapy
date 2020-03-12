@@ -81,7 +81,7 @@ def test_pp_netcdf(revision, tmpdir):
 	p.wait()
 	assert p.returncode == 0
 	ncallclose(ifile, ofile)
-	nccmpattrs(ifile, ofile, ignore=["creation_time"])
+	nccmpattrs(ifile, ofile, ignore=["creation_time", "software"])
 
 
 @pytest.mark.xfail(
@@ -107,4 +107,4 @@ def test_pp_xarray(revision, tmpdir):
 	p.wait()
 	assert p.returncode == 0
 	ncallclose(ifile, ofile)
-	nccmpattrs(ifile, ofile, ignore=["creation_time"])
+	nccmpattrs(ifile, ofile, ignore=["creation_time", "software"])
