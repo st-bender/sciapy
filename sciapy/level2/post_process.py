@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# vim: set fileencoding=utf-8
+# vim:fileencoding=utf-8
+#
+# Copyright (c) 2018 Stefan Bender
+#
+# This file is part of sciapy.
+# sciapy is free software: you can redistribute it or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 2.
+# See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 """SCIAMACHY level 2 data post processing
 
 Main script for SCIAMACHY orbital retrieval post processing
 and data combining (to netcdf).
-
-Copyright (c) 2018 Stefan Bender
-
-This file is part of sciapy.
-sciapy is free software: you can redistribute it or modify it
-under the terms of the GNU General Public License as published by
-the Free Software Foundation, version 2.
-See accompanying LICENSE file or http://www.gnu.org/licenses/gpl-2.0.html.
 """
 
 from __future__ import absolute_import, division, print_function
@@ -27,23 +27,23 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from scipy.interpolate import interp1d
+#import aacgmv2
+#import apexpy
 
 from astropy import units
 from astropy.time import Time
 import astropy.coordinates as coord
 
 import sciapy.level1c as sl
-from sciapy.level2 import density_pp as sd
-from sciapy.level2 import scia_akm as sa
-from sciapy.level2.igrf import gmag_igrf
-from sciapy.level2.aacgm2005 import gmag_aacgm2005
-from sciapy import __version__
+from . import scia_akm as sa
+from .igrf import gmag_igrf
+from .aacgm2005 import gmag_aacgm2005
 try:
 	from nrlmsise00 import msise_flat as msise
 except ImportError:
 	msise = None
 try:
-	from sciapy.level2.noem import noem_cpp
+	from .noem import noem_cpp
 except ImportError:
 	noem_cpp = None
 
@@ -167,6 +167,39 @@ def read_spectra(year, orbit, spec_base=None, skip_upleg=True):
 			np.asarray(alsts), eotcorr)
 
 
+def _get_orbit_ds(filename):
+	# >= 1.5 (NO-v1.5)
+	columns = [
+		"id", "alt_max", "alt", "alt_min",
+		"lat_max", "lat", "lat_min", "lons", "densities",
+		"dens_err_meas", "dens_err_tot", "dens_tot", "apriori", "akdiag",
+	]
+	# peek at the first line to extract the number of columns
+	with open(filename, 'rb') as _f:
+		ncols = len(_f.readline().split())
+	# reduce the columns depending on the retrieval version
+	# default is >= 1.5 (NO-v1.5)
+	if ncols < 16:  # < 1.5 (NO_emiss-183-gcaa9349)
+		columns.remove("akdiag")
+		if ncols < 15:  # < 1.0 (NO_emiss-178-g729efb0)
+			columns.remove("apriori")
+			if ncols < 14:  # initial output << v1.0
+				columns.remove("lons")
+	sdd_pd = pd.read_table(filename, header=None, names=columns, skiprows=1, sep='\s+')
+	sdd_pd = sdd_pd.set_index("id")
+	logging.debug("orbit ds: %s", sdd_pd.to_xarray())
+	ind = pd.MultiIndex.from_arrays(
+		[sdd_pd.lat, sdd_pd.alt],
+		names=["lats", "alts"],
+	)
+	sdd_ds = xr.Dataset.from_dataframe(sdd_pd).assign(id=ind).unstack("id")
+	logging.debug("orbit dataset: %s", sdd_ds)
+	sdd_ds["lons"] = sdd_ds.lons.mean("alts")
+	sdd_ds.load()
+	logging.debug("orbit ds 2: %s", sdd_ds.stack(id=["lats", "alts"]).reset_index("id"))
+	return sdd_ds
+
+
 class _circ_interp(object):
 	"""Interpolation on a circle"""
 	def __init__(self, x, y, **kw):
@@ -215,6 +248,7 @@ def process_orbit(
 	fail = (None,) * 5
 	logging.debug("processing orbit: %s", orbit)
 	dtrefdate = pd.to_datetime(ref_date, format="%Y-%m-%d", utc=True)
+	logging.debug("ref date: %s", dtrefdate)
 
 	dfiles = glob.glob(
 			"{0}/000NO_orbit_{1:05d}_*_Dichten.txt"
@@ -223,8 +257,10 @@ def process_orbit(
 		return fail
 	logging.debug("dfiles: %s", dfiles)
 	logging.debug("splits: %s", [fn.split('/') for fn in dfiles])
-	ddict = dict([(fn, (fn.split('/')[-3:-1] + fn.split('/')[-1].split('_')[3:4]))
-				for fn in dfiles])
+	ddict = dict([
+		(fn, (fn.split('/')[-3:-1] + fn.split('/')[-1].split('_')[3:4]))
+		for fn in dfiles
+	])
 	logging.debug("ddict: %s", ddict)
 	year = ddict[sorted(ddict.keys())[0]][-1][:4]
 	logging.debug("year: %s", year)
@@ -239,8 +275,7 @@ def process_orbit(
 	dts = np.array([dtd.days + dtd.seconds / 86400. for dtd in dts])
 	logging.debug("lats: %s, lons: %s, times: %s", lats, lons, times)
 
-	sdd = sd.scia_densities_pp(ref_date=ref_date)
-	sdd.read_from_file(dfiles[0])
+	sdd = _get_orbit_ds(dfiles[0])
 	logging.debug("density lats: %s, lons: %s", sdd.lats, sdd.lons)
 
 	# Re-interpolates the location (longitude) and times from the
@@ -280,10 +315,10 @@ def process_orbit(
 	logging.debug("utc day at equator: %s", dts_retr_interp0)
 	logging.debug("mean LST at equator: %s, apparent LST at equator: %s", mst0, lst0)
 
-	sdd.utchour = (time_intpf(sdd.lats) * 12. / np.pi) % 24.
-	sdd.utcdays = dts_retr_interpf(sdd.lats)
+	sdd["utc_hour"] = ("lats", (time_intpf(sdd.lats) * 12. / np.pi) % 24.)
+	sdd["utc_days"] = ("lats", dts_retr_interpf(sdd.lats))
 
-	if sdd.lons is None:
+	if "lons" not in sdd.data_vars:
 		# recalculate the longitudes
 		# estimate the equatorial longitude from the
 		# limb scan latitudes and longitudes
@@ -298,25 +333,31 @@ def process_orbit(
 		tg_retr_lats = np.tan(np.radians(sdd.lats))
 		calc_lons = (tg_retr_lats * PHI_FAC + lon0) % 360.
 		calc_lons_tp = (tg_retr_lats * PHI_FAC + lon0_tp) % 360.
-		sdd.lons = calc_lons_tp
+		sdd["lons"] = calc_lons_tp
 		logging.debug("(calculated) retrieval lons: %s, %s",
 				calc_lons, calc_lons_tp)
 	else:
 		# sdd.lons = sdd.lons % 360.
 		logging.debug("(original) retrieval lons: %s", sdd.lons)
 
-	sdd.mst = (sdd.utchour + sdd.lons / 15.) % 24.
-	sdd.lst = sdd.mst + eotcorr / 60.
+	sdd["mst"] = (sdd.utc_hour + sdd.lons / 15.) % 24.
+	sdd["lst"] = sdd.mst + eotcorr / 60.
 	mean_alt_km = sdd.alts.mean()
 
 	dt_date_this = dt.timedelta(np.asscalar(dts_retr_interp0)) + dtrefdate
 	logging.info("date: %s", dt_date_this)
-	# caclulate geomagnetic coordinates
-	sdd.gmlats, sdd.gmlons = gmag_igrf(dt_date_this, sdd.lats, sdd.lons, alt=mean_alt_km)
-	logging.debug("geomag. lats: %s, lons: %s", sdd.gmlats, sdd.gmlons)
-	sdd.aacgmgmlats, sdd.aacgmgmlons = gmag_aacgm2005(sdd.lats, sdd.lons)
+
+	gmlats, gmlons = gmag_igrf(dt_date_this, sdd.lats, sdd.lons, alt=mean_alt_km)
+	# gmlats, gmlons = apexpy.Apex(dt_date_this).geo2qd(sdd.lats, sdd.lons, mean_alt_km)
+	sdd["gm_lats"] = ("lats", gmlats)
+	sdd["gm_lons"] = ("lats", gmlons)
+	logging.debug("geomag. lats: %s, lons: %s", sdd.gm_lats, sdd.gm_lons)
+	aacgmgmlats, aacgmgmlons = gmag_aacgm2005(sdd.lats, sdd.lons)
+	# aacgmgmlats, aacgmgmlons = aacgmv2.convert(sdd.lats, sdd.lons, mean_alt_km, dt_date_this)
+	sdd["aacgm_gm_lats"] = ("lats", aacgmgmlats)
+	sdd["aacgm_gm_lons"] = ("lats", aacgmgmlons)
 	logging.debug("aacgm geomag. lats: %s, lons: %s",
-			sdd.aacgmgmlats, sdd.aacgmgmlons)
+			sdd.aacgm_gm_lats, sdd.aacgm_gm_lons)
 
 	# current day for MSIS input
 	f107_data = _read_gm(F107_FILE)
@@ -342,45 +383,58 @@ def process_orbit(
 	logging.debug("NOEM date: %s, f10.7: %s, kp: %s",
 			noem_date, noem_f107, noem_kp)
 
-	if sdd.noem_no is None:
-		sdd.noem_no = np.zeros_like(sdd.densities)
-	if sdd.temperature is None and msise is None:
-		sdd.temperature = np.full_like(sdd.densities, np.nan)
-	if sdd.sza is None:
-		sdd.sza = np.zeros_like(sdd.lats)
-	if sdd.akdiag is None:
-		sdd.akdiag = np.zeros_like(sdd.densities)
+	for var in ["noem_no"]:
+		if var not in sdd.data_vars:
+			sdd[var] = xr.zeros_like(sdd.densities)
+	if "sza" not in sdd.data_vars:
+		sdd["sza"] = xr.zeros_like(sdd.lats)
+	if "akdiag" not in sdd.data_vars:
+		sdd["akdiag"] = xr.full_like(sdd.densities, np.nan)
+		#akm_filename = glob.glob('{0}_orbit_{1:05d}_*_AKM*'.format(species, orb))[0]
 		akm_filename = glob.glob(
 				"{0}/000NO_orbit_{1:05d}_*_AKM*"
 				.format(dens_path, orbit))[0]
 		logging.debug("ak file: %s", akm_filename)
 		ak = sa.read_akm(akm_filename, sdd.nalt, sdd.nlat)
 		logging.debug("ak data: %s", ak)
-		sdd.akdiag = ak.diagonal(axis1=1, axis2=3).diagonal(axis1=0, axis2=1)
+		#ak1a = ak.sum(axis = 3)
+		#dak1a = np.diagonal(ak1a, axis1=0, axis2=2)
+		sdd["akdiag"] = ak.diagonal(axis1=1, axis2=3).diagonal(axis1=0, axis2=1)
 
 	if msise is not None:
-		if sdd.temperature is None or use_msis:
-			_msis_d_t = msise(
-				msis_dtdate,
-				sdd.alts[None, :], sdd.lats[:, None], sdd.lons[:, None] % 360.,
-				msis_f107a, msis_f107, msis_ap,
-				lst=sdd.lst[:, None],
-			)
-			sdd.temperature = _msis_d_t[:, :, -1]
-		if use_msis:
-			sdd.dens_tot = np.sum(_msis_d_t[:, :, np.r_[:5, 6:9]], axis=2)
-	for i, lat in enumerate(sdd.lats):
+		_msis_d_t = msise(
+			msis_dtdate,
+			sdd.alts.values[None, :],
+			sdd.lats.values[:, None],
+			sdd.lons.values[:, None] % 360.,
+			msis_f107a, msis_f107, msis_ap,
+			lst=sdd.lst.values[:, None],
+		)
+		if "temperature" not in sdd.data_vars or use_msis:
+			sdd["temperature"] = xr.zeros_like(sdd.densities)
+			sdd.temperature[:] = _msis_d_t[:, :, -1]
+		if "dens_tot" not in sdd.data_vars or use_msis:
+			sdd["dens_tot"] = xr.zeros_like(sdd.densities)
+			sdd.dens_tot[:] = np.sum(_msis_d_t[:, :, np.r_[:5, 6:9]], axis=2)
+	for i, (lat, lon) in enumerate(
+			zip(sdd.lats.values, sdd.lons.values)):
 		if noem_cpp is not None:
 			sdd.noem_no[i] = noem_cpp(noem_date.decode(), sdd.alts,
-					[lat], [sdd.lons[i]], noem_f107, noem_kp)[:]
+					[lat], [lon], noem_f107, noem_kp)[:]
 		else:
 			sdd.noem_no[i][:] = np.nan
 	sdd.sza[:] = solar_zenith_angle(
 			mean_alt_km,
 			sdd.lats, sdd.lons,
-			(pd.to_timedelta(sdd.utcdays, unit="days") + dtrefdate).to_pydatetime(),
+			(pd.to_timedelta(sdd.utc_days.values, unit="days") + dtrefdate).to_pydatetime(),
 	)
-	sdd.vmr = sdd.densities / sdd.dens_tot * 1.e9  # ppb
+	sdd["vmr"] = sdd.densities / sdd.dens_tot * 1.e9  # ppb
+	# drop unused variables
+	sdd = sdd.drop(["alt_min", "alt", "alt_max", "lat_min", "lat", "lat_max"])
+	# time and orbit
+	sdd = sdd.expand_dims("time")
+	sdd["time"] = ("time", [dts_retr_interp0])
+	sdd["orbit"] = ("time", [orbit])
 	return dts_retr_interp0, time0, lst0, lon0, sdd
 
 
@@ -420,9 +474,9 @@ def get_orbits_from_date(date, mlt=False, path=None, L2_version="v6.2"):
 
 def combine_orbit_data(orbits,
 		ref_date="2000-01-01",
-		L2_version="v6.2", file_version="2.2",
+		L2_version="v6.2",
 		dens_path=None, spec_base=None,
-		use_xarray=False, save_nc=False):
+		save_nc=False):
 	"""Combine post-processed SCIAMACHY retrieved orbit data
 
 	Parameters
@@ -434,8 +488,6 @@ def combine_orbit_data(orbits,
 		of the format "%Y-%m-%d". Default: 2000-01-01
 	L2_version: str, optional
 		SCIAMACHY level 2 data version to process
-	file_version: str, optional
-		Postprocessing format version of the output data
 	dens_path: str, optional
 		The path to the level 2 data. If `None` tries to infer
 		the data directory from the L2 version looking for anything
@@ -444,8 +496,6 @@ def combine_orbit_data(orbits,
 	spec_base: str, optional
 		The root path to the level 1c spectra. Uses the current
 		dir if not set or set to `None` (default).
-	use_xarray: bool, optional
-		Uses xarray (if available) to combine the orbital data.
 	save_nc: bool, optional
 		Save the intermediate orbit data sets to netcdf files
 		for debugging.
@@ -461,9 +511,7 @@ def combine_orbit_data(orbits,
 		density_base = os.curdir
 		dens_path = "{0}/*{1}".format(density_base, L2_version)
 
-	sdday = sd.scia_density_day(ref_date=ref_date)
 	sddayl = []
-	sdday_ds = None
 	for orbit in sorted(orbits):
 		dateo, timeo, lsto, lono, sdens = process_orbit(orbit,
 				ref_date=ref_date, dens_path=dens_path, spec_base=spec_base)
@@ -472,19 +520,12 @@ def combine_orbit_data(orbits,
 			orbit, dateo, timeo, lsto, lono
 		)
 		if sdens is not None:
-			sdens.version = file_version
-			sdens.data_version = L2_version
-			sdday.append_data(dateo, orbit, timeo, sdens)
-			if use_xarray:
-				sd_xr = sdens.to_xarray(dateo, orbit)
-				if sd_xr is not None:
-					logging.debug("orbit %s dataset: %s", orbit, sd_xr)
-					sddayl.append(sd_xr)
+			sddayl.append(sdens)
 			if save_nc:
-				sdens.write_to_netcdf(sdens.filename[:-3] + "nc")
-	if use_xarray and sddayl:
-		sdday_ds = xr.concat(sddayl, dim="time")
-	return sdday, sdday_ds
+				sdens.to_netcdf(sdens.filename[:-3] + "nc")
+	if not sddayl:
+		return None
+	return xr.concat(sddayl, dim="time")
 
 
 VAR_ATTRS = {
@@ -539,8 +580,8 @@ FLOAT_VARS = [
 ]
 
 
-def sddata_xr_set_attrs(
-	sdday_xr,
+def sddata_set_attrs(
+	sdday_ds,
 	file_version="2.2",
 	ref_date="2000-01-01",
 	rename=True,
@@ -553,7 +594,7 @@ def sddata_xr_set_attrs(
 
 	Parameters
 	----------
-	sdday_xr: `xarray.Dataset` instance
+	sdday_ds: `xarray.Dataset` instance
 		The combined dataset.
 	file_version: string "major.minor", optional
 		The netcdf file datase version, determines some variable
@@ -571,90 +612,93 @@ def sddata_xr_set_attrs(
 		Default: "NO".
 	"""
 	if rename:
-		sdday_xr = sdday_xr.rename({
+		sdday_ds = sdday_ds.rename({
 			# 2d vars
-			"akm_diagonal": "{0}_AKDIAG".format(species),
+			"akdiag": "{0}_AKDIAG".format(species),
 			"apriori": "{0}_APRIORI".format(species),
-			"density": "{0}_DENS".format(species),
-			"density_air": "MSIS_Dens",
-			"error_meas": "{0}_ERR".format(species),
-			"error_tot": "{0}_ETOT".format(species),
+			"densities": "{0}_DENS".format(species),
+			"dens_err_meas": "{0}_ERR".format(species),
+			"dens_err_tot": "{0}_ETOT".format(species),
+			"dens_tot": "MSIS_Dens",
+			"noem_no": "{0}_NOEM".format(species),
 			"temperature": "MSIS_Temp",
-			"NOEM_density": "{0}_NOEM".format(species),
-			"VMR": "{0}_VMR".format(species),
+			"vmr": "{0}_VMR".format(species),
 			# 1d vars and dimensions
-			"app_lst": "app_LST",
-			"mean_lst": "mean_LST",
-			"mean_sza": "mean_SZA",
+			"alts": "altitude",
+			"lats": "latitude",
+			"lons": "longitude",
+			"lst": "app_LST",
+			"mst": "mean_LST",
+			"sza": "mean_SZA",
 			"utc_hour": "UTC",
 		})
 	# relative standard deviation
-	sdday_xr["{0}_RSTD".format(species)] = 100.0 * np.abs(
-			sdday_xr["{0}_ERR".format(species)] / sdday_xr["{0}_DENS".format(species)])
+	sdday_ds["{0}_RSTD".format(species)] = 100.0 * np.abs(
+			sdday_ds["{0}_ERR".format(species)] / sdday_ds["{0}_DENS".format(species)])
 	# fix coordinate attributes
-	sdday_xr["time"].attrs = dict(axis='T', standard_name='time',
+	sdday_ds["time"].attrs = dict(axis='T', standard_name='time',
 		calendar='standard', long_name='equatorial crossing time',
 		units="days since {0}".format(
 			pd.to_datetime(ref_date, utc=True).isoformat(sep=" ")))
-	sdday_xr["altitude"].attrs = dict(axis='Z', positive='up',
+	sdday_ds["altitude"].attrs = dict(axis='Z', positive='up',
 		long_name='altitude', standard_name='altitude', units='km')
-	sdday_xr["latitude"].attrs = dict(axis='Y', long_name='latitude',
+	sdday_ds["latitude"].attrs = dict(axis='Y', long_name='latitude',
 		standard_name='latitude', units='degrees_north')
 	# Default variable attributes
-	sdday_xr["{0}_DENS".format(species)].attrs = {
+	sdday_ds["{0}_DENS".format(species)].attrs = {
 			"units": "cm^{-3}",
 			"long_name": "{0} number density".format(species)}
-	sdday_xr["{0}_ERR".format(species)].attrs = {
+	sdday_ds["{0}_ERR".format(species)].attrs = {
 			"units": "cm^{-3}",
 			"long_name": "{0} density measurement error".format(species)}
-	sdday_xr["{0}_ETOT".format(species)].attrs = {
+	sdday_ds["{0}_ETOT".format(species)].attrs = {
 			"units": "cm^{-3}",
 			"long_name": "{0} density total error".format(species)}
-	sdday_xr["{0}_RSTD".format(species)].attrs = dict(
+	sdday_ds["{0}_RSTD".format(species)].attrs = dict(
 			units='%',
 			long_name='{0} relative standard deviation'.format(species))
-	sdday_xr["{0}_AKDIAG".format(species)].attrs = dict(
+	sdday_ds["{0}_AKDIAG".format(species)].attrs = dict(
 			units='1',
 			long_name='{0} averaging kernel diagonal element'.format(species))
-	sdday_xr["{0}_APRIORI".format(species)].attrs = dict(
+	sdday_ds["{0}_APRIORI".format(species)].attrs = dict(
 			units='cm^{-3}', long_name='{0} apriori density'.format(species))
-	sdday_xr["{0}_NOEM".format(species)].attrs = dict(
+	sdday_ds["{0}_NOEM".format(species)].attrs = dict(
 			units='cm^{-3}', long_name='NOEM {0} number density'.format(species))
-	sdday_xr["{0}_VMR".format(species)].attrs = dict(
+	sdday_ds["{0}_VMR".format(species)].attrs = dict(
 			units='ppb', long_name='{0} volume mixing ratio'.format(species))
-	sdday_xr["MSIS_Dens"].attrs = dict(units='cm^{-3}',
+	sdday_ds["MSIS_Dens"].attrs = dict(units='cm^{-3}',
 			long_name='MSIS total number density',
 			model="NRLMSIS-00")
-	sdday_xr["MSIS_Temp"].attrs = dict(units='K',
+	sdday_ds["MSIS_Temp"].attrs = dict(units='K',
 			long_name='MSIS temperature',
 			model="NRLMSIS-00")
-	sdday_xr["longitude"].attrs = dict(long_name='longitude',
+	sdday_ds["longitude"].attrs = dict(long_name='longitude',
 			standard_name='longitude', units='degrees_east')
-	sdday_xr["app_LST"].attrs = dict(units='hours',
+	sdday_ds["app_LST"].attrs = dict(units='hours',
 			long_name='apparent local solar time')
-	sdday_xr["mean_LST"].attrs = dict(units='hours',
+	sdday_ds["mean_LST"].attrs = dict(units='hours',
 			long_name='mean local solar time')
-	sdday_xr["mean_SZA"].attrs = dict(units='degrees',
+	sdday_ds["mean_SZA"].attrs = dict(units='degrees',
 			long_name='solar zenith angle at mean altitude')
-	sdday_xr["UTC"].attrs = dict(units='hours',
+	sdday_ds["UTC"].attrs = dict(units='hours',
 			long_name='measurement utc time')
-	sdday_xr["utc_days"].attrs = dict(
+	sdday_ds["utc_days"].attrs = dict(
 			units='days since {0}'.format(
 				pd.to_datetime(ref_date, utc=True).isoformat(sep=" ")),
 			long_name='measurement utc day')
-	sdday_xr["gm_lats"].attrs = dict(long_name='geomagnetic_latitude',
+	sdday_ds["gm_lats"].attrs = dict(long_name='geomagnetic_latitude',
 			model='IGRF', units='degrees_north')
-	sdday_xr["gm_lons"].attrs = dict(long_name='geomagnetic_longitude',
+	sdday_ds["gm_lons"].attrs = dict(long_name='geomagnetic_longitude',
 			model='IGRF', units='degrees_east')
-	sdday_xr["aacgm_gm_lats"].attrs = dict(long_name='geomagnetic_latitude',
+	sdday_ds["aacgm_gm_lats"].attrs = dict(long_name='geomagnetic_latitude',
 			# model='AACGM2005 80 km',  # v2.3
 			model='AACGM',  # v2.1, v2.2
 			units='degrees_north')
-	sdday_xr["aacgm_gm_lons"].attrs = dict(long_name='geomagnetic_longitude',
+	sdday_ds["aacgm_gm_lons"].attrs = dict(long_name='geomagnetic_longitude',
 			# model='AACGM2005 80 km',  # v2.3
 			model='AACGM',  # v2.1, v2.2
 			units='degrees_east')
-	sdday_xr["orbit"].attrs = dict(
+	sdday_ds["orbit"].attrs = dict(
 			axis='T', calendar='standard',
 			# long_name='SCIAMACHY/Envisat orbit number',  # v2.3
 			long_name='orbit',  # v2.1, v2.2
@@ -664,27 +708,32 @@ def sddata_xr_set_attrs(
 	)
 	# Overwrite version-specific variable attributes
 	for _v, _a in VAR_ATTRS[file_version].items():
-		sdday_xr[_v].attrs = _a
+		sdday_ds[_v].attrs = _a
 	if rename:
 		# version specific renaming
-		sdday_xr = sdday_xr.rename(VAR_RENAME[file_version])
+		sdday_ds = sdday_ds.rename(VAR_RENAME[file_version])
 	if int(file_version.split(".")[0]) < 3:
 		# invert latitudes for backwards-compatitbility
-		sdday_xr = sdday_xr.sortby("latitude", ascending=False)
+		sdday_ds = sdday_ds.sortby("latitude", ascending=False)
 	else:
-		sdday_xr = sdday_xr.sortby("latitude", ascending=True)
+		sdday_ds = sdday_ds.sortby("latitude", ascending=True)
 
-	sdday_xr.attrs["software"] = "sciapy {0}".format(__version__)
+	# for var in FLOAT_VARS:
+	# 	_attrs = sdday_ds[var].attrs
+	# 	sdday_ds[var] = sdday_ds[var].astype('float32')
+	# 	sdday_ds[var].attrs = _attrs
 
 	dateo = pd.to_datetime(
-			xr.conventions.decode_cf_variable("date", sdday_xr.time).data[0],
+			xr.conventions.decode_cf_variable("date", sdday_ds.time).data[0],
 			utc=True,
 	).strftime("%Y-%m-%d")
-	logging.debug("date %s dataset: %s", dateo, sdday_xr)
-	return sdday_xr
+	logging.debug("date %s dataset: %s", dateo, sdday_ds)
+	return sdday_ds
 
 
 def main():
+	"""SCIAMACHY level 2 post processing
+	"""
 	logging.basicConfig(level=logging.WARNING,
 			format="[%(levelname)-8s] (%(asctime)s) "
 			"%(filename)s:%(lineno)d %(message)s",
@@ -718,8 +767,7 @@ def main():
 	parser.add_argument("-m", "--mlt", action="store_true", default=False,
 			help="indicate nominal (False, default) or MLT data (True)")
 	parser.add_argument("-X", "--xarray", action="store_true", default=False,
-			help="use xarray to prepare the dataset"
-			" (experimental, default %(default)s)")
+			help="DEPRECATED, kept for compatibility reasons, does nothing.")
 	loglevels = parser.add_mutually_exclusive_group()
 	loglevels.add_argument("-l", "--loglevel", default="WARNING",
 			choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
@@ -764,42 +812,26 @@ def main():
 		logging.warn("No orbits to process.")
 		return
 
-	sdlist, sdxr_ds = combine_orbit_data(olist,
+	sd_xr = combine_orbit_data(olist,
 			ref_date=args.base_date,
-			L2_version=args.retrieval_version, file_version=args.file_version,
-			dens_path=args.path, spec_base=args.spectra, use_xarray=args.xarray,
-			save_nc=False)
-	sdlist.author = args.author
+			L2_version=args.retrieval_version,
+			dens_path=args.path, spec_base=args.spectra, save_nc=False)
 
-	if args.xarray and sdxr_ds is not None:
-		sdxr_ds.attrs["author"] = args.author
-		sd_xr = sddata_xr_set_attrs(
-			sdxr_ds, ref_date=args.base_date,
-			rename=True, file_version=args.file_version,
-		)
-		sd_xr2 = sdlist.to_xarray()
-		# Overwrite version-specific variable attributes
-		for _v, _a in VAR_ATTRS[args.file_version].items():
-			sd_xr2[_v].attrs = _a
-		# version specific renaming
-		sd_xr2 = sd_xr2.rename(VAR_RENAME[args.file_version])
-		logging.debug(sd_xr)
-		logging.debug(sd_xr2)
-		logging.debug("equal datasets: %s", sd_xr.equals(sd_xr2))
-		xr.testing.assert_allclose(sd_xr, sd_xr2)
-		if sd_xr2 is not None:
-			logging.debug("xarray dataset: %s", sd_xr2)
-			sd_xr2.to_netcdf(args.file, unlimited_dims=["time"])
-	else:
-		if sdlist.no_dens is not None:
-			sdlist.write_to_netcdf(args.file)
-		else:
-			logging.warn("Processed data is empty.")
+	if sd_xr is None:
+		logging.warn("Processed data is empty.")
+		return
+
+	sd_xr = sddata_set_attrs(sd_xr, ref_date=args.base_date, file_version=args.file_version)
+	sd_xr = sd_xr[sorted(sd_xr.variables)]
+	sd_xr.attrs["author"] = args.author
+	sd_xr.attrs["creation_time"] = dt.datetime.utcnow().strftime(
+			"%a %b %d %Y %H:%M:%S +00:00 (UTC)")
+	sd_xr.attrs["software"] = "sciapy {0}".format(__version__)
+	sd_xr.attrs["L2_data_version"] = args.retrieval_version
+	sd_xr.attrs["version"] = args.file_version
+	print(sd_xr)
+	sd_xr.to_netcdf(args.file, unlimited_dims=["time"])
 
 
 if __name__ == "__main__":
-	logging.warn(
-		"%s: This script is deprecated, use 'python -m sciapy.level2.post_process' instead.",
-		DeprecationWarning.__name__,
-	)
 	main()
