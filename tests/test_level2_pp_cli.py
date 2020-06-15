@@ -18,7 +18,7 @@ import sys
 from subprocess import Popen
 
 import pytest
-from nccmpx import (ncallclose, nccmpattrs, ncequal, ncidentical)
+from nccmpx import ncallclose, nccmpattrs
 try:
 	import netCDF4
 	NC_FMT = "-4"
