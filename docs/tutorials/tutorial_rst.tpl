@@ -5,10 +5,13 @@
 
 .. note:: This tutorial was generated from an IPython notebook that can be
           downloaded `here <../_static/notebooks/{{ resources.metadata.name }}.ipynb>`_.
-          Try a live version: |binderbadge|.
+          Try a live version: |binderbadge|. |nbviewer|__.
 
-.. |binderbadge| image:: https://mybinder.org/badge.svg
+.. |binderbadge| image:: https://mybinder.org/badge_logo.svg
     :target: https://mybinder.org/v2/gh/st-bender/sciapy/master?filepath=docs/_static/notebooks/{{ resources.metadata.name }}.ipynb
+
+.. |nbviewer| replace:: View in *nbviewer*
+__ https://nbviewer.jupyter.org/github/st-bender/sciapy/tree/master/docs/_static/notebooks/{{ resources.metadata.name }}.ipynb
 
 .. _{{resources.metadata.name}}:
 {% endblock %}
