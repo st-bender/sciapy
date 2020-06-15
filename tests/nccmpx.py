@@ -77,8 +77,10 @@ def ncidentical(file1, file2, ignore=[]):
 	with xr.open_dataset(file1, decode_cf=False) as ds1:
 		ds2 = xr.open_dataset(file2, decode_cf=False)
 		for ign in ignore:
-			del ds1.attrs[ign]
-			del ds2.attrs[ign]
+			if ign in ds1.attrs.keys():
+				del ds1.attrs[ign]
+			if ign in ds2.attrs.keys():
+				del ds2.attrs[ign]
 		xr.testing.assert_identical(ds1, ds2)
 
 
