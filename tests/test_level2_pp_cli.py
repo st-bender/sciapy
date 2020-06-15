@@ -62,7 +62,7 @@ def test_pp_help():
 	sys.version_info[:2] == (3, 4),
 	reason="netcdf file attributes don't work with Python 3.4 compatible xarray.",
 )
-@pytest.mark.parametrize("revision", ["2.1", "2.2"])
+@pytest.mark.parametrize("revision", TEST_REVISIONS)
 def test_pp_netcdf(revision, tmpdir):
 	ifile = _gentestfile(IFILE1.format(revision), tmpdir)
 	ofile = os.path.join(tmpdir, "test_v{0}_t.nc".format(revision))
@@ -87,7 +87,7 @@ def test_pp_netcdf(revision, tmpdir):
 	sys.version_info[:2] == (3, 4),
 	reason="netcdf file attributes don't work with Python 3.4 compatible xarray.",
 )
-@pytest.mark.parametrize("revision", ["2.1", "2.2"])
+@pytest.mark.parametrize("revision", TEST_REVISIONS)
 def test_pp_xarray(revision, tmpdir):
 	ifile = _gentestfile(IFILE2.format(revision), tmpdir)
 	ofile = os.path.join(tmpdir, "test_v{0}x_t.nc".format(revision))
