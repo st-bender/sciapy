@@ -1,12 +1,14 @@
-
 .. module:: sciapy
 
 .. note:: This tutorial was generated from an IPython notebook that can be
           downloaded `here <../_static/notebooks/regress_model_fit.ipynb>`_.
-          Try a live version: |binderbadge|.
+          Try a live version: |binderbadge|. |nbviewer|__.
 
-.. |binderbadge| image:: https://mybinder.org/badge.svg
+.. |binderbadge| image:: https://mybinder.org/badge_logo.svg
     :target: https://mybinder.org/v2/gh/st-bender/sciapy/master?filepath=docs/_static/notebooks/regress_model_fit.ipynb
+
+.. |nbviewer| replace:: View in *nbviewer*
+__ https://nbviewer.jupyter.org/github/st-bender/sciapy/tree/master/docs/_static/notebooks/regress_model_fit.ipynb
 
 .. _regress_model_fit:
 
@@ -57,10 +59,10 @@ possible overflows in the calculations.
     max_days = 100
     max_amp = 1e10 * data_scale
 
-Lyman-\ :math:`\alpha` proxy
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Lyman-:math:`\alpha` proxy
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We start with the Lyman-\ :math:`\alpha` proxy, it is not centered
+We start with the Lyman-:math:`\alpha` proxy, it is not centered
 (mean-subtracted) and we set the rest of the parameters except
 ``ltscan`` to zero. This time we also set the bounds for the prior
 probabilities.
