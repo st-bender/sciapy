@@ -128,8 +128,8 @@ def test_pp_xarray(revision, tmpdir):
 def test_pp_module(binary, revision, tmpdir):
 	ifile = _gentestfile(IFILE2.format(revision), tmpdir)
 	ofile = os.path.join(tmpdir, "test_v{0}x_t.nc".format(revision))
-	p = Popen([
-		*(binary.split(" ")),
+	p = Popen(
+		binary.split(" ") + [
 		"-A", "The Dude",
 		"-M", "2010-02",
 		"-R", revision,
