@@ -100,7 +100,10 @@ if __name__ == "__main__":
 			"Programming Language :: Python :: 3.8",
 		],
 		entry_points={'console_scripts':
-			['scia_regress = sciapy.regress.__main__:main']
+			[
+				'scia_regress = sciapy.regress.__main__:main',
+				'scia_post_process_l2 = sciapy.level2.post_process:main',
+			]
 		},
 		options={
 			"bdist_wheel": {"universal": True},
