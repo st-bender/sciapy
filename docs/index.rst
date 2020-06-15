@@ -44,6 +44,7 @@ The source code is `developed on Github <https://github.com/st-bender/sciapy>`_.
     :maxdepth: 1
     :caption: Tutorials
 
+    tutorials/level2_binning
     tutorials/regress_intro
     tutorials/regress_model_fit
 
