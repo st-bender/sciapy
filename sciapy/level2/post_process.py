@@ -35,6 +35,7 @@ from astropy.time import Time
 import astropy.coordinates as coord
 
 import sciapy.level1c as sl
+from .. import __version__
 from . import scia_akm as sa
 from .igrf import gmag_igrf
 from .aacgm2005 import gmag_aacgm2005
