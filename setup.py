@@ -62,9 +62,10 @@ if __name__ == "__main__":
 			'scripts/scia_conv_hdf5_limb.py',
 			'scripts/scia_daily_zonal_mean.py',
 			'scripts/scia_post_process_l2.py'],
-		package_data={'sciapy.level2': ['IGRF.tab',
-				'AACGM2005_80km_grid.nc'],
-			'sciapy': ['data/indices/*.dat', 'data/indices/*.txt']},
+		package_data={
+			'sciapy.level2': ['IGRF.tab', 'AACGM2005_80km_grid.nc'],
+			'sciapy': ['data/indices/*.dat', 'data/indices/*.txt'],
+		},
 		install_requires=[
 			'numpy>=1.13.0',
 			'scipy>=0.17.0',
