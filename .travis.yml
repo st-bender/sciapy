@@ -22,13 +22,14 @@ before_install:
   - uname -a
   - lsb_release -a
 install:
-  - pip install "numpy>=1.13.0"
+  - pip install "numpy>=1.13.0,!=1.15.*"
   - pip install pybind11
+  - pip install "astropy<4.0"
   - pip install -U pytest pytest-cov codecov coveralls
   - pip install tox-travis
   - pip install scrutinizer-ocular
-  - pip install "astropy<4.0"
   - pip install -e ".[all]"
+  - pip list
 script:
   - py.test -v --cov sciapy
 after_success:
