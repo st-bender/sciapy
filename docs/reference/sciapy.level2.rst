@@ -46,10 +46,10 @@ sciapy.level2.igrf
     :undoc-members:
     :show-inheritance:
 
-sciapy.level2.msis
-^^^^^^^^^^^^^^^^^^
+sciapy.level2.post\_process
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. automodule:: sciapy.level2.msis
+.. automodule:: sciapy.level2.post_process
     :members:
     :undoc-members:
     :show-inheritance:
