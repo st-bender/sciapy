@@ -19,9 +19,13 @@ from subprocess import Popen
 
 import pytest
 from nccmpx import ncallclose, nccmpattrs
+# If netCDF4 is available, the produced files will be
+# netcdf4 files, otherwise netcdf3 files.
+# Sets the `ncgen` option to use the same format.
 try:
 	import netCDF4
 	NC_FMT = "-4"
+	del netCDF4
 except ImportError:
 	NC_FMT = "-3"
 
