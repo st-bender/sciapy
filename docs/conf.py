@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from os import getenv
-from recommonmark.parser import CommonMarkParser
 
 from sciapy import __version__
 
@@ -25,6 +24,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
     'sphinx_markdown_tables',
+    'recommonmark',
     'numpydoc'
 ]
 if getenv('SPELLCHECK'):
@@ -32,9 +32,6 @@ if getenv('SPELLCHECK'):
     spelling_show_suggestions = True
     spelling_lang = 'en_GB'
 
-source_parsers = {
-    '.md': CommonMarkParser,
-}
 source_suffix = ['.md', '.rst']
 master_doc = 'index'
 
