@@ -219,14 +219,14 @@ def igrf_mag(date, lat, lon, alt, filename="IGRF.tab"):
 	Bx, By, Bz = _igrf_model(igrf_coeffs, 13, r, np.radians(90. - glat), np.radians(glon))
 	logging.debug("spherical geomagnetic field (Bx, By, Bz): %s, %s, %s", Bx, By, Bz)
 	logging.debug("spherical dip coordinates: lat %s, lon %s",
-			np.degrees(np.arctan(0.5 * Bz / np.sqrt(Bx**2 + By**2))),
-			np.degrees(np.arctan(-By / Bz)))
+			np.degrees(np.arctan2(0.5 * Bz,  np.sqrt(Bx**2 + By**2))),
+			np.degrees(np.arctan2(-By, Bz)))
 	# back to geodetic coordinates
 	Bx, Bz = cd * Bx + sd * Bz, cd * Bz - sd * Bx
 	logging.debug("geodetic geomagnetic field (Bx, By, Bz): %s, %s, %s", Bx, By, Bz)
 	logging.debug("geodetic dip coordinates: lat %s, lon %s",
-			np.degrees(np.arctan(0.5 * Bz / np.sqrt(Bx**2 + By**2))),
-			np.degrees(np.arctan(-By / Bz)))
+			np.degrees(np.arctan2(0.5 * Bz, np.sqrt(Bx**2 + By**2))),
+			np.degrees(np.arctan2(-By, Bz)))
 	return Bx, By, Bz
 
 def gmpole(date, r_e=Earth_ellipsoid["re"], filename="IGRF.tab"):
@@ -353,12 +353,12 @@ def gmag_igrf(date, lat, lon, alt=0.,
 	lon_gmag_x = (np.cos(latr) * np.sin(lat_GMPr) * np.cos(lonr - lon_GMPr)
 				- np.sin(latr) * np.cos(lat_GMPr))
 	lat_gmag = np.arcsin(sin_lat_gmag)
-	lat_gmag_geod = np.arctan(np.tan(lat_gmag) / (1. - ellip.epssq))
+	lat_gmag_geod = np.arctan2(np.tan(lat_gmag), (1. - ellip.epssq))
 
 	B_r = -2. * B_0 * sin_lat_gmag / (grad / ellip.re)**3
 	B_th = -B_0 * np.cos(lat_gmag) / (grad / ellip.re)**3
 	logging.debug("B_r: %s, B_th: %s, dip lat: %s",
-			-B_r, B_th, np.degrees(np.arctan(0.5 * B_r / B_th)))
+			-B_r, B_th, np.degrees(np.arctan2(0.5 * B_r, B_th)))
 
 	lon_gmag = np.arctan2(lon_gmag_y, lon_gmag_x)
 	logging.debug("centered dipole coordinates: "
@@ -370,12 +370,16 @@ def gmag_igrf(date, lat, lon, alt=0.,
 		return (np.degrees(lat_gmag), np.degrees(lon_gmag))
 
 	# eccentric dipole coordinates (shifted dipole)
-	phi_ed = np.arctan2((grad * np.cos(lat_gmag) * np.sin(lon_gmag) - dY),
-			(grad * np.cos(lat_gmag) * np.cos(lon_gmag) - dX))
-	theta_ed = np.arctan2((grad * np.cos(lat_gmag) * np.cos(lon_gmag) - dX),
-			((grad * np.sin(lat_gmag) - dZ) * np.cos(phi_ed)))
+	phi_ed = np.arctan2(
+		(grad * np.cos(lat_gmag) * np.sin(lon_gmag) - dY),
+		(grad * np.cos(lat_gmag) * np.cos(lon_gmag) - dX)
+	)
+	theta_ed = np.arctan2(
+		(grad * np.cos(lat_gmag) * np.cos(lon_gmag) - dX),
+		(grad * np.sin(lat_gmag) - dZ) * np.cos(phi_ed)
+	)
 	lat_ed = 0.5 * np.pi - theta_ed
-	lat_ed_geod = np.arctan(np.tan(lat_ed) / (1. - ellip.epssq))
+	lat_ed_geod = np.arctan2(np.tan(lat_ed), (1. - ellip.epssq))
 	logging.debug("lats ed: %s", np.degrees(lat_ed))
 	logging.debug("lats ed geod: %s", np.degrees(lat_ed_geod))
 	logging.debug("phis ed: %s", np.degrees(phi_ed))
