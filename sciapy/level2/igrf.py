@@ -248,8 +248,11 @@ def gmpole(date, r_e=Earth_ellipsoid["re"], filename="IGRF.tab"):
 	(lat_s, phi_s): tuple of floats
 		Geographic latitude and longitude of the centered dipole
 		magnetic south pole.
-	(dX, dY, dZ): tuple of floats
+	(dx, dy, dz): tuple of floats
 		Magnetic variations in Earth-centered Cartesian coordinates
+		for shifting the dipole off-center.
+	(dX, dY, dZ): tuple of floats
+		Magnetic variations in centered-dipole Cartesian coordinates
 		for shifting the dipole off-center.
 	B_0: float
 		The magnitude of the magnetic field.
@@ -318,6 +321,7 @@ def gmpole(date, r_e=Earth_ellipsoid["re"], filename="IGRF.tab"):
 	# North pole, south pole coordinates
 	return ((np.degrees(lat_n), np.degrees(phi_n)),
 			(-np.degrees(lat_n), np.degrees(phi_n + np.pi)),
+			(dx, dy, dz),
 			(dX, dY, dZ),
 			np.sqrt(B_0_sq))
 
@@ -354,7 +358,7 @@ def gmag_igrf(date, lat, lon, alt=0.,
 	"""
 	ellip = _ellipsoid()
 	glat, glon, grad = _geod_to_spher(lat, lon, ellip, alt)
-	(lat_GMP, lon_GMP), _, (dX, dY, dZ), B_0 = gmpole(date, ellip.re, igrf_name)
+	(lat_GMP, lon_GMP), _, _, (dX, dY, dZ), B_0 = gmpole(date, ellip.re, igrf_name)
 	latr, lonr = np.radians(glat), np.radians(glon)
 	lat_GMPr, lon_GMPr = np.radians(lat_GMP), np.radians(lon_GMP)
 	sin_lat_gmag = (np.sin(latr) * np.sin(lat_GMPr)
