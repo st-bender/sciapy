@@ -263,9 +263,18 @@ def gmpole(date, r_e=Earth_ellipsoid["re"], filename="IGRF.tab"):
 
 	# This function finds the location of the north magnetic pole in spherical coordinates.
 	# The equations are from Wallace H. Campbell's "Introduction to Geomagnetic Fields"
+	# and Fraser-Smith 1987, Eq. (5).
+	# For the minus signs see also
+	# Laundal and Richmond, Space Sci. Rev. (2017) 206:27--59,
+	# doi:10.1007/s11214-016-0275-y: (p. 31)
+	# "The Earth’s field is such that the dipole axis points roughly southward,
+	# so that the dipole North Pole is really in the Southern Hemisphere (SH).
+	# However convention dictates that the axis of the geomagnetic dipole is
+	# positive northward, hence the negative sign in the definition of mˆ."
+	# Note that hence Phi_N in their Eq. (14) is actually Phi_S.
 	B_0_sq = g10**2 + g11**2 + h11**2
 	theta_n = np.arccos(-g10 / np.sqrt(B_0_sq))
-	phi_n = np.arctan2(h11, g11)
+	phi_n = np.arctan2(-h11, -g11)
 	lat_n = 0.5 * np.pi - theta_n
 	logging.debug("centered dipole pole coordinates "
 			"(lat, theta, phi): %s, %s, %s",
@@ -284,10 +293,11 @@ def gmpole(date, r_e=Earth_ellipsoid["re"], filename="IGRF.tab"):
 	dy = zeta * r_e
 	dz = xi * r_e
 
+	# Fraser-Smith 1987, Eq. (24)
 	delta = np.sqrt(dx**2 + dy**2 + dz**2)
 	theta_d = np.arccos(dz / delta)
 	lambda_d = 0.5 * np.pi - theta_d
-	phi_d = np.pi + np.arctan(dy / dx)
+	phi_d = np.arctan2(dy, dx)
 
 	sin_lat_ed = (np.sin(lambda_d) * np.sin(lat_n)
 				+ np.cos(lambda_d) * np.cos(lat_n) * np.cos(phi_d - phi_n))
