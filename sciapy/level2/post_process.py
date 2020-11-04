@@ -830,7 +830,7 @@ def main():
 	sd_xr.attrs["software"] = "sciapy {0}".format(__version__)
 	sd_xr.attrs["L2_data_version"] = args.retrieval_version
 	sd_xr.attrs["version"] = args.file_version
-	print(sd_xr)
+	logging.debug(sd_xr)
 	sd_xr.to_netcdf(args.file, unlimited_dims=["time"])
 
 
