@@ -65,7 +65,7 @@ def test_load_proxyLyafiles():
 @mark.parametrize("date, tfmt, texp, vexp", AEdata)
 def test_load_proxyAEvalues(date, tfmt, texp, vexp):
 	pAEt, pAEv = sciapy.regress.load_data.load_dailymeanAE(tfmt=tfmt)
-	idx = list(Time(pAEt, format=tfmt).strftime("%Y-%m-%d")).index(date)
+	idx = list(Time(pAEt, format=tfmt).iso).index(date + " 00:00:00.000")
 	np.testing.assert_allclose(pAEt[idx], texp)
 	np.testing.assert_allclose(pAEv["AE"][idx], vexp)
 
@@ -73,7 +73,7 @@ def test_load_proxyAEvalues(date, tfmt, texp, vexp):
 @mark.parametrize("date, tfmt, texp, vexp", Lyadata)
 def test_load_proxyLyavalues(date, tfmt, texp, vexp):
 	pLyat, pLyav = sciapy.regress.load_data.load_dailymeanLya(tfmt=tfmt)
-	idx = list(Time(pLyat, format=tfmt).strftime("%Y-%m-%d")).index(date)
+	idx = list(Time(pLyat, format=tfmt).iso).index(date + " 00:00:00.000")
 	np.testing.assert_allclose(pLyat[idx], texp)
 	np.testing.assert_allclose(pLyav["Lya"][idx], vexp)
 
