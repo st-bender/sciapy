@@ -350,8 +350,8 @@ def process_orbit(
 
 	gmlats, gmlons = gmag_igrf(dt_date_this, sdd.lats, sdd.lons, alt=mean_alt_km)
 	# gmlats, gmlons = apexpy.Apex(dt_date_this).geo2qd(sdd.lats, sdd.lons, mean_alt_km)
-	sdd["gm_lats"] = ("lats", gmlats)
-	sdd["gm_lons"] = ("lats", gmlons)
+	sdd["gm_lats"] = gmlats
+	sdd["gm_lons"] = gmlons
 	logging.debug("geomag. lats: %s, lons: %s", sdd.gm_lats, sdd.gm_lons)
 	aacgmgmlats, aacgmgmlons = gmag_aacgm2005(sdd.lats, sdd.lons)
 	# aacgmgmlats, aacgmgmlons = aacgmv2.convert(sdd.lats, sdd.lons, mean_alt_km, dt_date_this)
