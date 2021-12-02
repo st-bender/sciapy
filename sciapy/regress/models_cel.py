@@ -458,6 +458,10 @@ def trace_gas_model(constant=True, freqs=None, proxy_config=None, **kwargs):
 			the maximum and minimum amplitudes to be fitted.
 		* tfmt : string
 			The `astropy.time.Time` format string to setup the time axis.
+		* days_per_time_unit : float
+			The number of days per time unit, used to normalize the frequencies
+			for the harmonic terms. Use 365.25 if the times are in fractional years,
+			1 if they are in days. Default: 365.25
 		* max_amp : float
 			Maximum magnitude of the coefficients, used to constrain the
 			parameter search.
@@ -472,6 +476,7 @@ def trace_gas_model(constant=True, freqs=None, proxy_config=None, **kwargs):
 	fit_phase = kwargs.get("fit_phase", False)
 	scale = kwargs.get("scale", 1e-6)
 	tfmt = kwargs.get("time_format", "jyear")
+	delta_t = kwargs.get("days_per_time_unit", 365.25)
 
 	max_amp = kwargs.pop("max_amp", 1e10 * scale)
 	max_days = kwargs.pop("max_days", 100)
@@ -486,14 +491,14 @@ def trace_gas_model(constant=True, freqs=None, proxy_config=None, **kwargs):
 	harmonic_models = []
 	for freq in freqs:
 		if not fit_phase:
-			harm = HarmonicModelCosineSine(freq=freq,
+			harm = HarmonicModelCosineSine(freq=freq * delta_t / 365.25,
 					cos=0, sin=0,
 					bounds=dict([
 						("cos", [-max_amp, max_amp]),
 						("sin", [-max_amp, max_amp])])
 			)
 		else:
-			harm = HarmonicModelAmpPhase(freq=freq,
+			harm = HarmonicModelAmpPhase(freq=freq * delta_t / 365.25,
 					amp=0, phase=0,
 					bounds=dict([
 						("amp", [0, max_amp]),
