@@ -279,40 +279,48 @@ def gmpole(date, r_e=Earth_ellipsoid["re"], filename="IGRF.tab"):
 	theta_n = np.arccos(-g10 / np.sqrt(B_0_sq))
 	phi_n = np.arctan2(-h11, -g11)
 	lat_n = 0.5 * np.pi - theta_n
-	logging.debug("centered dipole pole coordinates "
+	logging.debug("centered dipole north pole coordinates "
 			"(lat, theta, phi): %s, %s, %s",
 			np.degrees(lat_n), np.degrees(theta_n), np.degrees(phi_n))
 
-	# calculate dipole offset according to Fraser and Smith, 1987
+	# dipole offset according to Fraser-Smith, 1987
 	L_0 = 2 * g10 * g20 + np.sqrt(3) * (g11 * g21 + h11 * h21)
 	L_1 = -g11 * g20 + np.sqrt(3) * (g10 * g21 + g11 * g22 + h11 * h22)
 	L_2 = -h11 * g20 + np.sqrt(3) * (g10 * h21 - h11 * g22 + g11 * h22)
 	E = (L_0 * g10 + L_1 * g11 + L_2 * h11) / (4 * B_0_sq)
 
+	# dipole offset in geodetic Cartesian coordinates
 	xi = (L_0 - g10 * E) / (3 * B_0_sq)
 	eta = (L_1 - g11 * E) / (3 * B_0_sq)
 	zeta = (L_2 - h11 * E) / (3 * B_0_sq)
 	dx = eta * r_e
 	dy = zeta * r_e
 	dz = xi * r_e
+	logging.debug("dx, dy, dz: %s, %s, %s", dx, dy, dz)
 
+	# dipole offset in geodetic spherical coordinates
 	# Fraser-Smith 1987, Eq. (24)
 	delta = np.sqrt(dx**2 + dy**2 + dz**2)
 	theta_d = np.arccos(dz / delta)
 	lambda_d = 0.5 * np.pi - theta_d
 	phi_d = np.arctan2(dy, dx)
+	logging.debug(
+		"delta: %s, theta_d: %s, phi_d: %s",
+		delta, np.degrees(theta_d), np.degrees(phi_d),
+	)
 
+	# dipole offset in centred-dipole spherical coordindates
 	sin_lat_ed = (np.sin(lambda_d) * np.sin(lat_n)
 				+ np.cos(lambda_d) * np.cos(lat_n) * np.cos(phi_d - phi_n))
 	lat_ed = np.arcsin(sin_lat_ed)
 	theta_ed = 0.5 * np.pi - lat_ed
-
 	sin_lon_ed = np.sin(theta_d) * np.sin(phi_d - phi_n) / np.sin(theta_ed)
 	lon_ed = np.pi - np.arcsin(sin_lon_ed)
-	logging.debug("eccentric dipole pole coordinates "
+	logging.debug("eccentric dipole offset in CD coordinates "
 			"(lat, theta, lon): %s, %s, %s",
 			np.degrees(theta_ed), np.degrees(lat_ed), np.degrees(lon_ed))
 
+	# dipole offset in centred-dipole Cartesian coordindates
 	dX = delta * np.sin(theta_ed) * np.cos(lon_ed)
 	dY = delta * np.sin(theta_ed) * np.sin(lon_ed)
 	dZ = delta * np.cos(theta_ed)
