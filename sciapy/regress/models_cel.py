@@ -456,7 +456,7 @@ def trace_gas_model(constant=True, freqs=None, proxy_config=None, **kwargs):
 		* scale : float
 			the factor by which the data is scaled, used to constrain
 			the maximum and minimum amplitudes to be fitted.
-		* tfmt : string
+		* time_format : string
 			The `astropy.time.Time` format string to setup the time axis.
 		* days_per_time_unit : float
 			The number of days per time unit, used to normalize the frequencies
