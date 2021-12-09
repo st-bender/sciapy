@@ -20,11 +20,13 @@ jobs:
       - run: sudo apt-get update
       - name: Install apt packages
         run: sudo apt-get install --no-install-recommends libhdf5-dev libnetcdf-dev netcdf-bin
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
       - name: Install dependencies
         run: |
           pip install h5py
