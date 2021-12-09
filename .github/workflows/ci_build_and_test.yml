@@ -22,7 +22,10 @@ jobs:
         run: sudo apt-get install --no-install-recommends libhdf5-dev libnetcdf-dev netcdf-bin
       - uses: actions/cache@v2
         with:
+          key: ${{ runner.os}}-pip-${{ matrix.python-version }}
           path: ~/.cache/pip
+          restore-keys: |
+            ${{ runner.os }}-pip-
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
