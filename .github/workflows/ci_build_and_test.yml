@@ -33,6 +33,7 @@ jobs:
           pip install -U pytest "pytest-cov<2.9" codecov coveralls
           pip install scrutinizer-ocular
           pip install astropy
+          pip install "emcee<3.1"
       - name: Install package
         run: |
           pip install -e ".[all]"
