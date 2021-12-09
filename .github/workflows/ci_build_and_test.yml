@@ -18,8 +18,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install apt packages
-        - run: sudo apt-get update
-        - run: sudo apt-get install --no-install-recommends libhdf5-dev libnetcdf-dev netcdf-bin
+        run: sudo apt-get update
+        run: sudo apt-get install --no-install-recommends libhdf5-dev libnetcdf-dev netcdf-bin
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
