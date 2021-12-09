@@ -50,9 +50,7 @@ jobs:
       - name: Test
         run: |
           py.test -v --cov sciapy
-      - name: Upload coverage reports
+      - name: Convert coverage
+        run: python -m coverage xml
+      - name: Upload coverage report
         uses: codecov/codecov-action@v2
-      - name: Upload coverage to Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
