@@ -50,3 +50,8 @@ jobs:
       - name: Test
         run: |
           py.test -v --cov sciapy
+      - name: Upload coverage reports
+        run: |
+          codecov
+          coveralls
+          ocular --data-file ".coverage"
