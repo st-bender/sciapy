@@ -54,3 +54,23 @@ jobs:
         run: python -m coverage xml
       - name: Upload coverage report
         uses: codecov/codecov-action@v2
+
+  deploy:
+    name: Deploy to PiPi
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: python -m pip install --upgrade pip
+    - run: python -m pip install build twine check-wheel-contents
+    - name: Build package
+      run: python -m build --sdist --wheel .
+    - run: ls -alF dist/
+    - run: check-wheel-contents dist/*.whl
+    - name: Check long_description
+      run: python -m twine check dist/*
