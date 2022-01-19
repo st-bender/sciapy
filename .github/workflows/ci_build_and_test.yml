@@ -50,3 +50,7 @@ jobs:
       - name: Test
         run: |
           py.test -v --cov sciapy
+      - name: Convert coverage
+        run: python -m coverage xml
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v2
