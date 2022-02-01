@@ -10,8 +10,8 @@ SCIAMACHY level 1c, level 2 data tools and regression modelling.
 
 The source code is `developed on Github <https://github.com/st-bender/sciapy>`_.
 
-.. image:: https://travis-ci.org/st-bender/sciapy.svg?branch=master
-    :target: https://travis-ci.org/st-bender/sciapy
+.. image:: https://github.com/st-bender/sciapy/actions/workflows/ci_build_and_test.yml/badge.svg?branch=master
+    :target: https://github.com/st-bender/sciapy/actions/workflows/ci_build_and_test.yml
     :alt: builds
 .. image:: https://readthedocs.org/projects/sciapy/badge/?version=latest
     :target: https://sciapy.readthedocs.io/en/latest/?badge=latest

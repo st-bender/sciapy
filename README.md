@@ -1,6 +1,6 @@
 # SCIAMACHY data tools
 
-[![builds](https://travis-ci.org/st-bender/sciapy.svg?branch=master)](https://travis-ci.org/st-bender/sciapy)
+[![builds](https://github.com/st-bender/sciapy/actions/workflows/ci_build_and_test.yml/badge.svg?branch=master)](https://github.com/st-bender/sciapy/actions/workflows/ci_build_and_test.yml)
 [![docs](https://rtfd.org/projects/sciapy/badge/?version=latest)](https://sciapy.rtfd.io/en/latest/?badge=latest)
 [![coveralls](https://coveralls.io/repos/github/st-bender/sciapy/badge.svg)](https://coveralls.io/github/st-bender/sciapy)
 [![scrutinizer](https://scrutinizer-ci.com/g/st-bender/sciapy/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/st-bender/sciapy/?branch=master)
