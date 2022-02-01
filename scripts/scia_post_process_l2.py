@@ -742,11 +742,11 @@ def main():
 	pddrange = []
 	if args.month is not None:
 		d0 = pd.to_datetime(args.month + "-01", utc=True)
-		pddrange += pd.date_range(d0, d0 + pd.tseries.offsets.MonthEnd())
+		pddrange.extend(pd.date_range(d0, d0 + pd.tseries.offsets.MonthEnd()))
 	if args.date_range is not None:
-		pddrange += pd.date_range(*args.date_range.split(':'))
+		pddrange.extend(pd.date_range(*args.date_range.split(':')))
 	if args.dates is not None:
-		pddrange += pd.to_datetime(args.dates.split(','), utc=True)
+		pddrange.extend(pd.to_datetime(args.dates.split(','), utc=True))
 	logging.debug("pddrange: %s", pddrange)
 
 	olist = []
