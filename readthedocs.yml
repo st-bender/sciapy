@@ -1,12 +1,12 @@
 build:
-    image: stable
+    image: latest
 
 conda:
     file: .rtd-environment.yml
 
 python:
     pip_install: true
-    version: 3.6
+    version: 3.8
 
 formats:
     - none
