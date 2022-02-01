@@ -34,6 +34,7 @@ jobs:
         run: |
           pip install h5py
           pip install "numpy>=1.13.0,!=1.15.*"
+          pip install "pandas<1.4"
           pip install pybind11
           pip install -U pytest "pytest-cov<2.9" codecov coveralls
           pip install scrutinizer-ocular
@@ -41,6 +42,7 @@ jobs:
       - name: Install deps for old python versions
         if: matrix.python-version == '2.7' || matrix.python-version == '3.5'
         run: |
+          pip install "cftime<1.5.2"
           pip install "emcee<3.1"
           pip install "netcdf4==1.5.3"
       - name: Install package
