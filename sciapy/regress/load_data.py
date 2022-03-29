@@ -83,7 +83,7 @@ def load_dailymeanAE(
 			names=["time", name], tfmt=tfmt)
 
 
-def load_dailymeanLya(filename="data/indices/lisird_lya3_1980-2017.dat",
+def load_dailymeanLya(filename="data/indices/lisird_lya3_1980-2021.dat",
 		name="Lya", tfmt="jyear"):
 	from pkg_resources import resource_filename
 	Lyafilename = resource_filename("sciapy", filename)

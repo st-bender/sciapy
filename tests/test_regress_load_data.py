@@ -55,7 +55,7 @@ def test_load_proxyAEfiles():
 
 def test_load_proxyLyafiles():
 	Lyafile = resource_filename("sciapy",
-			"data/indices/lisird_lya3_1980-2017.dat")
+			"data/indices/lisird_lya3_1980-2021.dat")
 	pLyat, pLyav = sciapy.regress.load_solar_gm_table(Lyafile,
 			cols=[0, 1], names=["time", "Lya"], tfmt="jyear")
 	pLyat2, pLyav2 = sciapy.regress.load_data.load_dailymeanLya()
