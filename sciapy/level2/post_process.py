@@ -32,6 +32,7 @@ from scipy.interpolate import interp1d
 
 from astropy import units
 from astropy.time import Time
+from astropy.utils import iers
 import astropy.coordinates as coord
 
 import sciapy.level1c as sl
@@ -56,6 +57,14 @@ KP_FILE = resource_filename("sciapy", "data/indices/spidr_kp_2000-2012.dat")
 
 PHI_FAC = 11.91
 LST_FAC = -0.62
+
+iers.conf.auto_download = False
+iers.conf.auto_max_age = None
+# Use a mirror page for the astrpy time data, see
+# https://github.com/mzechmeister/serval/issues/33#issuecomment-551156361
+# and
+# https://github.com/astropy/astropy/issues/8981#issuecomment-523984247
+iers.conf.iers_auto_url = "https://astroconda.org/aux/astropy_mirror/iers_a_1/finals2000A.all"
 
 
 def solar_zenith_angle(alt, lat, lon, time):
