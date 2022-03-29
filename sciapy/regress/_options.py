@@ -58,7 +58,7 @@ parser.add_argument("-m", "--name_suffix", default="",
 		help="The suffix for the figure plot files (default: \"\")")
 parser.add_argument("--proxies", metavar="NAME1:FILE1,NAME2:FILE2,...",
 		default="Sol:data/indices/lisird_lya_version3_daily_full.dat,"
-		"GM:data/indices/AE_Kyoto_1980-2016_daily2_shift12h.dat",
+		"GM:data/indices/AE_Kyoto_1980-2018_daily2_shift12h.dat",
 		help="Comma separated list of (solar and geomagnetic or other) "
 		"proxies as 'name:file' (default: %(default)s)")
 parser.add_argument("-T", "--fit_lags", default="", type=str,

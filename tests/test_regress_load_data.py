@@ -46,7 +46,7 @@ Lyadata = [
 
 def test_load_proxyAEfiles():
 	AEfile = resource_filename("sciapy",
-			"data/indices/AE_Kyoto_1980-2016_daily2_shift12h.dat")
+			"data/indices/AE_Kyoto_1980-2018_daily2_shift12h.dat")
 	pAEt, pAEv = sciapy.regress.load_solar_gm_table(AEfile,
 			cols=[0, 1], names=["time", "AE"], tfmt="jyear")
 	pAEt2, pAEv2 = sciapy.regress.load_data.load_dailymeanAE()
