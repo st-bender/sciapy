@@ -103,7 +103,12 @@ conda install numpy pybind11
 
 ### sciapy
 
-There is no `pip` package yet, but
+Official releases are available as `pip` packages from the main package repository,
+to be found at <https://pypi.org/project/sciapy/>, and which can be installed with:
+```sh
+$ pip install sciapy
+```
+The latest development version of
 sciapy can be installed with [`pip`](https://pip.pypa.io) directly
 from github (see <https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support>
 and <https://pip.pypa.io/en/stable/reference/pip_install/#git>):
