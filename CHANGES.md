@@ -1,6 +1,16 @@
 Changelog
 =========
 
+v0.0.8 (unreleased)
+-------------------
+
+### New
+
+- `pip` package available from <pypi.org>: <https://pypi.org/project/sciapy/>
+
+### Changes
+
+
 v0.0.7 (2022-04-04)
 -------------------
 
