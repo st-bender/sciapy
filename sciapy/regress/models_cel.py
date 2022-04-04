@@ -252,7 +252,7 @@ class ProxyModel(Model):
 					+ self.tausin1 * np.sin(1 * self.omega * (t + self.t_adj))
 					+ self.taucos2 * np.cos(2 * self.omega * (t + self.t_adj))
 					+ self.tausin2 * np.sin(2 * self.omega * (t + self.t_adj)))
-		tau_cs[tau_cs < 0] = 0.  # clip to zero
+		tau_cs = np.maximum(0., tau_cs)  # clip to zero
 		tau = self.tau0 + tau_cs
 		if self.ltscan > 0:
 			_ltscn = int(np.floor(self.ltscan))
@@ -292,7 +292,7 @@ class ProxyModel(Model):
 			dtau_sin2 = np.sin(2 * self.omega * (t + self.t_adj))
 			tau_cs = (self.taucos1 * dtau_cos1 + self.tausin1 * dtau_sin1 +
 					self.taucos2 * dtau_cos2 + self.tausin2 * dtau_sin2)
-		tau_cs[tau_cs < 0] = 0.  # clip to zero
+		tau_cs = np.maximum(0., tau_cs)  # clip to zero
 		tau = self.tau0 + tau_cs
 		if self.ltscan > 0:
 			_ltscn = int(np.floor(self.ltscan))
