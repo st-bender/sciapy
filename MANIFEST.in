@@ -3,6 +3,7 @@ graft docs
 prune docs/_build
 
 include LICENSE
+include *.md
 
 global-exclude *.py[cod] *.so *.dylib *.git *.swp *.bak *~
 global-exclude __pycache__/* .ipynb_checkpoints/* dask-worker-space/*
