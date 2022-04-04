@@ -292,7 +292,7 @@ def process_orbit(
 	# limb scan spectra files along the orbit to determine the values
 	# at the Equator and to fill in possibly missing data.
 	#
-	# y values are unit circle angles in radians (0 < φ < 2π or -π < φ < π)
+	# y values are unit circle angles in radians (0 < phi < 2 pi or -pi < phi < pi)
 	# longitudes
 	lons_intpf = _circ_interp(
 		lats[::-1], np.radians(lons[::-1]),
