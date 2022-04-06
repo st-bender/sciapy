@@ -405,6 +405,7 @@ def trace_gas_modelset(constant=True, freqs=None, proxy_config=None, **kwargs):
 	max_amp = kwargs.pop("max_amp", 1e10 * scale)
 	max_days = kwargs.pop("max_days", 100)
 
+	freqs = freqs or []
 	proxy_config = proxy_config or _default_proxy_config(tfmt=tfmt)
 
 	with pm.Model() as model:
