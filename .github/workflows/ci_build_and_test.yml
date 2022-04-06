@@ -48,7 +48,7 @@ jobs:
           pip install "netcdf4==1.5.3"
       - name: Install package
         run: |
-          pip install -e ".[all]"
+          pip install -e ".[tests]"
       - run: pip list
       - name: Test
         run: |
