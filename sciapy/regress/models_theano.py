@@ -137,6 +137,7 @@ class LifetimeModel:
 		self.lower = lower
 
 	def get_value(self, t):
+		t = tt.as_tensor_variable(t).astype("float64")
 		tau_cs = tt.zeros(t.shape[:-1], dtype="float64")
 		for h in self.harmonics:
 			tau_cs += h.get_value(t)
@@ -244,7 +245,7 @@ class ProxyModel:
 		return yp * self.dt
 
 	def get_value(self, t):
-		t = tt.as_tensor_variable(t)
+		t = tt.as_tensor_variable(t).astype("float64")
 		proxy_val = _interp(
 			t - self.lag,
 			self.times, self.values,
@@ -265,6 +266,7 @@ class ModelSet:
 		self.models = models
 
 	def get_value(self, t):
+		t = tt.as_tensor_variable(t).astype("float64")
 		v = tt.zeros(t.shape[:-1], dtype="float64")
 		for m in self.models:
 			v += m.get_value(t)
