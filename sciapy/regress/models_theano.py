@@ -134,7 +134,7 @@ class LifetimeModel:
 		if not hasattr(harmonics, "getitem"):
 			harmonics = [harmonics]
 		self.harmonics = harmonics
-		self.lower = lower
+		self.lower = tt.as_tensor_variable(lower).astype("float64")
 
 	def get_value(self, t):
 		t = tt.as_tensor_variable(t).astype("float64")
