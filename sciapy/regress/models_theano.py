@@ -290,6 +290,11 @@ def setup_proxy_model_theano(
 	lifetime_scan = kwargs.get("lifetime_scan", 60)
 	positive = kwargs.get("positive", False)
 	time_format = kwargs.get("time_format", "jyear")
+	days_per_time_unit = kwargs.get(
+		"days_per_time_unit",
+		1. if time_format.endswith("d") else 365.25
+	)
+	harm_freq = days_per_time_unit / 365.25
 
 	with model:
 		if positive:
@@ -305,7 +310,7 @@ def setup_proxy_model_theano(
 			tau0 = pm.Deterministic("{0}_tau0".format(name), pm.math.exp(log_tau0))
 			cos1 = pm.Normal("{0}_tau_cos1".format(name), mu=0.0, sd=max_amp)
 			sin1 = pm.Normal("{0}_tau_sin1".format(name), mu=0.0, sd=max_amp)
-			harm1 = HarmonicModelCosineSine(1., cos1, sin1)
+			harm1 = HarmonicModelCosineSine(harm_freq, cos1, sin1)
 			tau1 = LifetimeModel(harm1, lower=0)
 		else:
 			tau0 = 0.
@@ -317,7 +322,7 @@ def setup_proxy_model_theano(
 			tau0=tau0,
 			tau_harm=tau1,
 			tau_scan=lifetime_scan,
-			days_per_time_unit=1 if time_format.endswith("d") else 365.25,
+			days_per_time_unit=days_per_time_unit,
 		)
 	return proxy
 
