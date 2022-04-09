@@ -54,6 +54,8 @@ The source code is `developed on Github <https://github.com/st-bender/sciapy>`_.
 
     reference/index
 
+    CHANGES
+
 
 Indices and tables
 ==================
