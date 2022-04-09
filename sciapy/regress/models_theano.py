@@ -13,7 +13,19 @@
 Model classes for SCIAMACHY data regression fits using
 :mod:`theano` for :mod:`pymc3`.
 
-This interface is still experimental.
+This interface is still experimental, it is available
+when installing ``sciapy``'s ``pymc3`` or ``theano`` extras:
+
+.. code-block:: bash
+
+	pip install "sciapy[pymc3]"
+
+The classes can be imported as usual, e.g. via:
+
+.. code-block:: python
+
+	from sciapy.regress.models_theano import ProxyModel
+
 """
 from __future__ import absolute_import, division, print_function
 from warnings import warn
