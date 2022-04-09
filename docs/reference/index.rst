@@ -8,11 +8,3 @@ sciapy reference
     sciapy.level1c
     sciapy.level2
     sciapy.regress
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
