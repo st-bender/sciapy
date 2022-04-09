@@ -6,6 +6,8 @@ v0.0.8 (unreleased)
 
 ### New
 
+- `pymc3` (`theano`) regression model interface for inference
+  with `pymc3` <https://docs.pymc.io>
 - `pip` package available from <pypi.org>: <https://pypi.org/project/sciapy/>
 
 ### Changes
