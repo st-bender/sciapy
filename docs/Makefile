@@ -16,9 +16,9 @@ I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
 default: html
 TUTORIALS = \
-	tutorials/level2_binning.rst \
-	tutorials/regress_intro.rst \
-	tutorials/regress_model_fit.rst
+	tutorials/level2_binning.ipynb \
+	tutorials/regress_intro.ipynb \
+	tutorials/regress_model_fit.ipynb
 
 tutorials/%.rst: _static/notebooks/%.ipynb tutorials/tutorial_rst.tpl
 	jupyter nbconvert --template tutorials/tutorial_rst --to rst $< --output-dir tutorials
