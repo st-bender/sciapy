@@ -9,6 +9,7 @@ dependencies:
     - pybind11
     - celerite
     - george
+    - nbsphinx
     - numpydoc
     - ipython
     - pip
