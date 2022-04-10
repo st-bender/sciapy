@@ -25,6 +25,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx_markdown_tables',
     'recommonmark',
+    'nbsphinx',
     'numpydoc'
 ]
 if getenv('SPELLCHECK'):
@@ -69,6 +70,24 @@ texinfo_documents = [
      author, 'sciapy', 'SCIAMACHY data tools.',
      'Miscellaneous'),
 ]
+
+nbsphinx_prolog = r"""
+{% set docname = env.doc2path(env.docname, base=None) %}
+
+.. module:: sciapy
+
+.. note:: This tutorial was generated from an IPython notebook that can be
+          downloaded `here <{{ docname }}>`_.
+          Try a live version: |binderbadge|. |nbviewer|__.
+
+.. |binderbadge| image:: https://mybinder.org/badge_logo.svg
+    :target: https://mybinder.org/v2/gh/st-bender/sciapy/master?filepath=docs/tutorials/{{ docname | basename }}
+
+.. |nbviewer| replace:: View in *nbviewer*
+__ https://nbviewer.jupyter.org/github/st-bender/sciapy/tree/master/docs/tutorials/{{ docname | basename }}
+
+.. _{{ docname }}:
+"""
 
 # on_rtd is whether we are on readthedocs.org
 on_rtd = getenv("READTHEDOCS", None) == "True"
