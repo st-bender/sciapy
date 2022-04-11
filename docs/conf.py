@@ -42,6 +42,13 @@ htmlhelp_basename = 'sciapydoc'
 
 autosummary_generate = True
 
+napoleon_custom_sections = [
+    ("Arguments", "params_style"),
+    ("Attributes", "params_style"),
+]
+napoleon_custom_section_rename = False
+napoleon_use_param = False
+
 latex_elements = {
     "papersize": "a4paper",
     "pointsize": "11pt",
