@@ -72,19 +72,19 @@ texinfo_documents = [
 ]
 
 nbsphinx_prolog = r"""
-{% set docname = env.doc2path(env.docname, base=None) %}
+{% set docname = 'docs/' + env.doc2path(env.docname, base=None) %}
 
 .. module:: sciapy
 
 .. note:: This tutorial was generated from an IPython notebook that can be
-          downloaded `here <{{ docname }}>`_.
-          Try a live version: |binderbadge|. |nbviewer|__.
+          downloaded `here <https://github.com/st-bender/sciapy/blob/master/{{ docname }}>`_.
+          Try a live version: |binderbadge|, or |nbviewer|__.
 
 .. |binderbadge| image:: https://mybinder.org/badge_logo.svg
-    :target: https://mybinder.org/v2/gh/st-bender/sciapy/master?filepath=docs/tutorials/{{ docname | basename }}
+    :target: https://mybinder.org/v2/gh/st-bender/sciapy/master?filepath={{ docname }}
 
-.. |nbviewer| replace:: View in *nbviewer*
-__ https://nbviewer.jupyter.org/github/st-bender/sciapy/tree/master/docs/tutorials/{{ docname | basename }}
+.. |nbviewer| replace:: view in *nbviewer*
+__ https://nbviewer.jupyter.org/github/st-bender/sciapy/tree/master/{{ docname }}
 
 .. _{{ docname }}:
 """
