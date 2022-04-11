@@ -25,7 +25,7 @@ tutorials/%.rst: _static/notebooks/%.ipynb tutorials/tutorial_rst.tpl
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILDDIR)/* $(TUTORIALS)
+	rm -rf $(BUILDDIR)/*
 
 .PHONY: html
 html: $(TUTORIALS)
