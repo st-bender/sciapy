@@ -5,7 +5,7 @@ channels:
 
 dependencies:
     - python=3
-    - numpy
+    - numpy<1.22
     - pybind11
     - celerite
     - george

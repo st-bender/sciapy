@@ -4,13 +4,9 @@ build:
   os: "ubuntu-20.04"
   tools:
     python: "mambaforge-4.10"
+  jobs:
+    post_create_environment:
+      - python -m pip install --no-cache-dir .[pymc3]
 
 conda:
   environment: .rtd-environment.yml
-
-python:
-  install:
-    - method: pip
-      path: .
-      extra_requirements:
-        - pymc3
