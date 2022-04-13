@@ -461,7 +461,7 @@ def get_orbits_from_date(date, mlt=False, path=None, L2_version="v6.2"):
 	path: str, optional
 		The path to the level 2 data. If `None` tries to infer
 		the data directory from the L2 version using
-		'./*<L2_version>'. Default: None
+		`./*<L2_version>`. Default: None
 
 	Returns
 	-------
@@ -501,7 +501,7 @@ def combine_orbit_data(orbits,
 	dens_path: str, optional
 		The path to the level 2 data. If `None` tries to infer
 		the data directory from the L2 version looking for anything
-		in the current directory that ends in <L2_version>: './*<L2_version>'.
+		in the current directory that ends in <L2_version>: `./*<L2_version>`.
 		Default: None
 	spec_base: str, optional
 		The root path to the level 1c spectra. Uses the current

@@ -161,7 +161,7 @@ class scia_densities(object):
 	Note
 	----
 	The variables are empty when initialized, use one of the
-	read_from_...() methods to fill with actual data.
+	`read_from_...()` methods to fill with actual data.
 	"""
 	def __init__(self, author="unknown", ref_date="2000-01-01", ver=None, data_ver=None):
 		self.author = author
