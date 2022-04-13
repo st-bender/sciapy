@@ -185,7 +185,7 @@ class ProxyModel:
 	amp : float
 		The amplitude of the proxy term
 	lag : float, optional
-		The lag of the proxy value in years.
+		The lag of the proxy value in days.
 	tau0 : float, optional
 		The base life time of the proxy
 	tau_harm : LifetimeModel, optional
