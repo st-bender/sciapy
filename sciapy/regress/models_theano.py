@@ -299,7 +299,7 @@ def setup_proxy_model_theano(
 	# extract setup from `kwargs`
 	fit_lag = kwargs.get("fit_lag", False)
 	lag = kwargs.get("lag", 0.)
-	lifetime_scan = kwargs.get("lifetime_scan", 60)
+	lifetime_scan = kwargs.get("lifetime_scan", 0)
 	positive = kwargs.get("positive", False)
 	time_format = kwargs.get("time_format", "jyear")
 	days_per_time_unit = kwargs.get(
@@ -358,7 +358,7 @@ def _default_proxy_config(tfmt="jyear"):
 		"GM": {
 			"times": paet,
 			"values": paedf["GM"],
-			"lifetime_scan": 60,
+			"lifetime_scan": 30,
 			"positive": True,
 		}
 	})
