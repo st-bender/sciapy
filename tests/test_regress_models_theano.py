@@ -24,6 +24,8 @@ try:
 	from sciapy.regress.models_theano import (
 		HarmonicModelCosineSine,
 		HarmonicModelAmpPhase,
+		LifetimeModel,
+		ProxyModel,
 	)
 except ImportError:
 	pytest.skip("Theano/PyMC3 interface not installed", allow_module_level=True)
@@ -84,4 +86,87 @@ def test_harmonics_theano(xs, c, s):
 		trace1.posterior.median(dim=("chain", "draw"))[["amp", "phase"]].to_array(),
 		trace2.posterior.median(dim=("chain", "draw"))[["amp", "phase"]].to_array(),
 		atol=3e-3,
+	)
+
+
+def _test_data(xs, c, s):
+	# generate proxy "values"
+	values = ys(xs, c, s)
+	amp = 3.
+	lag = 2.
+	tau0 = 1.
+	harm0 = HarmonicModelCosineSine(1., c, s)
+	tau_lt0 = LifetimeModel(harm0, lower=0.)
+	proxy0 = ProxyModel(
+		xs, values,
+		amp=amp,
+		lag=lag,
+		tau0=tau0,
+		tau_harm=tau_lt0,
+		tau_scan=10,
+	)
+	return proxy0.get_value(xs).eval()
+
+
+@pytest.mark.long
+def test_proxy_theano(xs, c=3.0, s=1.0):
+	# Initialize random number generator
+	np.random.seed(93457)
+
+	# proxy "values"
+	values = ys(xs, c, s)
+
+	yp = _test_data(xs, c, s)
+	yp += 0.5 * np.random.randn(xs.shape[0])
+
+	# using "name" prefixes all variables with <name>_
+	with pm.Model(name="proxy") as model:
+		# amplitude
+		plamp = pm.Normal("log_amp", mu=0.0, sd=np.log(10.0))
+		pamp = pm.Deterministic("amp", pm.math.exp(plamp))
+		# lag
+		pllag = pm.Normal("log_lag", mu=0.0, sd=np.log(10.0))
+		plag = pm.Deterministic("lag", pm.math.exp(pllag))
+		# lifetime
+		pltau0 = pm.Normal("log_tau0", mu=0.0, sd=np.log(10.0))
+		ptau0 = pm.Deterministic("tau0", pm.math.exp(pltau0))
+		cos1 = pm.Normal("tau_cos1", mu=0.0, sd=10.0)
+		sin1 = pm.Normal("tau_sin1", mu=0.0, sd=10.0)
+		harm1 = HarmonicModelCosineSine(1., cos1, sin1)
+		tau1 = LifetimeModel(harm1, lower=0)
+
+		proxy = ProxyModel(
+			xs, values,
+			amp=pamp,
+			lag=plag,
+			tau0=ptau0,
+			tau_harm=tau1,
+			tau_scan=10,
+		)
+		prox1 = proxy.get_value(xs)
+		# Include "jitter"
+		log_jitter = pm.Normal("log_jitter", mu=0.0, sd=4.0)
+		pm.Normal("obs", mu=prox1, sd=pm.math.exp(log_jitter), observed=yp)
+
+		maxlp0 = pm.find_MAP()
+		trace = pm.sample(
+			chains=2,
+			draws=1000,
+			tune=1000,
+			init="jitter+adapt_full",
+			random_seed=[286923464, 464329682],
+			return_inferencedata=True,
+			start=maxlp0,
+			target_accept=0.9,
+		)
+
+	medians = trace.posterior.median(dim=("chain", "draw"))
+	np.testing.assert_allclose(
+		medians[[
+			"proxy_amp", "proxy_lag", "proxy_tau0",
+			"proxy_tau_cos1", "proxy_tau_sin1",
+			"proxy_log_jitter",
+		]].to_array(),
+		(3., 2., 1., c, s, np.log(0.5)),
+		atol=3e-2, rtol=1e-2,
 	)
