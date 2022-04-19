@@ -11,15 +11,18 @@ on:
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.allow-failure }}
 
     strategy:
       fail-fast: false
       matrix:
         python-version: ["2.7", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10"]
         extras: [""]
+        allow-failure: [false]
         include:
           - python-version: "3.8"
             extras: "pymc3"
+            allow-failure: true
 
     steps:
       - uses: actions/checkout@v2
