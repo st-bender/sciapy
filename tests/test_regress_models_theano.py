@@ -17,7 +17,7 @@ import pytest
 try:
 	import pymc3 as pm
 	import arviz as az
-except (ImportError, ModuleNotFoundError):
+except ImportError:
 	pytest.skip("Theano/PyMC3 packages not installed", allow_module_level=True)
 
 try:
@@ -25,7 +25,7 @@ try:
 		HarmonicModelCosineSine,
 		HarmonicModelAmpPhase,
 	)
-except (ImportError, ModuleNotFoundError):
+except ImportError:
 	pytest.skip("Theano/PyMC3 interface not installed", allow_module_level=True)
 
 
