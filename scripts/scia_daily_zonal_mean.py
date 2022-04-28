@@ -31,9 +31,8 @@ except ImportError:
 
 from sciapy.level2.binning import bin_lat_timeavg
 
-# non-sensible vairables to drop
-_drop_vars = ["NO_ERR_std", "NO_ETOT_std", "NO_RSTD_std",
-		"NO_ERR_cnt", "NO_ETOT_cnt", "NO_RSTD_cnt"]
+# non-sensible variables to drop
+_drop_vars = ["NO_RSTD_cnt", "NO_RSTD_std"]
 
 
 if __name__ == "__main__":
