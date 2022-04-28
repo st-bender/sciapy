@@ -41,7 +41,7 @@ def _bin_stats(ds,
 	# unbiased standard deviations
 	var_ds = ((_weights * (ds - mean_ds)**2).sum(dim=stacked) /
 			(1. - _ssqw)) if area_weighted else ds.var(dim=stacked, ddof=1)
-	sdev_ds = var_ds.apply(np.sqrt)
+	sdev_ds = np.sqrt(var_ds)
 	cnts_ds = ds.count(dim=stacked)
 	if set_attrs:
 		for var in ds.data_vars:
