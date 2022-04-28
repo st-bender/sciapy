@@ -149,7 +149,7 @@ if __name__ == "__main__":
 		tbin_edges = np.concatenate([[ds.time.values[0] - 0.5],
 			ds.time.values[np.where(np.diff(ds.time) > 1)] + 0.01,
 			[ds.time.values[-1] + 0.5]])
-		tbin_labels = ds.time.groupby_bins("time", tbin_edges).mean("time")
+		tbin_labels = ds.time.groupby_bins("time", tbin_edges).mean("time").values
 		ds_bins_daily_gb = ds.groupby_bins("time", tbin_edges, labels=tbin_labels)
 	else:
 		time_rename_dict = {"date": "time"}
