@@ -61,6 +61,40 @@ def ds():
 	return ds
 
 
+def test__bin_stats(ds):
+	from sciapy.level2.binning import _bin_stats
+	_ds = ds.copy()
+	_ds["latitude"] = xr.zeros_like(_ds.latitude)
+	# binning result
+	avg_aw = _bin_stats(
+		_ds,
+		binvar="latitude", tvar="time",
+		area_weighted=True,
+	)
+	avg_nw = _bin_stats(
+		_ds,
+		binvar="latitude", tvar="time",
+		area_weighted=False,
+	)
+	xr.testing.assert_allclose(avg_nw, avg_aw)
+
+	# non-weighted mean using standard functions
+	dims = ("latitude", "time")
+	stacked = "__stacked__"
+	_ds = _ds.stack(**{stacked: dims})
+	ds_avg = _ds.mean(dim=stacked)
+	ds_cnt = _ds.count(dim=stacked)
+	ds_std = _ds.std(dim=stacked, ddof=1)
+	ds_std = ds_std.rename({v: v + "_std" for v in ds_std.data_vars})
+	ds_cnt = ds_cnt.rename({v: v + "_cnt" for v in ds_cnt.data_vars})
+	avg_ds = xr.merge([ds_avg, ds_std, ds_cnt])
+	# Re-create the sum of squared weights
+	_ws = xr.ones_like(_ds.latitude, dtype=float)
+	_ws /= _ws.sum(dim=stacked)
+	avg_ds["wsqsum"] = (_ws**2).sum(dim=stacked)
+	xr.testing.assert_allclose(avg_nw, avg_ds)
+
+
 def test_binning_aw(ds):
 	from sciapy.level2.binning import bin_lat_timeavg
 	data = ds.data.values
