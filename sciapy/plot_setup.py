@@ -30,11 +30,11 @@ def plot_setup():
 	rcParams["figure.dpi"] = 96
 	rcParams["figure.figsize"] = [8, 5]
 	rcParams["font.size"] = 16
-	rcParams['mathtext.default'] = 'regular'
-	rcParams['savefig.dpi'] = 600
-	rcParams['pdf.compression'] = 0
-	rcParams['axes.linewidth'] = 1.5
-	rcParams['lines.linewidth'] = 1.5
+	rcParams["mathtext.default"] = "regular"
+	rcParams["savefig.dpi"] = 600
+	rcParams["pdf.compression"] = 0
+	rcParams["axes.linewidth"] = 1.5
+	rcParams["lines.linewidth"] = 1.5
 	# visible ticks
 	rcParams["xtick.minor.visible"] = True
 	rcParams["ytick.minor.visible"] = True
