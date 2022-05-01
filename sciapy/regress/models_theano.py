@@ -309,20 +309,20 @@ def setup_proxy_model_theano(
 	)
 	harm_freq = days_per_time_unit / 365.25
 
-	with model:
+	with pm.Model(model=model, name=name):
 		if positive:
-			log_amp = pm.Normal("log_{0}_amp".format(name), mu=0.0, sd=np.log(max_amp))
-			amp = pm.Deterministic("{0}_amp".format(name), pm.math.exp(log_amp))
+			log_amp = pm.Normal("log_amp", mu=0.0, sd=np.log(max_amp))
+			amp = pm.Deterministic("amp", pm.math.exp(log_amp))
 		else:
-			amp = pm.Normal("{0}_amp".format(name), mu=0.0, sd=max_amp)
+			amp = pm.Normal("amp", mu=0.0, sd=max_amp)
 		if fit_lag:
-			log_lag = pm.Normal("log_{0}_lag".format(name), mu=-5.0, sd=np.log(max_days))
-			lag = pm.Deterministic("{0}_lag".format(name), pm.math.exp(log_lag))
+			log_lag = pm.Normal("log_lag", mu=0.0, sd=np.log(max_days))
+			lag = pm.Deterministic("lag", pm.math.exp(log_lag))
 		if lifetime_scan > 0:
-			log_tau0 = pm.Normal("log_{0}_tau0".format(name), mu=-5.0, sd=np.log(max_days))
-			tau0 = pm.Deterministic("{0}_tau0".format(name), pm.math.exp(log_tau0))
-			cos1 = pm.Normal("{0}_tau_cos1".format(name), mu=0.0, sd=max_amp)
-			sin1 = pm.Normal("{0}_tau_sin1".format(name), mu=0.0, sd=max_amp)
+			log_tau0 = pm.Normal("log_tau0", mu=0.0, sd=np.log(max_days))
+			tau0 = pm.Deterministic("tau0", pm.math.exp(log_tau0))
+			cos1 = pm.Normal("tau_cos1", mu=0.0, sd=max_amp)
+			sin1 = pm.Normal("tau_sin1", mu=0.0, sd=max_amp)
 			harm1 = HarmonicModelCosineSine(harm_freq, cos1, sin1)
 			tau1 = LifetimeModel(harm1, lower=0)
 		else:
