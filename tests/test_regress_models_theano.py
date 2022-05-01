@@ -66,7 +66,7 @@ def test_harmonics_theano(xs, c, s):
 		pm.Deterministic("phase", harm1.get_phase())
 		resid1 = yp - wave1
 		pm.Normal("obs", mu=0.0, observed=resid1)
-		trace1 = pm.sample(tune=800, draws=800, chains=2, return_inferencedata=True)
+		trace1 = pm.sample(tune=400, draws=400, chains=2, return_inferencedata=True)
 
 	with pm.Model() as model2:
 		amp2 = pm.HalfNormal("amp", sigma=4.0)
@@ -75,7 +75,7 @@ def test_harmonics_theano(xs, c, s):
 		wave2 = harm2.get_value(xs)
 		resid2 = yp - wave2
 		pm.Normal("obs", mu=0.0, observed=resid2)
-		trace2 = pm.sample(tune=800, draws=800, chains=2, return_inferencedata=True)
+		trace2 = pm.sample(tune=400, draws=400, chains=2, return_inferencedata=True)
 
 	np.testing.assert_allclose(
 		trace1.posterior.median(dim=("chain", "draw"))[["cos", "sin"]].to_array(),
@@ -85,7 +85,7 @@ def test_harmonics_theano(xs, c, s):
 	np.testing.assert_allclose(
 		trace1.posterior.median(dim=("chain", "draw"))[["amp", "phase"]].to_array(),
 		trace2.posterior.median(dim=("chain", "draw"))[["amp", "phase"]].to_array(),
-		atol=3e-3,
+		atol=4e-3,
 	)
 
 
@@ -151,8 +151,8 @@ def test_proxy_theano(xs, c=3.0, s=1.0):
 		maxlp0 = pm.find_MAP()
 		trace = pm.sample(
 			chains=2,
-			draws=1000,
-			tune=1000,
+			draws=400,
+			tune=400,
 			init="jitter+adapt_full",
 			random_seed=[286923464, 464329682],
 			return_inferencedata=True,
