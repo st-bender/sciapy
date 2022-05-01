@@ -251,15 +251,16 @@ class ProxyModel:
 		for b in self.bs:
 			taufac *= tauexp
 			yp += taufac * _interp(
-				t - self.lag - b,
+				t - b,
 				self.times, self.values,
 			)
 		return yp * self.dt
 
 	def get_value(self, t):
 		t = tt.as_tensor_variable(t).astype("float64")
+		tp = t - self.lag
 		proxy_val = _interp(
-			t - self.lag,
+			tp,
 			self.times, self.values,
 		)
 		if self.tau_scan == 0:
@@ -269,7 +270,7 @@ class ProxyModel:
 		if self.tau_harm is not None:
 			tau_cs = self.tau_harm.get_value(t + self.t_adj)
 			tau += tau_cs
-		proxy_val += self._lt_corr(t, tau)
+		proxy_val += self._lt_corr(tp, tau)
 		return self.amp * proxy_val
 
 
