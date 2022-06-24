@@ -56,7 +56,7 @@ def _gentestfile(tfile, tmpdir):
 
 
 def test_pp_help():
-	p = Popen(["scia_post_process_l2.py", "-h"])
+	p = Popen(["python", "-m", "sciapy.level2.post_process", "-h"])
 	p.communicate()
 	p.wait()
 	assert p.returncode == 0
@@ -71,7 +71,7 @@ def test_pp_netcdf(revision, tmpdir):
 	ifile = _gentestfile(IFILE1.format(revision), tmpdir)
 	ofile = os.path.join(tmpdir, "test_v{0}_t.nc".format(revision))
 	p = Popen([
-		"scia_post_process_l2.py",
+		"python", "-m", "sciapy.level2.post_process",
 		"-A", "The Dude",
 		"-M", "2010-02",
 		"-R", revision,
@@ -96,7 +96,7 @@ def test_pp_xarray(revision, tmpdir):
 	ifile = _gentestfile(IFILE2.format(revision), tmpdir)
 	ofile = os.path.join(tmpdir, "test_v{0}x_t.nc".format(revision))
 	p = Popen([
-		"scia_post_process_l2.py",
+		"python", "-m", "sciapy.level2.post_process",
 		"-A", "The Dude",
 		"-M", "2010-02",
 		"-R", revision,
