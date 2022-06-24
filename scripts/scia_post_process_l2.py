@@ -318,7 +318,7 @@ def process_orbit(
 	sdd.lst = sdd.mst + eotcorr / 60.
 	mean_alt_km = sdd.alts.mean()
 
-	dt_date_this = dt.timedelta(np.asscalar(dts_retr_interp0)) + dtrefdate
+	dt_date_this = dt.timedelta(dts_retr_interp0.item()) + dtrefdate
 	logging.info("date: %s", dt_date_this)
 	# caclulate geomagnetic coordinates
 	sdd.gmlats, sdd.gmlons = gmag_igrf(dt_date_this, sdd.lats, sdd.lons, alt=mean_alt_km)
@@ -331,7 +331,7 @@ def process_orbit(
 	f107_data = _read_gm(F107_FILE)
 	f107a_data = _read_gm(F107A_FILE)
 	ap_data = _read_gm(AP_FILE)
-	msis_dtdate = dt.timedelta(np.asscalar(dts_retr_interp0)) + dtrefdate
+	msis_dtdate = dt.timedelta(dts_retr_interp0.item()) + dtrefdate
 	msis_dtdate1 = msis_dtdate - dt.timedelta(days=1)
 	msis_date = msis_dtdate.strftime("%Y-%m-%d").encode()
 	msis_date1 = msis_dtdate1.strftime("%Y-%m-%d").encode()
@@ -344,7 +344,7 @@ def process_orbit(
 	# previous day for NOEM input
 	f107_adj = _read_gm(F107_ADJ_FILE)
 	kp_data = _read_gm(KP_FILE)
-	noem_dtdate = dt.timedelta(np.asscalar(dts_retr_interp0) - 1) + dtrefdate
+	noem_dtdate = dt.timedelta(dts_retr_interp0.item() - 1) + dtrefdate
 	noem_date = noem_dtdate.strftime("%Y-%m-%d").encode()
 	noem_f107 = f107_adj[noem_date]
 	noem_kp = kp_data[noem_date]
