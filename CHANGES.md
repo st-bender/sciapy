@@ -12,6 +12,8 @@ v0.0.8 (unreleased)
 
 ### Changes
 
+- Fixes `numpy` v1.23 compatibility by using `.item()` instead of `np.asscalar()`
+
 
 v0.0.7 (2022-04-04)
 -------------------
