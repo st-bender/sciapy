@@ -311,18 +311,18 @@ def setup_proxy_model_theano(
 
 	with pm.Model(model=model, name=name):
 		if positive:
-			log_amp = pm.Normal("log_amp", mu=0.0, sd=np.log(max_amp))
+			log_amp = pm.Normal("log_amp", mu=0.0, sigma=np.log(max_amp))
 			amp = pm.Deterministic("amp", pm.math.exp(log_amp))
 		else:
-			amp = pm.Normal("amp", mu=0.0, sd=max_amp)
+			amp = pm.Normal("amp", mu=0.0, sigma=max_amp)
 		if fit_lag:
-			log_lag = pm.Normal("log_lag", mu=0.0, sd=np.log(max_days))
+			log_lag = pm.Normal("log_lag", mu=0.0, sigma=np.log(max_days))
 			lag = pm.Deterministic("lag", pm.math.exp(log_lag))
 		if lifetime_scan > 0:
-			log_tau0 = pm.Normal("log_tau0", mu=0.0, sd=np.log(max_days))
+			log_tau0 = pm.Normal("log_tau0", mu=0.0, sigma=np.log(max_days))
 			tau0 = pm.Deterministic("tau0", pm.math.exp(log_tau0))
-			cos1 = pm.Normal("tau_cos1", mu=0.0, sd=max_amp)
-			sin1 = pm.Normal("tau_sin1", mu=0.0, sd=max_amp)
+			cos1 = pm.Normal("tau_cos1", mu=0.0, sigma=max_amp)
+			sin1 = pm.Normal("tau_sin1", mu=0.0, sigma=max_amp)
 			harm1 = HarmonicModelCosineSine(harm_freq, cos1, sin1)
 			tau1 = LifetimeModel(harm1, lower=0)
 		else:
@@ -433,20 +433,20 @@ def trace_gas_modelset(constant=True, freqs=None, proxy_config=None, **kwargs):
 	with pm.Model() as model:
 		offset = 0.
 		if constant:
-			offset = pm.Normal("offset", mu=0.0, sd=max_amp)
+			offset = pm.Normal("offset", mu=0.0, sigma=max_amp)
 
 		modelset = []
 		for freq in freqs:
 			if not fit_phase:
-				cos = pm.Normal("cos{0}".format(freq), mu=0., sd=max_amp)
-				sin = pm.Normal("sin{0}".format(freq), mu=0., sd=max_amp)
+				cos = pm.Normal("cos{0}".format(freq), mu=0., sigma=max_amp)
+				sin = pm.Normal("sin{0}".format(freq), mu=0., sigma=max_amp)
 				harm = HarmonicModelCosineSine(
 					freq * delta_t / 365.25,
 					cos, sin,
 				)
 			else:
-				amp = pm.Normal("amp{0}".format(freq), mu=0., sd=max_amp)
-				phase = pm.Normal("phase{0}".format(freq), mu=0., sd=max_amp)
+				amp = pm.Normal("amp{0}".format(freq), mu=0., sigma=max_amp)
+				phase = pm.Normal("phase{0}".format(freq), mu=0., sigma=max_amp)
 				harm = HarmonicModelAmpPhase(
 					freq * delta_t / 365.25,
 					amp, phase,
