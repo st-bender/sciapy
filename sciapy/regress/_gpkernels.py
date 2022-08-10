@@ -55,7 +55,7 @@ celerite_terms = {
 						# The `celerite` version of the Matern-3/2
 						# kernel has problems with very large `log_rho`
 						# values. -7.4 is empirical.
-						"log_rho": [-7.4, 16]}),
+						"log_rho": [-7.4, 15]}),
 	"SHO0": terms.SHOTerm(log_S0=-6, log_Q=1.0 / np.sqrt(2.), log_omega0=0.,
 				bounds={"log_S0": [-30, 30],
 						"log_Q": [-30, 30],
