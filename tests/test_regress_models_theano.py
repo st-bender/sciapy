@@ -57,8 +57,8 @@ def test_harmonics_theano(xs, c, s):
 	yp += 0.5 * np.random.randn(xs.shape[0])
 
 	with pm.Model() as model1:
-		cos = pm.Normal("cos", mu=0.0, sd=4.0)
-		sin = pm.Normal("sin", mu=0.0, sd=4.0)
+		cos = pm.Normal("cos", mu=0.0, sigma=4.0)
+		sin = pm.Normal("sin", mu=0.0, sigma=4.0)
 		harm1 = HarmonicModelCosineSine(1., cos, sin)
 		wave1 = harm1.get_value(xs)
 		# add amplitude and phase for comparison
@@ -70,7 +70,7 @@ def test_harmonics_theano(xs, c, s):
 
 	with pm.Model() as model2:
 		amp2 = pm.HalfNormal("amp", sigma=4.0)
-		phase2 = pm.Normal("phase", mu=0.0, sd=4.0)
+		phase2 = pm.Normal("phase", mu=0.0, sigma=4.0)
 		harm2 = HarmonicModelAmpPhase(1., amp2, phase2)
 		wave2 = harm2.get_value(xs)
 		resid2 = yp - wave2
@@ -122,16 +122,16 @@ def test_proxy_theano(xs, c=3.0, s=1.0):
 	# using "name" prefixes all variables with <name>_
 	with pm.Model(name="proxy") as model:
 		# amplitude
-		plamp = pm.Normal("log_amp", mu=0.0, sd=np.log(10.0))
+		plamp = pm.Normal("log_amp", mu=0.0, sigma=np.log(10.0))
 		pamp = pm.Deterministic("amp", pm.math.exp(plamp))
 		# lag
-		pllag = pm.Normal("log_lag", mu=0.0, sd=np.log(10.0))
+		pllag = pm.Normal("log_lag", mu=0.0, sigma=np.log(10.0))
 		plag = pm.Deterministic("lag", pm.math.exp(pllag))
 		# lifetime
-		pltau0 = pm.Normal("log_tau0", mu=0.0, sd=np.log(10.0))
+		pltau0 = pm.Normal("log_tau0", mu=0.0, sigma=np.log(10.0))
 		ptau0 = pm.Deterministic("tau0", pm.math.exp(pltau0))
-		cos1 = pm.Normal("tau_cos1", mu=0.0, sd=10.0)
-		sin1 = pm.Normal("tau_sin1", mu=0.0, sd=10.0)
+		cos1 = pm.Normal("tau_cos1", mu=0.0, sigma=10.0)
+		sin1 = pm.Normal("tau_sin1", mu=0.0, sigma=10.0)
 		harm1 = HarmonicModelCosineSine(1., cos1, sin1)
 		tau1 = LifetimeModel(harm1, lower=0)
 
@@ -145,8 +145,8 @@ def test_proxy_theano(xs, c=3.0, s=1.0):
 		)
 		prox1 = proxy.get_value(xs)
 		# Include "jitter"
-		log_jitter = pm.Normal("log_jitter", mu=0.0, sd=4.0)
-		pm.Normal("obs", mu=prox1, sd=pm.math.exp(log_jitter), observed=yp)
+		log_jitter = pm.Normal("log_jitter", mu=0.0, sigma=4.0)
+		pm.Normal("obs", mu=prox1, sigma=pm.math.exp(log_jitter), observed=yp)
 
 		maxlp0 = pm.find_MAP()
 		trace = pm.sample(
