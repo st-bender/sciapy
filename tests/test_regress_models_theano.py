@@ -16,7 +16,6 @@ import pytest
 
 try:
 	import pymc3 as pm
-	import arviz as az
 except ImportError:
 	pytest.skip("Theano/PyMC3 packages not installed", allow_module_level=True)
 
