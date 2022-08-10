@@ -159,12 +159,14 @@ def test_proxy_theano(xs, c=3.0, s=1.0):
 		)
 
 	medians = trace.posterior.median(dim=("chain", "draw"))
+	var_names = [
+		model.name_for(n)
+		for n in [
+			"amp", "lag", "tau0", "tau_cos1", "tau_sin1", "log_jitter",
+		]
+	]
 	np.testing.assert_allclose(
-		medians[[
-			"proxy_amp", "proxy_lag", "proxy_tau0",
-			"proxy_tau_cos1", "proxy_tau_sin1",
-			"proxy_log_jitter",
-		]].to_array(),
+		medians[var_names].to_array(),
 		(3., 2., 1., c, s, np.log(0.5)),
 		atol=3e-2, rtol=1e-2,
 	)
