@@ -64,8 +64,7 @@ def test_harmonics_theano(xs, c, s):
 		# add amplitude and phase for comparison
 		pm.Deterministic("amp", harm1.get_amplitude())
 		pm.Deterministic("phase", harm1.get_phase())
-		resid1 = yp - wave1
-		pm.Normal("obs", mu=0.0, observed=resid1)
+		pm.Normal("obs", mu=wave1, observed=yp)
 		trace1 = pm.sample(tune=400, draws=400, chains=2, return_inferencedata=True)
 
 	with pm.Model() as model2:
@@ -73,8 +72,7 @@ def test_harmonics_theano(xs, c, s):
 		phase2 = pm.Normal("phase", mu=0.0, sigma=4.0)
 		harm2 = HarmonicModelAmpPhase(1., amp2, phase2)
 		wave2 = harm2.get_value(xs)
-		resid2 = yp - wave2
-		pm.Normal("obs", mu=0.0, observed=resid2)
+		pm.Normal("obs", mu=wave2, observed=yp)
 		trace2 = pm.sample(tune=400, draws=400, chains=2, return_inferencedata=True)
 
 	np.testing.assert_allclose(
