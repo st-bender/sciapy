@@ -405,6 +405,9 @@ def trace_gas_modelset(constant=True, freqs=None, proxy_config=None, **kwargs):
 		* max_days : float
 			Maximum magnitude of the lifetimes, used to constrain the
 			parameter search.
+		* model_kwargs : dict
+			Keyword arguments passed to ``pymc.Model()``, e.g. ``name``
+			or ``coords``.
 
 	Returns
 	-------
@@ -427,10 +430,12 @@ def trace_gas_modelset(constant=True, freqs=None, proxy_config=None, **kwargs):
 	max_amp = kwargs.pop("max_amp", 1e10 * scale)
 	max_days = kwargs.pop("max_days", 100)
 
+	model_kwargs = kwargs.pop("model_kwargs", {})
+
 	freqs = freqs or []
 	proxy_config = proxy_config or _default_proxy_config(tfmt=tfmt)
 
-	with pm.Model() as model:
+	with pm.Model(**model_kwargs) as model:
 		offset = 0.
 		if constant:
 			offset = pm.Normal("offset", mu=0.0, sigma=max_amp)
