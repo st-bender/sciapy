@@ -156,11 +156,13 @@ class LifetimeModel:
 		return tt.maximum(self.lower, tau_cs)
 
 
-def _interp(x, xs, ys, fill_value=0.):
+def _interp(x, xs, ys, fill_value=0., interpolate=True):
 	idx = xs.searchsorted(x)
 	out_of_bounds = tt.zeros(x.shape[:-1], dtype=bool)
 	out_of_bounds |= (idx < 1) | (idx >= xs.shape[0])
 	idx = tt.clip(idx, 1, xs.shape[0] - 1)
+	if not interpolate:
+		return tt.switch(out_of_bounds, fill_value, ys[idx - 1])
 	dl = x - xs[idx - 1]
 	dr = xs[idx] - x
 	d = dl + dr
@@ -256,12 +258,13 @@ class ProxyModel:
 			)
 		return yp * self.dt
 
-	def get_value(self, t):
+	def get_value(self, t, interpolate=True):
 		t = tt.as_tensor_variable(t).astype("float64")
 		tp = t - self.lag
 		proxy_val = _interp(
 			tp,
 			self.times, self.values,
+			interpolate=interpolate,
 		)
 		if self.tau_scan == 0:
 			# no lifetime, nothing else to do
@@ -270,6 +273,8 @@ class ProxyModel:
 		if self.tau_harm is not None:
 			tau_cs = self.tau_harm.get_value(t + self.t_adj)
 			tau += tau_cs
+		# interpolate the life time convolution,
+		# the proxy values might be too sparsely sampled
 		proxy_val += self._lt_corr(tp, tau)
 		return self.amp * proxy_val
 
