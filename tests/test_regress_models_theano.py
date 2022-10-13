@@ -114,13 +114,20 @@ def _yy(x, c, s):
 
 
 @pytest.mark.long
-def test_proxy_theano(xx, f=1, c=3.0, s=1.0):
+@pytest.mark.parametrize(
+	"f",
+	[1., 1. / 365.25]
+)
+def test_proxy_theano(xx, f, c=3.0, s=1.0):
 	# Initialize random number generator
 	np.random.seed(93457)
 
 	dx = 1. / (f * 365.25)
-	# convert to fractional years
-	xs = 1859 + (xx - 44.25) * dx
+	if f < 1.:
+		xs = xx * dx
+	else:
+		# convert to fractional years
+		xs = 1859 + (xx - 44.25) * dx
 	# proxy "values"
 	values = _yy(xs, c, s)
 
