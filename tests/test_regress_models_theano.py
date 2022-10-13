@@ -31,8 +31,9 @@ except ImportError:
 
 
 @pytest.fixture(scope="module")
-def xs():
-	_xs = np.linspace(0., 11.1, 2048)
+def xx():
+	# modified Julian days, 2 years from 2000-01-01
+	_xs = 51544.5 + np.arange(0., 2 * 365. + 1, 1.)
 	return np.ascontiguousarray(_xs, dtype=np.float64)
 
 
@@ -49,9 +50,11 @@ def ys(xs, c, s):
 		(1.0, 1.0),
 	]
 )
-def test_harmonics_theano(xs, c, s):
+def test_harmonics_theano(xx, c, s):
 	# Initialize random number generator
 	np.random.seed(93457)
+	# convert to fractional years
+	xs = 1859 + (xx - 44.25) / 365.25
 	yp = ys(xs, c, s)
 	yp += 0.5 * np.random.randn(xs.shape[0])
 
@@ -77,12 +80,12 @@ def test_harmonics_theano(xs, c, s):
 	np.testing.assert_allclose(
 		trace1.posterior.median(dim=("chain", "draw"))[["cos", "sin"]].to_array(),
 		(c, s),
-		atol=1e-2,
+		atol=2e-2,
 	)
 	np.testing.assert_allclose(
 		trace1.posterior.median(dim=("chain", "draw"))[["amp", "phase"]].to_array(),
 		trace2.posterior.median(dim=("chain", "draw"))[["amp", "phase"]].to_array(),
-		atol=4e-3,
+		atol=6e-3,
 	)
 
 
@@ -115,6 +118,9 @@ def test_proxy_theano(xx, f=1, c=3.0, s=1.0):
 	# Initialize random number generator
 	np.random.seed(93457)
 
+	dx = 1. / (f * 365.25)
+	# convert to fractional years
+	xs = 1859 + (xx - 44.25) * dx
 	# proxy "values"
 	values = _yy(xs, c, s)
 
