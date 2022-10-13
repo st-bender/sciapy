@@ -234,7 +234,6 @@ class ProxyModel:
 			# modified julian days. It should be pretty safe to judge on
 			# that for most use cases.
 			self.t_adj = tt.switch(tt.gt(self.times[0], 1.8e6), 13., -44.25)
-		self.t_adj = tt.as_tensor_variable(self.t_adj).astype("float64")
 
 	def _lt_corr(self, t, tau):
 		"""Lifetime corrected values
