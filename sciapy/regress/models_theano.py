@@ -235,7 +235,7 @@ class ProxyModel:
 			# that for most use cases.
 			self.t_adj = tt.switch(tt.gt(self.times[0], 1.8e6), 13., -44.25)
 
-	def _lt_corr(self, t, tau):
+	def _lt_corr(self, t, tau, interpolate=True):
 		"""Lifetime corrected values
 
 		Corrects for a finite lifetime by summing over the last `tmax`
@@ -249,6 +249,7 @@ class ProxyModel:
 			yp += taufac * _interp(
 				t - b,
 				self.times, self.values,
+				interpolate=interpolate,
 			)
 		return yp * self.dt
 
@@ -269,7 +270,7 @@ class ProxyModel:
 			tau += tau_cs
 		# interpolate the life time convolution,
 		# the proxy values might be too sparsely sampled
-		proxy_val += self._lt_corr(tp, tau)
+		proxy_val += self._lt_corr(tp, tau, interpolate=True)
 		return self.amp * proxy_val
 
 
