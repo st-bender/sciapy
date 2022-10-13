@@ -166,11 +166,8 @@ def test_proxy_theano(xx, f, c=3.0, s=1.0):
 			chains=2,
 			draws=400,
 			tune=400,
-			init="jitter+adapt_full",
 			random_seed=[286923464, 464329682],
 			return_inferencedata=True,
-			start=maxlp0,
-			target_accept=0.9,
 		)
 
 	medians = trace.posterior.median(dim=("chain", "draw"))
