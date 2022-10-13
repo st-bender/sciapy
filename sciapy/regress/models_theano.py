@@ -157,7 +157,7 @@ class LifetimeModel:
 
 
 def _interp(x, xs, ys, fill_value=0., interpolate=True):
-	idx = xs.searchsorted(x)
+	idx = xs.searchsorted(x, side="right")
 	out_of_bounds = tt.zeros(x.shape[:-1], dtype=bool)
 	out_of_bounds |= (idx < 1) | (idx >= xs.shape[0])
 	idx = tt.clip(idx, 1, xs.shape[0] - 1)
