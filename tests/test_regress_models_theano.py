@@ -111,14 +111,14 @@ def _yy(x, c, s):
 
 
 @pytest.mark.long
-def test_proxy_theano(xs, c=3.0, s=1.0):
+def test_proxy_theano(xx, f=1, c=3.0, s=1.0):
 	# Initialize random number generator
 	np.random.seed(93457)
 
 	# proxy "values"
 	values = _yy(xs, c, s)
 
-	yp = _test_data(xs, values, 1, c, s)
+	yp = _test_data(xs, values, f, c, s)
 	yp += 0.5 * np.random.randn(xs.shape[0])
 
 	# using "name" prefixes all variables with <name>_
@@ -131,7 +131,7 @@ def test_proxy_theano(xs, c=3.0, s=1.0):
 		ptau0 = pm.Lognormal("tau0", mu=0.0, sigma=4.0, testval=1.0)
 		cos1 = pm.Normal("tau_cos1", mu=0.0, sigma=10.0)
 		sin1 = pm.Normal("tau_sin1", mu=0.0, sigma=10.0)
-		harm1 = HarmonicModelCosineSine(1., cos1, sin1)
+		harm1 = HarmonicModelCosineSine(f, cos1, sin1)
 		tau1 = LifetimeModel(harm1, lower=0)
 
 		proxy = ProxyModel(
@@ -141,6 +141,7 @@ def test_proxy_theano(xs, c=3.0, s=1.0):
 			tau0=ptau0,
 			tau_harm=tau1,
 			tau_scan=10,
+			days_per_time_unit=f * 365.25,
 		)
 		prox1 = proxy.get_value(xs)
 		# Include "jitter"
