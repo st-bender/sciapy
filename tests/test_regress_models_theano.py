@@ -124,14 +124,11 @@ def test_proxy_theano(xs, c=3.0, s=1.0):
 	# using "name" prefixes all variables with <name>_
 	with pm.Model(name="proxy") as model:
 		# amplitude
-		plamp = pm.Normal("log_amp", mu=0.0, sigma=np.log(10.0))
-		pamp = pm.Deterministic("amp", pm.math.exp(plamp))
+		pamp = pm.Normal("amp", mu=0.0, sigma=4.0)
 		# lag
-		pllag = pm.Normal("log_lag", mu=0.0, sigma=np.log(10.0))
-		plag = pm.Deterministic("lag", pm.math.exp(pllag))
+		plag = pm.Lognormal("lag", mu=0.0, sigma=4.0, testval=1.0)
 		# lifetime
-		pltau0 = pm.Normal("log_tau0", mu=0.0, sigma=np.log(10.0))
-		ptau0 = pm.Deterministic("tau0", pm.math.exp(pltau0))
+		ptau0 = pm.Lognormal("tau0", mu=0.0, sigma=4.0, testval=1.0)
 		cos1 = pm.Normal("tau_cos1", mu=0.0, sigma=10.0)
 		sin1 = pm.Normal("tau_sin1", mu=0.0, sigma=10.0)
 		harm1 = HarmonicModelCosineSine(1., cos1, sin1)
