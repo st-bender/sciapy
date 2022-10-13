@@ -228,17 +228,12 @@ class ProxyModel:
 		# seasonal variation. The julian epoch (the default)
 		# is slightly offset with respect to (modified) julian days.
 		self.t_adj = 0.
-		if self.days_per_time_unit == 1:
+		if days_per_time_unit == 1.:
 			# discriminate between julian days and modified julian days,
 			# 1.8e6 is year 216 in julian days and year 6787 in
 			# modified julian days. It should be pretty safe to judge on
 			# that for most use cases.
-			if self.times[0] > 1.8e6:
-				# julian days
-				self.t_adj = 13.
-			else:
-				# modified julian days
-				self.t_adj = -44.25
+			self.t_adj = tt.switch(tt.gt(self.times[0], 1.8e6), 13., -44.25)
 		self.t_adj = tt.as_tensor_variable(self.t_adj).astype("float64")
 
 	def _lt_corr(self, t, tau):
