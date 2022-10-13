@@ -86,13 +86,11 @@ def test_harmonics_theano(xs, c, s):
 	)
 
 
-def _test_data(xs, c, s):
-	# generate proxy "values"
-	values = ys(xs, c, s)
+def _test_data(xs, values, f, c, s):
 	amp = 3.
 	lag = 2.
 	tau0 = 1.
-	harm0 = HarmonicModelCosineSine(1., c, s)
+	harm0 = HarmonicModelCosineSine(f, c, s)
 	tau_lt0 = LifetimeModel(harm0, lower=0.)
 	proxy0 = ProxyModel(
 		xs, values,
@@ -101,6 +99,7 @@ def _test_data(xs, c, s):
 		tau0=tau0,
 		tau_harm=tau_lt0,
 		tau_scan=10,
+		days_per_time_unit=f * 365.25,
 	)
 	return proxy0.get_value(xs).eval()
 
@@ -113,7 +112,7 @@ def test_proxy_theano(xs, c=3.0, s=1.0):
 	# proxy "values"
 	values = ys(xs, c, s)
 
-	yp = _test_data(xs, c, s)
+	yp = _test_data(xs, values, 1, c, s)
 	yp += 0.5 * np.random.randn(xs.shape[0])
 
 	# using "name" prefixes all variables with <name>_
