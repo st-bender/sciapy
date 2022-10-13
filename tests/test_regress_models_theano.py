@@ -85,7 +85,7 @@ def test_harmonics_theano(xx, c, s):
 	np.testing.assert_allclose(
 		trace1.posterior.median(dim=("chain", "draw"))[["amp", "phase"]].to_array(),
 		trace2.posterior.median(dim=("chain", "draw"))[["amp", "phase"]].to_array(),
-		atol=6e-3,
+		atol=8e-3,
 	)
 
 
@@ -180,5 +180,5 @@ def test_proxy_theano(xx, f, c=3.0, s=1.0):
 	np.testing.assert_allclose(
 		medians[var_names].to_array(),
 		(3., 2., 1., c, s, np.log(0.5)),
-		atol=3e-2, rtol=1e-2,
+		atol=4e-2, rtol=1e-2,
 	)
