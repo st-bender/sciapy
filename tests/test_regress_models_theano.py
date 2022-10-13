@@ -104,13 +104,19 @@ def _test_data(xs, values, f, c, s):
 	return proxy0.get_value(xs).eval()
 
 
+def _yy(x, c, s):
+	_ys = np.zeros_like(x)
+	_ys[10::20] = 10.
+	return np.ascontiguousarray(_ys, dtype=np.float64)
+
+
 @pytest.mark.long
 def test_proxy_theano(xs, c=3.0, s=1.0):
 	# Initialize random number generator
 	np.random.seed(93457)
 
 	# proxy "values"
-	values = ys(xs, c, s)
+	values = _yy(xs, c, s)
 
 	yp = _test_data(xs, values, 1, c, s)
 	yp += 0.5 * np.random.randn(xs.shape[0])
