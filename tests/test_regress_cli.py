@@ -90,7 +90,8 @@ def test_main_lin_gp(tmpdir, optimize):
 
 
 @mark.long
-def test_main_nonlin_gp(tmpdir):
+@mark.parametrize("gpopts", [(), ("-g",), ("-g", "-H")])
+def test_main_nonlin_gp(tmpdir, gpopts):
 	p = Popen(["python", "-m", "sciapy.regress",
 			DATA_FILE,
 			"-o", tmpdir,
@@ -106,7 +107,6 @@ def test_main_nonlin_gp(tmpdir):
 			"--cnt_threshold=3",
 			"--akd_threshold=0.01",
 			"-K", "Mat32",
-			"-g",
 			"-O1",
 			"-w", "4",
 			"-b", "10",
@@ -119,6 +119,7 @@ def test_main_nonlin_gp(tmpdir):
 			"--no-plot_samples",
 			"--random_seed=1234",
 			"-q",
+			*gpopts,
 			])
 	p.communicate()
 	p.wait()
