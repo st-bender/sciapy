@@ -321,8 +321,10 @@ def main():
 			solver=george_solvers[solver], **skwargs)
 		# the george interface does not allow setting the bounds in
 		# the kernel initialization so we prepare simple default bounds
-		kernel_bounds = [(-0.3 * max_amp, 0.3 * max_amp)
-				for _ in gpmodel.kernel.get_parameter_names()]
+		kernel_bounds = [(-0.3 * max_amp, 0.3 * max_amp)] * args.fit_white + [
+			(-0.3 * max_amp, 0.3 * max_amp)
+			for _ in gpmodel.kernel.get_parameter_names()
+		]
 		bounds = gpmodel.mean.get_parameter_bounds() + kernel_bounds
 	else:
 		gpname, cel_terms = setup_celerite_terms(kernls,
