@@ -68,6 +68,8 @@ jobs:
       - name: Test
         run: |
           py.test -v --cov sciapy
+      - name: Upload to scrutinizer
+        run: ocular
       - name: Convert coverage
         run: python -m coverage xml
       - name: Upload coverage report
