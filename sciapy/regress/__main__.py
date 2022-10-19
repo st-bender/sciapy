@@ -70,7 +70,7 @@ def save_samples_netcdf(filename, model, alt, lat, samples,
 				"tau": "d"}}
 	for pname in smpl_ds.data_vars:
 		_pp = pname.split(':')
-		for _n, _u in units[_pp[0]].items():
+		for _n, _u in units.get(_pp[0], {}).items():
 			if _pp[-1].startswith(_n):
 				logging.debug("units for %s: %s", pname, _u)
 				smpl_ds[pname].attrs["units"] = _u
