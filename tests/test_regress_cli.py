@@ -119,8 +119,7 @@ def test_main_nonlin_gp(tmpdir, gpopts):
 			"--no-plot_samples",
 			"--random_seed=1234",
 			"-q",
-			*gpopts,
-			])
+			] + list(gpopts))
 	p.communicate()
 	p.wait()
 	assert p.returncode == 0
