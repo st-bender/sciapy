@@ -10,10 +10,8 @@ here = path.abspath(path.dirname(__file__))
 
 extras_require = {
 	"msis": ["nrlmsise00"],
-	"pymc3": ["pymc3>=3.9, <3.12", "aesara-theano-fallback>=0.0.2"],
 	"tests": ["nrlmsise00", "pytest"],
 }
-extras_require["theano"] = extras_require["pymc3"]
 extras_require["all"] = sorted(
 	{v for req in extras_require.values() for v in req},
 )
@@ -85,6 +83,7 @@ if __name__ == "__main__":
 			'corner',
 			'george',
 			'emcee',
+			'regressproxy',
 		],
 		extras_require=extras_require,
 		license='GPLv2',

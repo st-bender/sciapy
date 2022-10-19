@@ -29,8 +29,9 @@ import matplotlib as mpl
 # switch off X11 rendering
 mpl.use("Agg")
 
+from regressproxy.models_cel import proxy_model_set as trace_gas_model
+
 from .load_data import load_solar_gm_table, load_scia_dzm
-from .models_cel import trace_gas_model
 from .mcmc import mcmc_sample_model
 from .statistics import mcmc_statistics
 
