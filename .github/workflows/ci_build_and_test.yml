@@ -25,18 +25,18 @@ jobs:
             allow-failure: true
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: sudo apt-get update
       - name: Install apt packages
         run: sudo apt-get install --no-install-recommends libhdf5-dev libnetcdf-dev netcdf-bin
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           key: ${{ runner.os}}-pip-${{ matrix.python-version }}
           path: ~/.cache/pip
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -71,7 +71,7 @@ jobs:
       - name: Convert coverage
         run: python -m coverage xml
       - name: Upload coverage report
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
 
       - name: Upload to Coveralls
         if: matrix.python-version != '2.7'
@@ -87,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.9"
       - name: Finish coverage collection
@@ -103,9 +103,9 @@ jobs:
     needs: build_and_test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - name: Install dependencies
