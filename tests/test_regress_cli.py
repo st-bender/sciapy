@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # vim:fileencoding=utf-8
 #
-# Copyright (c) 2019 Stefan Bender
+# Copyright (c) 2019-2022 Stefan Bender
 #
 # This module is part of sciapy.
 # sciapy is free software: you can redistribute it or modify
