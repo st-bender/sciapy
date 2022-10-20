@@ -200,8 +200,10 @@ parser.add_argument("-O", "--optimize", type=int, default="1",
 		"4: least squares curve fitting (experimental) "
 		"(default: %(default)s)")
 parser.add_argument("-N", "--openblas_threads", metavar="N",
-		type=int, default=1,
-		help="Use N OpenBlas threads (default: %(default)s)")
+		type=int, default=None,
+		help="Use N OpenMP/OpenBlas threads. If not set uses the "
+		"environment settings (OMP_NUM_THREADS and OPENBLAS_NUM_THREADS) "
+		"or the library's default (default: %(default)s)")
 parser.add_argument("-S", "--random_seed", metavar="VALUE",
 		type=int, default=None,
 		help="Use a particular random seed to obtain "

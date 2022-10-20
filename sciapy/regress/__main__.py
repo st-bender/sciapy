@@ -16,7 +16,7 @@ daily zonal mean time series (NO for now).
 
 import ctypes
 import logging
-from os import path
+from os import environ, path
 
 import numpy as np
 import scipy.optimize as op
@@ -163,22 +163,11 @@ def main():
 	else:
 		logging.getLogger().setLevel(args.loglevel)
 
-	from numpy.distutils.system_info import get_info
-	try:
-		ob_lib_dirs = get_info("openblas")["library_dirs"]
-	except KeyError:
-		ob_lib_dirs = []
-	for oblas_path in ob_lib_dirs:
-		oblas_name = "{0}/libopenblas.so".format(oblas_path)
-		logging.info("Trying %s", oblas_name)
-		try:
-			oblas_lib = ctypes.cdll.LoadLibrary(oblas_name)
-			oblas_cores = oblas_lib.openblas_get_num_threads()
-			oblas_lib.openblas_set_num_threads(args.openblas_threads)
-			logging.info("Using %s/%s Openblas thread(s).",
-					oblas_lib.openblas_get_num_threads(), oblas_cores)
-		except:
-			logging.info("Setting number of openblas threads failed.")
+	if args.openblas_threads is not None:
+		# Sets OpenMP/Openblas number of threads if set,
+		# else uses the environment's and library's defaults
+		environ["OMP_NUM_THREADS"] = str(args.openblas_threads)
+		environ["OPENBLAS_NUM_THREADS"] = str(args.openblas_threads)
 
 	if args.random_seed is not None:
 		np.random.seed(args.random_seed)
