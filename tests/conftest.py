@@ -18,6 +18,12 @@ import tempfile
 import pytest
 
 
+def pytest_configure(config):
+	config.addinivalue_line(
+		"markers", "long: tests that need probably a bit longer to run."
+	)
+
+
 @pytest.fixture(scope="session")
 def tmpdir():
 	tmpdir = tempfile.mkdtemp()
