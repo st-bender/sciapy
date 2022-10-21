@@ -13,4 +13,3 @@ SCIAMACHY level 2 number density data (only NO for now).
 
 from .load_data import *
 from .mcmc import *
-from .models_cel import *
