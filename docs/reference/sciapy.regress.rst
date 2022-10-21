@@ -21,19 +21,3 @@ sciapy.regress.mcmc
     :members:
     :undoc-members:
     :show-inheritance:
-
-sciapy.regress.models\_cel
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. automodule:: sciapy.regress.models_cel
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-sciapy.regress.models\_theano
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. automodule:: sciapy.regress.models_theano
-    :members:
-    :undoc-members:
-    :show-inheritance:
