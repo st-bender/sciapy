@@ -156,3 +156,10 @@ $ pydoc sciapy.level1c
 $ pydoc sciapy.level2
 $ pydoc sciapy.regress
 ```
+
+## License
+
+This python package is free software: you can redistribute it or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 2 (GPLv2), see [local copy](./LICENSE)
+or [online version](http://www.gnu.org/licenses/gpl-2.0.html).
