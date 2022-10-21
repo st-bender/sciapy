@@ -48,6 +48,8 @@ The level 2 tools also include a simple binning algorithm.
 
 The `sciapy.regress` submodule can be used for regression analysis of SCIAMACHY
 level 2 trace gas density time series, either directly or as daily zonal means.
+It uses the [`regressproxy`](https://regressproxy.readthedocs.io) package
+for modelling the proxy input with lag and lifetime decay.
 The regression tools support various parameter fitting methods using
 [`scipy.optimize`](https://docs.scipy.org/doc/scipy/reference/optimize.html)
 and uncertainty evaluation using Markov-Chain Monte-Carlo sampling with
@@ -82,7 +84,8 @@ install some of the important packages beforehand:
 - `celerite` at least version 0.3.0 and
 - `george` for Gaussian process modelling,
 - `emcee` for MCMC sampling and
-- `corner` for the sample histogram plots.
+- `corner` for the sample histogram plots,
+- `regressproxy` for the regression proxy modelling.
 
 Out of these packages, `numpy` is probably the most important one
 to be installed first because at least `celerite` needs it for setup.
