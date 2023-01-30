@@ -113,16 +113,11 @@ def bin_lat_timeavg(ds, binvar="latitude", tvar="time",
 	# adjust the time variable
 	if np.issubdtype(ds[tvar].values[0], np.floating):
 		# convert floats to datetime first (probably MLT states)
-		try:
-			# xarray <= 0.9.6
-			date = (xr.conventions.decode_cf_variable(ds[tvar])
-				.values[0]
-				.astype("datetime64[D]"))
-		except TypeError:
-			# xarray => 0.10.0
-			date = (xr.conventions.decode_cf_variable(tvar, ds[tvar])
-				.values[0]
-				.astype("datetime64[D]"))
+		date = (
+			xr.conventions.decode_cf(ds[[tvar]])[tvar]
+			.values[0]
+			.astype("datetime64[D]")
+		)
 	else:
 		date = ds[tvar].values[0].astype('datetime64[D]')
 	if not hasattr(ds, binvar):
