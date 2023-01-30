@@ -22,8 +22,10 @@ jobs:
         include:
           - python-version: "3.5"
             os: ubuntu-20.04
+            allow-failure: false
           - python-version: "3.6"
             os: ubuntu-20.04
+            allow-failure: false
 
     steps:
       - uses: actions/checkout@v3
