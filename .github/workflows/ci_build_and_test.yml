@@ -26,6 +26,12 @@ jobs:
           - python-version: "3.6"
             os: ubuntu-20.04
             allow-failure: false
+          - python-version: "3.11"
+            os: ubuntu-latest
+            allow-failure: true
+          - python-version: "3.12"
+            os: ubuntu-latest
+            allow-failure: true
 
     steps:
       - uses: actions/checkout@v3
