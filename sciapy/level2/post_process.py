@@ -734,7 +734,7 @@ def sddata_set_attrs(
 	# 	sdday_ds[var].attrs = _attrs
 
 	dateo = pd.to_datetime(
-			xr.conventions.decode_cf_variable("date", sdday_ds.time).data[0],
+			xr.conventions.decode_cf(sdday_ds[["time"]]).time.data[0],
 			utc=True,
 	).strftime("%Y-%m-%d")
 	logging.debug("date %s dataset: %s", dateo, sdday_ds)

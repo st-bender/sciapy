@@ -686,7 +686,7 @@ def sddata_xr_set_attrs(
 	sdday_xr.attrs["software"] = "sciapy {0}".format(__version__)
 
 	dateo = pd.to_datetime(
-			xr.conventions.decode_cf_variable("date", sdday_xr.time).data[0],
+			xr.conventions.decode_cf(sdday_xr[["time"]]).time.data[0],
 			utc=True,
 	).strftime("%Y-%m-%d")
 	logging.debug("date %s dataset: %s", dateo, sdday_xr)
