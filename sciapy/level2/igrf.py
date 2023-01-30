@@ -80,7 +80,7 @@ def _load_igrf_file(filename="IGRF.tab"):
 	"""
 	igrf_tab = np.genfromtxt(filename, skip_header=3, dtype=None)
 
-	sv = igrf_tab[igrf_tab.dtype.names[-1]][1:].astype(np.float)
+	sv = igrf_tab[igrf_tab.dtype.names[-1]][1:].astype(np.float64)
 
 	years = np.asarray(igrf_tab[0].tolist()[3:-1])
 	years = np.append(years, [years[-1] + 5])
