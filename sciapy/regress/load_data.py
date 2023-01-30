@@ -244,12 +244,7 @@ def load_scia_dzm(filename, alt, lat, tfmt="jyear",
 				chunks={"time": 400, "latitude": 9, "altitude": 11})
 	logging.info("done.")
 	# Decode time coordinate for selection
-	try:
-		# xarray <= 0.9.6
-		NO_ds["time"] = xr.conventions.decode_cf_variable(NO_ds.time)
-	except TypeError:
-		# xarray => 0.10.0
-		NO_ds["time"] = xr.conventions.decode_cf_variable("time", NO_ds.time)
+	NO_ds["time"] = xr.conventions.decode_cf(NO_ds[["time"]]).time
 
 	NO_mean = 0.
 	if center:
